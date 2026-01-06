@@ -1,0 +1,24 @@
+/* 深色主题 */
+@import './variables.css';
+
+body[data-theme='dark'] {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+body[data-theme='dark'] .card {
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+}
+
+body[data-theme='dark'] .button {
+  background-color: var(--primary-color);
+}
+
+body[data-theme='dark'] .button:hover {
+  background-color: var(--primary-hover-color);
+}
+
+body[data-theme='dark'] .button:active {
+  background-color: var(--primary-active-color);
+}

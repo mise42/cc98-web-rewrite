@@ -1,0 +1,9 @@
+# Ignore vendor legacy code
+src/lib/ubb/
+src/types/api/
+
+# Ignore config files
+playwright.config.ts
+vitest.config.ts
+vite.config.ts
+tests/setup.ts

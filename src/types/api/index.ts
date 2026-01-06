@@ -1,0 +1,21 @@
+// API 类型定义
+// 从 vendor/cc98-web-upstream/@types/@cc98 复制并调整
+
+export * from './IAward'
+export * from './IBasicTopic'
+export * from './IBasicUser'
+export * from './IBoard'
+export * from './IBoardMasterTitle'
+export * from './IConfig'
+export * from './IHotTopic'
+export * from './IIndex'
+export * from './ILike'
+export * from './IMessageContent'
+export * from './IPost'
+export * from './IRecentMessage'
+export * from './IRecommendationReading'
+export * from './ISignIn'
+export * from './ISite'
+export * from './ITag'
+export * from './ITopic'
+export * from './IUser'
