@@ -43,7 +43,11 @@ export const useAuthStore = create<AuthState>()(
           set({
             error: error instanceof Error ? error.message : '登录失败',
             isLoading: false,
+            isAuthenticated: false,
+            user: null,
           })
+          // 重新抛出错误，让调用方能够捕获
+          throw error
         }
       },
 

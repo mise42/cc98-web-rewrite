@@ -116,7 +116,7 @@ export const authService = {
    * 获取当前登录用户信息
    */
   async getCurrentUser(): Promise<IUser> {
-    return apiClient.get<IUser>('/user/me')
+    return apiClient.get<IUser>('/me')
   },
 
   /**
