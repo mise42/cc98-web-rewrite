@@ -10,7 +10,13 @@ export function RootLayout() {
   return (
     <div className="main-container">
       <Header />
-      <main style={{ minHeight: 'calc(100vh - 200px)' }}>
+      <main
+        style={{
+          minHeight: 'calc(100vh - 64px - 200px)',
+          marginTop: '64px',
+          padding: '2rem',
+        }}
+      >
         <Outlet />
       </main>
       <Footer />
