@@ -3,16 +3,15 @@ import { useNavigate, useLocation } from 'react-router'
 import { Form, Input, Button, Card, message, Space, Divider } from 'antd'
 import { UserOutlined, LockOutlined, LoginOutlined } from '@ant-design/icons'
 import { useAuth } from '@/hooks/useAuth'
-import { authService } from '@/services/auth'
 
 /**
  * 登录页组件
- * 支持用户名密码登录和 OAuth2 登录
+ * 使用 OAuth2 Password Grant 模式（用户名密码登录）
  */
 export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { login, loginWithOAuth, isAuthenticated, isLoading } = useAuth()
+  const { login, isAuthenticated, isLoading } = useAuth()
   const [form] = Form.useForm()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -24,7 +23,7 @@ export function LoginPage() {
     }
   }, [isAuthenticated, isLoading, navigate, location])
 
-  // 用户名密码登录
+  // 用户名密码登录（OAuth2 Password Grant）
   const handlePasswordLogin = async (values: { username: string; password: string }) => {
     try {
       setIsSubmitting(true)
@@ -38,19 +37,6 @@ export function LoginPage() {
         message.error('登录失败，请稍后重试')
       }
     } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  // OAuth2 登录
-  const handleOAuthLogin = async () => {
-    try {
-      setIsSubmitting(true)
-      // 直接调用 authService 的 loginWithOAuth 方法
-      await authService.loginWithOAuth()
-      // OAuth2 会跳转到外部登录页面，不需要处理跳转
-    } catch (error) {
-      message.error('OAuth2 登录失败，请稍后重试')
       setIsSubmitting(false)
     }
   }
@@ -92,6 +78,7 @@ export function LoginPage() {
               placeholder="用户名"
               size="large"
               disabled={isSubmitting}
+              autoComplete="username"
             />
           </Form.Item>
 
@@ -107,6 +94,7 @@ export function LoginPage() {
               placeholder="密码"
               size="large"
               disabled={isSubmitting}
+              autoComplete="current-password"
             />
           </Form.Item>
 
@@ -124,22 +112,25 @@ export function LoginPage() {
           </Form.Item>
         </Form>
 
-        <Divider>或</Divider>
-
-        <Button
-          size="large"
-          onClick={handleOAuthLogin}
-          loading={isSubmitting}
-          block
-          style={{ marginBottom: '1rem' }}
-        >
-          使用 OAuth2 登录
-        </Button>
-
+        <Divider />
         <div style={{ textAlign: 'center', fontSize: '0.875rem', color: '#999' }}>
           还没有账号？
-          <a href="https://account.cc98.org/" target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://account.cc98.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ marginLeft: '0.5rem', color: '#1890ff' }}
+          >
             立即注册
+          </a>
+          <Divider type="vertical" />
+          <a
+            href="https://account.cc98.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: '#1890ff' }}
+          >
+            找回密码
           </a>
         </div>
       </Card>

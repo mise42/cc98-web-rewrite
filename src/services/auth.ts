@@ -113,20 +113,6 @@ export const authService = {
   },
 
   /**
-   * 发起 OAuth2 授权码模式登录
-   */
-  loginWithOAuth(): void {
-    const params = new URLSearchParams({
-      client_id: Constants.oauth.clientId,
-      redirect_uri: Constants.oauth.redirectUri,
-      response_type: 'code',
-      scope: Constants.oauth.scope,
-    })
-    const authUrl = `${Constants.oauth.authorizeEndpoint}?${params.toString()}`
-    window.location.href = authUrl
-  },
-
-  /**
    * 获取当前登录用户信息
    */
   async getCurrentUser(): Promise<IUser> {
