@@ -1,8 +1,12 @@
-import tsParser from '@typescript-eslint/parser'
-import tsPlugin from '@typescript-eslint/eslint-plugin'
+import eslint from '@eslint/js'
+import tseslint from 'typescript-eslint'
+import pluginReactHooks from 'eslint-plugin-react-hooks'
+import pluginReactRefresh from 'eslint-plugin-react-refresh'
 
-export default [
+export default tseslint.config(
+  // Global ignores
   {
+    name: 'cc98/global-ignores',
     ignores: [
       'dist',
       'node_modules',
@@ -18,10 +22,15 @@ export default [
       'eslint.config.js',
     ],
   },
+  // Base ESLint recommended config
+  eslint.configs.recommended,
+  // TypeScript ESLint recommended config
+  ...tseslint.configs.recommended,
+  // React + TypeScript files
   {
+    name: 'cc98/react-typescript',
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
-      parser: tsParser,
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
@@ -31,13 +40,16 @@ export default [
       },
     },
     plugins: {
-      '@typescript-eslint': tsPlugin,
+      'react-hooks': pluginReactHooks,
+      'react-refresh': pluginReactRefresh,
     },
     rules: {
-      ...tsPlugin.configs.recommended.rules,
+      ...tseslint.configs.recommended.rules,
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',
       'no-console': 'off',
+      ...pluginReactHooks.configs.recommended.rules,
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
-  },
-]
+  }
+)
