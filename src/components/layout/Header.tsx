@@ -1,3 +1,5 @@
+import { Link } from 'react-router'
+
 /**
  * Header 组件（占位符）
  * TODO: 在阶段 3.2 中实现完整的 Header
@@ -14,14 +16,16 @@ export function Header() {
         color: 'white',
       }}
     >
-      <h1 style={{ margin: 0, fontSize: '1.5rem' }}>CC98</h1>
+      <Link to="/" style={{ color: 'white', textDecoration: 'none' }}>
+        <h1 style={{ margin: 0, fontSize: '1.5rem' }}>CC98</h1>
+      </Link>
       <nav style={{ marginLeft: '2rem', display: 'flex', gap: '1rem' }}>
-        <a href="/" style={{ color: 'white', textDecoration: 'none' }}>
+        <Link to="/" style={{ color: 'white', textDecoration: 'none' }}>
           首页
-        </a>
-        <a href="/boardlist" style={{ color: 'white', textDecoration: 'none' }}>
+        </Link>
+        <Link to="/boardlist" style={{ color: 'white', textDecoration: 'none' }}>
           版面
-        </a>
+        </Link>
       </nav>
     </header>
   )

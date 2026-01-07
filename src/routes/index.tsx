@@ -27,6 +27,10 @@ export const router = createBrowserRouter([
         element: <LoginPage />,
       },
       {
+        path: 'boardlist',
+        element: <div>版面列表（占位符）</div>,
+      },
+      {
         path: 'usercenter',
         element: (
           <ProtectedRoute>
