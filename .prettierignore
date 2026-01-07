@@ -1,4 +1,5 @@
-# Ignore vendor legacy code
+# Ignore all vendor legacy code
+vendor/
 src/lib/ubb/
 src/types/api/
 
@@ -7,3 +8,15 @@ playwright.config.ts
 vitest.config.ts
 vite.config.ts
 tests/setup.ts
+
+# Ignore build output
+dist/
+build/
+
+# Ignore dependencies
+node_modules/
+
+# Ignore test coverage
+coverage/
+playwright-report/
+test-results/
