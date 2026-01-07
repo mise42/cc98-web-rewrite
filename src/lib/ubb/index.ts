@@ -4,3 +4,19 @@
 
 export * from './Core'
 export * from './UbbCodeExtension'
+
+// Handlers
+export * from './handlers/AcTagHandler'
+export * from './handlers/AlignTagHandler'
+export * from './handlers/AudioTagHandler'
+export * from './handlers/BBCodeTagHandler'
+export * from './handlers/BiliTagHandler'
+export * from './handlers/BlockQuoteTagHandler'
+export * from './handlers/BTagHandler'
+export * from './handlers/ColorTagHandler'
+export * from './handlers/CodeTagHandler'
+
+// Parsers
+export * from './parsers/TopicTagParser'
+export * from './parsers/FocusTagParser'
+EOF

@@ -1,4 +1,4 @@
-import { useEditorStore } from '../stores/editor'
+import { useEditorStore } from '@/stores/editor'
 
 /**
  * 编辑器 Hook

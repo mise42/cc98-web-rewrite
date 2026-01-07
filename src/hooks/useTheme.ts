@@ -1,4 +1,4 @@
-import { useThemeStore } from '../stores/theme'
+import { useThemeStore } from '@/stores/theme'
 
 /**
  * 主题 Hook

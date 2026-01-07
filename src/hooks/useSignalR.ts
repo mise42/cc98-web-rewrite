@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { signalrService } from '../services/signalr'
-import { useAuthStore } from '../stores/auth'
-import { useMessageStore } from '../stores/message'
+import { useAuthStore } from '@/stores/auth'
+import { useMessageStore } from '@/stores/message'
 
 /**
  * SignalR Hook
