@@ -18,11 +18,12 @@ export const Constants = {
     redirectUri: import.meta.env.VITE_OAUTH_REDIRECT_URI,
     tokenEndpoint: `${import.meta.env.VITE_OPENID_URL}/connect/token`,
     authorizeEndpoint: `${import.meta.env.VITE_OPENID_URL}/connect/authorize`,
-    scope: 'cc98Api offline_access',
+    scope: 'cc98-api openid offline_access',
   },
 
   // SignalR 配置
   signalrUrl: import.meta.env.VITE_SIGNALR_URL,
+  signalrHubName: 'notification',
 
   // 本地存储键
   storageKeys: {

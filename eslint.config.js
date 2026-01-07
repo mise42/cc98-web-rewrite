@@ -54,6 +54,7 @@ export default tseslint.config(
       '@typescript-eslint/return-await': 'off',
       '@typescript-eslint/strict-template-expressions': 'off',
       '@typescript-eslint/no-misused-spreads': 'off',
+      '@typescript-eslint/no-invalid-void-type': 'off',
     },
   }
 )
