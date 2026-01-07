@@ -14,6 +14,7 @@ export const Constants = {
   // OAuth 配置
   oauth: {
     clientId: import.meta.env.VITE_OAUTH_CLIENT_ID,
+    clientSecret: import.meta.env.VITE_OAUTH_CLIENT_SECRET || '',
     redirectUri: import.meta.env.VITE_OAUTH_REDIRECT_URI,
     tokenEndpoint: `${import.meta.env.VITE_OPENID_URL}/connect/token`,
     authorizeEndpoint: `${import.meta.env.VITE_OPENID_URL}/connect/authorize`,
