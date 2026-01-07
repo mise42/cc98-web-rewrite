@@ -4,6 +4,7 @@ import { RootLayout } from './root'
 import { ProtectedRoute } from './protected'
 import { HomePage } from '@pages/home/HomePage'
 import { LoginPage } from '@pages/auth/LoginPage'
+import { OAuthCallbackPage } from '@pages/auth/OAuthCallbackPage'
 
 /**
  * React Router v7 对象式路由配置
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
       {
         path: 'login',
         element: <LoginPage />,
+      },
+      {
+        path: 'auth/callback',
+        element: <OAuthCallbackPage />,
       },
       {
         path: 'boardlist',
