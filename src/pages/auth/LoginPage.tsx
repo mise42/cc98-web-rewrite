@@ -27,13 +27,10 @@ export function LoginPage() {
   const handlePasswordLogin = async (values: { username: string; password: string }) => {
     try {
       setIsSubmitting(true)
-      console.log('开始登录...', values.username)
       await login(values.username, values.password)
-      console.log('登录成功，isAuthenticated:', isAuthenticated)
       message.success('登录成功！')
       // 跳转逻辑在 useEffect 中处理
     } catch (error) {
-      console.error('登录失败:', error)
       if (error instanceof Error) {
         message.error(error.message || '登录失败，请检查用户名和密码')
       } else {

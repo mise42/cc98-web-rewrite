@@ -155,13 +155,6 @@ export function Header() {
                   src={user.portraitUrl}
                   alt={user.name}
                   style={{ width: 32, height: 32, borderRadius: '50%' }}
-                  onError={e => {
-                    console.error('头像加载失败:', user.portraitUrl, e)
-                    ;(e.target as HTMLImageElement).style.display = 'none'
-                  }}
-                  onLoad={() => {
-                    console.log('头像加载成功:', user.portraitUrl)
-                  }}
                 />
               ) : (
                 <UserOutlined style={{ fontSize: '1.2rem' }} />
