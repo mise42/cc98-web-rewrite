@@ -8,5 +8,5 @@ export * from './BBCodeTagHandler';
 export * from './BiliTagHandler';
 export * from './BlockQuoteTagHandler';
 export * from './BTagHandler';
-export * from ├── './ColorTagHandler';
+export * from './ColorTagHandler';
 export * from './CodeTagHandler';

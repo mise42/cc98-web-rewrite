@@ -21,7 +21,7 @@ interface MessageState {
   messages: IMessageContent[]
 
   setUnreadCount: (count: number) => void
-  addMessage: (message: any) => void
+  addMessage: (message: IMessageContent) => void
   markAsRead: (messageId: number) => void
   clearMessages: () => void
 }

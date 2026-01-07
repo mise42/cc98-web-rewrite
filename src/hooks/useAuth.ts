@@ -1,12 +1,10 @@
 import { useAuthStore } from '@/stores/auth'
-import { useNavigate } from 'react-router'
 
 /**
  * 认证 Hook
  */
 export function useAuth() {
   const { user, isAuthenticated, isLoading, error, login, loginWithOAuth, logout } = useAuthStore()
-  const navigate = useNavigate()
 
   return {
     user,
@@ -25,9 +23,9 @@ export function useAuth() {
  */
 export function useRequireAuth() {
   const { isAuthenticated, isLoading } = useAuthStore()
-  const navigate = useNavigate()
 
   // TODO: 实现路由跳转（需要在 React Router 中集成）
+  // const navigate = useNavigate()
   // if (!isLoading && !isAuthenticated) {
   //   navigate('/login', { replace: true });
   // }
