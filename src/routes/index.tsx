@@ -31,6 +31,14 @@ export const router = createBrowserRouter([
         element: <div>版面列表（占位符）</div>,
       },
       {
+        path: 'newtopics',
+        element: <div>新帖列表（占位符）</div>,
+      },
+      {
+        path: 'recommendedtopics',
+        element: <div>精选帖子（占位符）</div>,
+      },
+      {
         path: 'usercenter',
         element: (
           <ProtectedRoute>
