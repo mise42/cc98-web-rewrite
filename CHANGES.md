@@ -37,7 +37,7 @@ cc98-web-rewrite/
 │   ├── types/           # TypeScript 类型
 │   └── config/          # 配置文件
 ├── tests/               # 测试文件
-├── vendor/              # Git submodule（原始项���）
+├── vendor/              # Git submodule（原始项目)
 └── public/              # 静态资源
 ```
 
