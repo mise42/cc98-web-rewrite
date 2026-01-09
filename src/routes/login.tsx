@@ -1,13 +1,20 @@
 import { createFileRoute, Navigate } from '@tanstack/react-router'
+import { z } from 'zod'
 import { useAuth } from '@/hooks/useAuth'
 import { LoginPage as LoginPageComponent } from '@/pages/auth/LoginPage'
 
+const loginSearchSchema = z.object({
+  redirect: z.string().optional(),
+})
+
 export const Route = createFileRoute('/login')({
+  validateSearch: loginSearchSchema,
   component: LoginRoute,
 })
 
 function LoginRoute() {
   const { isAuthenticated, isLoading } = useAuth()
+  const search = Route.useSearch()
 
   if (isLoading) {
     return (
@@ -18,8 +25,8 @@ function LoginRoute() {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/" />
+    return <Navigate to={search.redirect || '/'} />
   }
 
-  return <LoginPageComponent />
+  return <LoginPageComponent redirect={search.redirect} />
 }

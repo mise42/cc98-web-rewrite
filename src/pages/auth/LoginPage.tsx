@@ -8,7 +8,11 @@ import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import { useAuth } from '@/hooks/useAuth'
 
-export function LoginPage() {
+interface LoginPageProps {
+  redirect?: string
+}
+
+export function LoginPage({ redirect }: LoginPageProps) {
   const navigate = useNavigate()
   const { login } = useAuth()
   const [username, setUsername] = useState('')
@@ -32,7 +36,7 @@ export function LoginPage() {
       setIsSubmitting(true)
       await login(username, password)
       toast.success('登录成功！')
-      navigate({ to: '/', replace: true })
+      navigate({ to: redirect || '/', replace: true })
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message || '登录失败，请检查用户名和密码')
