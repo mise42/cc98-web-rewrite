@@ -22,6 +22,7 @@ import { Route as TopicTopicIdRouteImport } from './routes/topic/$topicId'
 import { Route as BoardBoardIdRouteImport } from './routes/board/$boardId'
 import { Route as AuthenticatedUsercenterRouteImport } from './routes/_authenticated/usercenter'
 import { Route as AuthenticatedMessageRouteImport } from './routes/_authenticated/message'
+import { Route as UserRouteImport } from './routes/user..'
 
 const RecommendedtopicsRoute = RecommendedtopicsRouteImport.update({
   id: '/recommendedtopics',
@@ -87,6 +88,11 @@ const AuthenticatedMessageRoute = AuthenticatedMessageRouteImport.update({
   path: '/message',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const UserRoute = UserRouteImport.update({
+  id: '/user/',
+  path: '/user/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -97,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/newtopics': typeof NewtopicsRoute
   '/privacy': typeof PrivacyRoute
   '/recommendedtopics': typeof RecommendedtopicsRoute
+  '/user': typeof UserRoute
   '/message': typeof AuthenticatedMessageRoute
   '/usercenter': typeof AuthenticatedUsercenterRoute
   '/board/$boardId': typeof BoardBoardIdRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/newtopics': typeof NewtopicsRoute
   '/privacy': typeof PrivacyRoute
   '/recommendedtopics': typeof RecommendedtopicsRoute
+  '/user': typeof UserRoute
   '/message': typeof AuthenticatedMessageRoute
   '/usercenter': typeof AuthenticatedUsercenterRoute
   '/board/$boardId': typeof BoardBoardIdRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/newtopics': typeof NewtopicsRoute
   '/privacy': typeof PrivacyRoute
   '/recommendedtopics': typeof RecommendedtopicsRoute
+  '/user/': typeof UserRoute
   '/_authenticated/message': typeof AuthenticatedMessageRoute
   '/_authenticated/usercenter': typeof AuthenticatedUsercenterRoute
   '/board/$boardId': typeof BoardBoardIdRoute
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
     | '/newtopics'
     | '/privacy'
     | '/recommendedtopics'
+    | '/user'
     | '/message'
     | '/usercenter'
     | '/board/$boardId'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
     | '/newtopics'
     | '/privacy'
     | '/recommendedtopics'
+    | '/user'
     | '/message'
     | '/usercenter'
     | '/board/$boardId'
@@ -172,6 +183,7 @@ export interface FileRouteTypes {
     | '/newtopics'
     | '/privacy'
     | '/recommendedtopics'
+    | '/user/'
     | '/_authenticated/message'
     | '/_authenticated/usercenter'
     | '/board/$boardId'
@@ -188,6 +200,7 @@ export interface RootRouteChildren {
   NewtopicsRoute: typeof NewtopicsRoute
   PrivacyRoute: typeof PrivacyRoute
   RecommendedtopicsRoute: typeof RecommendedtopicsRoute
+  UserRoute: typeof UserRoute
   BoardBoardIdRoute: typeof BoardBoardIdRoute
   TopicTopicIdRoute: typeof TopicTopicIdRoute
 }
@@ -285,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMessageRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/user/': {
+      id: '/user/'
+      path: '/user'
+      fullPath: '/user'
+      preLoaderRoute: typeof UserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -312,6 +332,7 @@ const rootRouteChildren: RootRouteChildren = {
   NewtopicsRoute: NewtopicsRoute,
   PrivacyRoute: PrivacyRoute,
   RecommendedtopicsRoute: RecommendedtopicsRoute,
+  UserRoute: UserRoute,
   BoardBoardIdRoute: BoardBoardIdRoute,
   TopicTopicIdRoute: TopicTopicIdRoute,
 }

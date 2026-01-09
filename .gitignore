@@ -1,44 +1,44 @@
-# Logs
-logs
-*.log
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/dist
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# local env files
+.env*.local
+.env
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# vercel
+.vercel
 
-# Environment variables
-.env.local
-.env.*.local
+# typescript
+*.tsbuildinfo
+next-env.d.ts
 
-# Testing
-coverage
-playwright-report
-test-results
+# IDE
+.vscode/
+.idea/
 
-# Build output
-dist
-dist-ssr
-*.local
-
-# Vendor directory is managed as git submodule
-vendor/
-
-# Vendor directory is managed as git submodule
+# Vendor submodule
 vendor/

@@ -186,20 +186,20 @@
 
 ```typescript
 {
-  id: number;
-  name: string;
-  portraitUrl: string;
-  birthday: string;
-  fanCount: number;
-  followCount: number;
-  gender: number;
-  lastLogOnTime: string;
-  popularity: number;
-  prestige: number;
-  signatureCode: string;
-  levelTitle: string;
-  displayTitle: string;
-  isFollowing: boolean;
+  id: number
+  name: string
+  portraitUrl: string
+  birthday: string
+  fanCount: number
+  followCount: number
+  gender: number
+  lastLogOnTime: string
+  popularity: number
+  prestige: number
+  signatureCode: string
+  levelTitle: string
+  displayTitle: string
+  isFollowing: boolean
 }
 ```
 
@@ -207,24 +207,24 @@
 
 ```typescript
 {
-  id: number;
-  title: string;
-  content: string;
-  userId: number;
-  userName: string;
-  portraitUrl: string;
-  boardId: number;
-  boardName: string;
-  time: string;
-  lastPostTime: string;
-  hitCount: number;
-  replyCount: number;
-  floorCount: number;
-  isAnonymous: boolean;
-  isLocked: boolean;
-  topState: number;
-  tag1: string;
-  tag2: string;
+  id: number
+  title: string
+  content: string
+  userId: number
+  userName: string
+  portraitUrl: string
+  boardId: number
+  boardName: string
+  time: string
+  lastPostTime: string
+  hitCount: number
+  replyCount: number
+  floorCount: number
+  isAnonymous: boolean
+  isLocked: boolean
+  topState: number
+  tag1: string
+  tag2: string
 }
 ```
 
@@ -232,17 +232,17 @@
 
 ```typescript
 {
-  id: number;
-  content: string;
-  userId: number;
-  userName: string;
-  userInfo: UserInfo;
-  topicId: number;
-  floor: number;
-  time: string;
-  lastUpdateTime: string;
-  isAnonymous: boolean;
-  isDeleted: boolean;
+  id: number
+  content: string
+  userId: number
+  userName: string
+  userInfo: UserInfo
+  topicId: number
+  floor: number
+  time: string
+  lastUpdateTime: string
+  isAnonymous: boolean
+  isDeleted: boolean
 }
 ```
 
@@ -250,10 +250,10 @@
 
 ```typescript
 {
-  atCount: number;
-  replyCount: number;
-  systemCount: number;
-  total: number;
+  atCount: number
+  replyCount: number
+  systemCount: number
+  total: number
 }
 ```
 
@@ -261,10 +261,10 @@
 
 ```typescript
 {
-  id: number;
-  name: string;
-  description: string;
-  parentId: number;
+  id: number
+  name: string
+  description: string
+  parentId: number
 }
 ```
 
@@ -278,7 +278,7 @@
 
 1. **Token 获取**
    - 用户登录后获得 `access_token` 和 `refresh_token`
-   - Token 存储在 `localStorage` 中
+   - Token 存储在 `localStorage` 中（通过 Zustand auth-storage 持久化）
 
 2. **Token 使用**
    - 每个 API 请求需要在 Header 中携带：
@@ -316,16 +316,21 @@
 
 ### 前端错误处理
 
-前端使用 Redux 统一管理错误状态，主要错误类型：
+前端使用 TanStack Query 统一管理 API 请求的加载（isLoading）和错误（isError）状态。
 
-- `LogOut`: 未登录，需要跳转登录页
-- `UnauthorizedTopic`: 无权限访问主题
-- `UnauthorizedBoard`: 无权限访问版面
-- `OperationForbidden`: 操作被禁止
-- `NotFoundTopic`: 主题不存在
-- `NotFoundBoard`: 版面不存在
-- `ServerError`: 服务器错误
-- `Disconnected`: 网络断开
+全局错误处理策略：
+
+- **401 Unauthorized**: 自动清除认证状态并跳转登录页（带重定向参数）
+- **网络错误**: 显示 Toast 提示（Sonner）
+- **组件级错误**: 使用 Error Boundary 捕获并显示错误 UI
+- **表单错误**: 显示在对应的输入框下方或 Toast 提示
+
+主要错误类型处理：
+
+- `LogOut`: 未登录，自动重定向到登录页
+- `Unauthorized`: 无权限，显示错误提示
+- `NotFound`: 资源不存在，显示 404 组件
+- `ServerError`: 服务器错误，显示重试按钮
 
 ---
 
@@ -355,16 +360,16 @@ GET /board/123/topic?from=20&size=20
 
 2. **时间格式**
    - 后端返回 ISO 8601 格式的 UTC 时间
-   - 前端会转换为本地时间显示
+   - 前端使用 `date-fns` 库转换为本地时间显示
 
 3. **内容过滤**
    - 所有用户生成的内容都会经过 XSS 过滤
-   - 支持 UBB 代码和 Markdown
+   - 支持 UBB 代码（自定义解析引擎）和 Markdown（react-markdown）
 
 4. **缓存策略**
-   - 版面列表缓存 1 小时
-   - 用户信息缓存 30 天
-   - 配置信息根据具体设置缓存
+   - 使用 TanStack Query 进行自动缓存管理
+   - 版面列表、配置信息等静态数据配置了较长的 staleTime
+   - 用户操作（如点赞、回复）后会自动失效相关查询以刷新数据
 
 5. **批量查询**
    - 用户信息批量查询：`/user/basic?id=1&id=2&id=3`

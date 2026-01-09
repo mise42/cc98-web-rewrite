@@ -1,9 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { UserDetailPage } from '@/pages/user/UserDetailPage'
 
-/**
- * 用户中心（占位符）
- * 需要登录才能访问
- */
 export const Route = createFileRoute('/_authenticated/usercenter')({
-  component: () => <div>用户中心（占位符）</div>,
+  component: () => <UserDetailPage isOwnProfile={true} />,
 })

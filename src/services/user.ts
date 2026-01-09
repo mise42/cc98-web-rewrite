@@ -7,9 +7,10 @@ import type { IUser, IBasicUser } from '@/types/api'
 export const userService = {
   /**
    * 获取当前用户信息
+   * 注意：使用 /me 端点获取当前登录用户
    */
   async getCurrentUser(): Promise<IUser> {
-    return apiClient.get<IUser>('/user/me')
+    return apiClient.get<IUser>('/me')
   },
 
   /**
@@ -17,6 +18,13 @@ export const userService = {
    */
   async getUser(userId: number): Promise<IUser> {
     return apiClient.get<IUser>(`/user/${userId}`)
+  },
+
+  /**
+   * 通过用户名获取用户信息
+   */
+  async getUserByName(userName: string): Promise<IUser> {
+    return apiClient.get<IUser>(`/user/name/${encodeURIComponent(userName)}`)
   },
 
   /**
@@ -31,7 +39,7 @@ export const userService = {
    * 更新用户信息
    */
   async updateUserInfo(data: Partial<IUser>): Promise<IUser> {
-    return apiClient.put<IUser>('/user/me', data)
+    return apiClient.put<IUser>('/me', data)
   },
 
   /**
@@ -47,21 +55,21 @@ export const userService = {
    * 更新签名档
    */
   async updateSignature(signatureCode: string): Promise<void> {
-    return apiClient.put('/user/me', { signatureCode })
+    return apiClient.put('/me', { signatureCode })
   },
 
   /**
    * 关注用户
    */
   async followUser(userId: number): Promise<void> {
-    return apiClient.post(`/user/${userId}/follow`)
+    return apiClient.put<void>(`/me/followee/${userId}`)
   },
 
   /**
    * 取消关注
    */
   async unfollowUser(userId: number): Promise<void> {
-    return apiClient.post(`/user/${userId}/unfollow`)
+    return apiClient.delete<void>(`/me/followee/${userId}`)
   },
 
   /**

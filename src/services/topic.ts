@@ -64,6 +64,17 @@ export const topicService = {
   async getRecommendedTopics(size: number = 10): Promise<IRandomRecommendation[]> {
     return apiClient.get<IRandomRecommendation[]>(`/topic/random-recommendation?size=${size}`)
   },
+
+  /**
+   * 获取收藏的主题
+   */
+  async getFavoriteTopics(
+    from: number = 0,
+    size: number = 20,
+    order: 'desc' | 'asc' = 'desc'
+  ): Promise<ITopic[]> {
+    return apiClient.get<ITopic[]>(`/topic/me/favorite?from=${from}&size=${size}&order=${order}`)
+  },
 }
 
 /**
