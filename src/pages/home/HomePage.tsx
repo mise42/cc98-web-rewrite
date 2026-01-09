@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { MessageSquare, Flame, BarChart3, Users, FileText } from 'lucide-react'
 import type { IIndex } from '@/types/config'
+import { UbbContainer } from '@/components/UbbContainer'
 
 export function HomePage() {
   const { data, isLoading, error, refetch } = useQuery<IIndex>({
@@ -55,8 +56,8 @@ export function HomePage() {
           {data.announcement && (
             <Card className="border-l-4 border-l-primary shadow-md overflow-hidden bg-card/50 backdrop-blur-sm">
               <CardContent className="p-4">
-                <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <div dangerouslySetInnerHTML={{ __html: data.announcement }} />
+                <div className="prose prose-sm dark:prose-invert max-w-none text-gray-900 dark:text-gray-100">
+                  <UbbContainer content={data.announcement} />
                 </div>
               </CardContent>
             </Card>
@@ -95,9 +96,9 @@ export function HomePage() {
                           {item.title}
                         </h4>
                         {item.content && (
-                          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                            {item.content}
-                          </p>
+                          <div className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                            <UbbContainer content={item.content} />
+                          </div>
                         )}
                       </div>
                     </a>

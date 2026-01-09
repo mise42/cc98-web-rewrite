@@ -19,6 +19,8 @@ import { boardService } from '@/services/board'
 import type { IPost, ITopic, IBoard } from '@/types/api'
 import { format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
+import { UbbContainer } from '@/components/UbbContainer'
+import { Markdown } from '@/lib/ubb-modern/components/Markdown'
 
 export function TopicDetailPage() {
   const { topicId } = useParams({ from: '/topic/$topicId' })
@@ -186,10 +188,14 @@ function PostItem({ post, floor }: PostItemProps) {
         </div>
       </CardHeader>
       <CardContent className="py-4">
-        <div
-          className="prose prose-sm dark:prose-invert max-w-none"
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
+        {post.contentType === 1 ? (
+          <Markdown>{post.content}</Markdown>
+        ) : (
+          <UbbContainer
+            content={post.content}
+            className="prose prose-sm dark:prose-invert max-w-none break-words [&_img]:max-w-full [&_img]:h-auto"
+          />
+        )}
         <div className="flex items-center gap-4 mt-4 pt-3 border-t border-border text-sm text-muted-foreground">
           <button className="flex items-center gap-1 hover:text-primary transition-colors">
             <ThumbsUp className="w-4 h-4" />
