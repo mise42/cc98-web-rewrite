@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useParams, Link } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
@@ -25,18 +25,10 @@ interface UserDetailPageProps {
   isOwnProfile?: boolean
 }
 
-export function UserDetailPage({ isOwnProfile = false }: UserDetailPageProps) {
+export function UserDetailPage({ isOwnProfile = true }: UserDetailPageProps) {
   const { user: currentUser } = useAuth()
-  const params = useParams({
-    from: isOwnProfile ? '/_authenticated/usercenter' : '/user/$method/$id',
-  })
 
-  // 如果是个人中心，使用当前登录用户ID；否则从路由参数获取
-  const targetUserId = isOwnProfile
-    ? currentUser?.id
-    : params.method === 'id'
-      ? Number(params.id)
-      : undefined
+  const targetUserId = currentUser?.id
 
   const {
     data: userInfo,
@@ -49,7 +41,6 @@ export function UserDetailPage({ isOwnProfile = false }: UserDetailPageProps) {
     staleTime: 1000 * 60 * 5,
   })
 
-  // 获取用户收藏的主题（仅查看自己的时候显示）
   const { data: favoriteTopics } = useQuery({
     queryKey: ['topic', targetUserId, 'favorite'],
     queryFn: () => topicService.getFavoriteTopics(0, 5),
@@ -57,7 +48,6 @@ export function UserDetailPage({ isOwnProfile = false }: UserDetailPageProps) {
     staleTime: 1000 * 60,
   })
 
-  // 获取用户关注的用户
   const { data: followingUsers } = useQuery({
     queryKey: ['user', targetUserId, 'following'],
     queryFn: () => userService.getFollowing(targetUserId!),
@@ -65,7 +55,6 @@ export function UserDetailPage({ isOwnProfile = false }: UserDetailPageProps) {
     staleTime: 1000 * 60,
   })
 
-  // 获取用户的粉丝
   const { data: fans } = useQuery({
     queryKey: ['user', targetUserId, 'fans'],
     queryFn: () => userService.getFans(targetUserId!),
@@ -74,7 +63,7 @@ export function UserDetailPage({ isOwnProfile = false }: UserDetailPageProps) {
   })
 
   if (isLoading) {
-    return <UserDetailSkeleton />
+    return <UserDetailPageSkeleton />
   }
 
   if (error) {
@@ -199,9 +188,19 @@ export function UserDetailPage({ isOwnProfile = false }: UserDetailPageProps) {
 
         <div className="lg:col-span-2">
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
-              <TabsTrigger value="profile">个人简介</TabsTrigger>
-              {isOwnProfile && <TabsTrigger value="favorites">收藏主题</TabsTrigger>}
+            <TabsList className="flex flex-wrap gap-2">
+              <TabsTrigger value="profile">个人主页</TabsTrigger>
+              {isOwnProfile && (
+                <>
+                  <TabsTrigger value="mytopics" asChild>
+                    <Link to="/usercenter/mytopics/1">我的主题</Link>
+                  </TabsTrigger>
+                  <TabsTrigger value="myposts" asChild>
+                    <Link to="/usercenter/myposts/1">我的回复</Link>
+                  </TabsTrigger>
+                  <TabsTrigger value="favorites">收藏主题</TabsTrigger>
+                </>
+              )}
               <TabsTrigger value="following">
                 关注{' '}
                 <span className="ml-1 text-xs opacity-70">({followingUsers?.length || 0})</span>
@@ -222,10 +221,8 @@ export function UserDetailPage({ isOwnProfile = false }: UserDetailPageProps) {
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent>
 
-            {isOwnProfile && favoriteTopics && favoriteTopics.length > 0 && (
-              <TabsContent value="favorites" className="space-y-6">
+              {isOwnProfile && favoriteTopics && favoriteTopics.length > 0 && (
                 <Card className="shadow-md bg-card/50 backdrop-blur-sm">
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
@@ -261,7 +258,29 @@ export function UserDetailPage({ isOwnProfile = false }: UserDetailPageProps) {
                     </div>
                   </CardContent>
                 </Card>
-              </TabsContent>
+              )}
+            </TabsContent>
+
+            {isOwnProfile && (
+              <>
+                <TabsContent value="mytopics">
+                  <div className="text-center py-8 text-muted-foreground">
+                    请使用上方导航跳转到"我的主题"页面
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="myposts">
+                  <div className="text-center py-8 text-muted-foreground">
+                    请使用上方导航跳转到"我的回复"页面
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="favorites">
+                  <div className="text-center py-8 text-muted-foreground">
+                    收藏主题显示在"个人主页"标签页中
+                  </div>
+                </TabsContent>
+              </>
             )}
 
             <TabsContent value="following" className="space-y-6">
@@ -278,8 +297,8 @@ export function UserDetailPage({ isOwnProfile = false }: UserDetailPageProps) {
                       {followingUsers.map(u => (
                         <Link
                           key={u.id}
-                          to="/user/$method/$id"
-                          params={{ method: 'id', id: String(u.id) }}
+                          to="/user/id/$id"
+                          params={{ id: String(u.id) }}
                           className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/30 transition-colors"
                         >
                           <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-sm font-medium">
@@ -325,8 +344,8 @@ export function UserDetailPage({ isOwnProfile = false }: UserDetailPageProps) {
                       {fans.map(u => (
                         <Link
                           key={u.id}
-                          to="/user/$method/$id"
-                          params={{ method: 'id', id: String(u.id) }}
+                          to="/user/id/$id"
+                          params={{ id: String(u.id) }}
                           className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/30 transition-colors"
                         >
                           <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-sm font-medium">
@@ -364,7 +383,7 @@ export function UserDetailPage({ isOwnProfile = false }: UserDetailPageProps) {
   )
 }
 
-function UserDetailSkeleton() {
+function UserDetailPageSkeleton() {
   return (
     <div className="container mx-auto px-4 py-6 max-w-[1200px]">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

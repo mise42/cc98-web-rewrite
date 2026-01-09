@@ -85,4 +85,37 @@ export const userService = {
   async getFans(userId: number): Promise<IBasicUser[]> {
     return apiClient.get<IBasicUser[]>(`/user/${userId}/fans`)
   },
+
+  /**
+   * 获取当前用户最近发表的主题
+   */
+  async getRecentTopics(from: number = 0, size: number = 10): Promise<any[]> {
+    return apiClient.get<any[]>(`/me/recent-topic?from=${from}&size=${size}`)
+  },
+
+  /**
+   * 获取当前用户最近的回复
+   */
+  async getRecentPosts(
+    from: number = 0,
+    size: number = 10
+  ): Promise<{ data: any[]; count: number }> {
+    return apiClient.get<{ data: any[]; count: number }>(
+      `/me/recent-post?from=${from}&size=${size}`
+    )
+  },
+
+  /**
+   * 获取当前用户的热门回复
+   */
+  async getHotPosts(from: number = 0, size: number = 10): Promise<{ data: any[]; count: number }> {
+    return apiClient.get<{ data: any[]; count: number }>(`/me/hot-post?from=${from}&size=${size}`)
+  },
+
+  /**
+   * 获取指定用户最近发表的主题
+   */
+  async getUserRecentTopics(userId: number, from: number = 0, size: number = 10): Promise<any[]> {
+    return apiClient.get<any[]>(`/user/${userId}/recent-topic?from=${from}&size=${size}`)
+  },
 }
