@@ -1,13 +1,14 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
+import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [tanstackRouter(), react(), tailwindcss()],
 
   // 路径别名
   resolve: {
@@ -58,8 +59,8 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'antd-vendor': ['antd', '@ant-design/icons'],
+          'react-vendor': ['react', 'react-dom'],
+          'router-vendor': ['@tanstack/react-router'],
           'query-vendor': ['@tanstack/react-query'],
           'signalr-vendor': ['@microsoft/signalr'],
           'editor-vendor': ['@cc98/hell-react-mde'],
@@ -70,6 +71,6 @@ export default defineConfig({
 
   // 优化配置
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', 'antd', '@tanstack/react-query'],
+    include: ['react', 'react-dom', '@tanstack/react-router', '@tanstack/react-query'],
   },
 })

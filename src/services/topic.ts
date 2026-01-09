@@ -1,5 +1,5 @@
 import { apiClient } from './client'
-import type { ITopic, IPost } from '@/types/api'
+import type { ITopic, IPost, IRandomRecommendation } from '@/types/api'
 
 /**
  * 帖子相关接口
@@ -55,6 +55,14 @@ export const topicService = {
    */
   async getHotTopics(): Promise<ITopic[]> {
     return apiClient.get<ITopic[]>('/topic/hot')
+  },
+
+  async getNewTopics(from: number = 0, size: number = 20): Promise<ITopic[]> {
+    return apiClient.get<ITopic[]>(`/topic/new?from=${from}&size=${size}`)
+  },
+
+  async getRecommendedTopics(size: number = 10): Promise<IRandomRecommendation[]> {
+    return apiClient.get<IRandomRecommendation[]>(`/topic/random-recommendation?size=${size}`)
   },
 }
 

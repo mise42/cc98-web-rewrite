@@ -1,9 +1,6 @@
-import { Link } from 'react-router'
+import { Link } from '@tanstack/react-router'
+import { Separator } from '@/components/ui/separator'
 
-/**
- * Footer 组件
- * 包含友情链接、版权信息等
- */
 export function Footer() {
   const currentYear = new Date().getFullYear()
 
@@ -15,62 +12,48 @@ export function Footer() {
   ]
 
   return (
-    <footer
-      style={{
-        background: '#001529',
-        color: 'rgba(255, 255, 255, 0.65)',
-        padding: '2rem',
-        textAlign: 'center',
-        marginTop: 'auto',
-      }}
-    >
-      {/* 友情链接 */}
-      <div style={{ marginBottom: '1rem' }}>
-        <span style={{ marginRight: '1rem', fontWeight: 'bold' }}>友情链接：</span>
-        {friendLinks.map((link, index) => (
-          <span key={index}>
-            <a
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                color: 'rgba(255, 255, 255, 0.65)',
-                textDecoration: 'none',
-                margin: '0 0.5rem',
-              }}
-            >
-              {link.name}
-            </a>
-            {index < friendLinks.length - 1 && <span style={{ margin: '0 0.5rem' }}>|</span>}
-          </span>
-        ))}
-      </div>
+    <footer className="w-full border-t border-border bg-background py-8 text-sm text-muted-foreground mt-auto">
+      <div className="container mx-auto px-4 flex flex-col items-center gap-6">
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-2">
+          <span className="font-semibold text-foreground">友情链接：</span>
+          {friendLinks.map((link, index) => (
+            <div key={index} className="flex items-center">
+              <a
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-primary transition-colors"
+              >
+                {link.name}
+              </a>
+              {index < friendLinks.length - 1 && (
+                <Separator orientation="vertical" className="h-3 mx-3 bg-border" />
+              )}
+            </div>
+          ))}
+        </div>
 
-      {/* 版权信息 */}
-      <div style={{ fontSize: '0.875rem', lineHeight: 1.8 }}>
-        <p style={{ margin: '0.5rem 0' }}>&copy; {currentYear} CC98. All rights reserved.</p>
-        <p style={{ margin: '0.5rem 0' }}>
-          <Link to="/about" style={{ color: 'rgba(255, 255, 255, 0.65)', textDecoration: 'none' }}>
-            关于我们
-          </Link>
-          <span style={{ margin: '0 1rem' }}>|</span>
-          <Link
-            to="/contact"
-            style={{ color: 'rgba(255, 255, 255, 0.65)', textDecoration: 'none' }}
-          >
-            联系我们
-          </Link>
-          <span style={{ margin: '0 1rem' }}>|</span>
-          <Link
-            to="/privacy"
-            style={{ color: 'rgba(255, 255, 255, 0.65)', textDecoration: 'none' }}
-          >
-            隐私政策
-          </Link>
-        </p>
-        <p style={{ margin: '0.5rem 0', fontSize: '0.75rem', opacity: 0.5 }}>
-          CC98 是清华大学学生社区论坛，致力于为清华师生提供交流平台
-        </p>
+        <Separator className="w-24 bg-border" />
+
+        <div className="flex flex-col items-center gap-2 text-center">
+          <p>&copy; {currentYear} CC98. All rights reserved.</p>
+
+          <div className="flex items-center gap-4">
+            <Link to="/about" className="hover:text-primary transition-colors">
+              关于我们
+            </Link>
+            <Link to="/contact" className="hover:text-primary transition-colors">
+              联系我们
+            </Link>
+            <Link to="/privacy" className="hover:text-primary transition-colors">
+              隐私政策
+            </Link>
+          </div>
+
+          <p className="text-xs text-muted-foreground/60 mt-2">
+            CC98 是清华大学学生社区论坛，致力于为清华师生提供交流平台
+          </p>
+        </div>
       </div>
     </footer>
   )

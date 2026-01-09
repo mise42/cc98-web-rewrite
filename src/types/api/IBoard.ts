@@ -1,62 +1,39 @@
-export interface IBoard {;
-  /**;
-   * 版面id;
-   */;
-  id: number;
-  /**;
-   * 版面名称;
-   */;
-  name: string;
-  /**;
-   * 版面名称;
-   */;
-  description: string;
-  /**;
-   * 发帖总数;
-   */;
-  topicCount: number;
-  /**;
-   * 回复总数;
-   */;
-  postCount: number;
-  /**;
-   * 今日回复总数;
-   */;
-  todayCount: number;
-  /**;
-   * 版主;
-   */;
-  boardMasters: string[];
-  /**;
-   * 是否关注;
-   */;
-  isUserCustomBoard?: boolean;
-  /**;
-   * 是否仅内网可见;
-   */;
-  internalState: number;
-  /**;
-   * 是否已锁定;
-   */;
-  isLock: boolean;
-  /**;
-   * 父版面id;
-   */;
-  parentId: number;
-  /**;
-   * 是否匿名;
-   */;
-  anonymousState: number;
-  /**;
-   * 是否能进入;
-   */;
-  canEntry: boolean;
-  /**;
-   * 是否能投票;
-   */;
-  canVote: boolean;
-  /**;
-   * 大字报;
-   */;
-  bigPaper: string;
-};
+export interface IBoard {
+  id: number
+  name: string
+  description: string
+  topicCount: number
+  postCount: number
+  todayCount: number
+  boardMasters: string[]
+  isUserCustomBoard?: boolean
+  internalState: number
+  isLock: boolean
+  parentId: number
+  anonymousState: number
+  canEntry: boolean
+  canVote: boolean
+  bigPaper: string
+}
+
+/**
+ * 子版面信息（/board/all 返回的嵌套结构中的子版面）
+ */
+export interface IChildBoard {
+  id: number
+  name: string
+  masters: string[]
+  todayCount: number
+  topicCount: number
+  postCount: number
+}
+
+/**
+ * 根版面/区（/board/all 返回的嵌套结构）
+ */
+export interface IRootBoard {
+  id: number
+  name: string
+  masters: string[]
+  boards: IChildBoard[]
+}

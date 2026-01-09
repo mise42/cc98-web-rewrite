@@ -1,64 +1,18 @@
-import { createBrowserRouter, Navigate } from 'react-router'
-import { ErrorBoundary } from './error'
-import { RootLayout } from './root'
-import { ProtectedRoute } from './protected'
-import { HomePage } from '@pages/home/HomePage'
-import { LoginPage } from '@pages/auth/LoginPage'
+import { createFileRoute } from '@tanstack/react-router'
+import { configService } from '@/services/config'
+import { HomePage } from '@/pages/home/HomePage'
 
-/**
- * React Router v7 对象式路由配置
- * @see https://reactrouter.com/start/route
- */
-export const router = createBrowserRouter([
-  {
-    path: '/',
-    element: (
-      <ErrorBoundary>
-        <RootLayout />
-      </ErrorBoundary>
-    ),
-    children: [
-      {
-        index: true,
-        element: <HomePage />,
-      },
-      {
-        path: 'login',
-        element: <LoginPage />,
-      },
-      {
-        path: 'boardlist',
-        element: <div>版面列表（占位符）</div>,
-      },
-      {
-        path: 'newtopics',
-        element: <div>新帖列表（占位符）</div>,
-      },
-      {
-        path: 'recommendedtopics',
-        element: <div>精选帖子（占位符）</div>,
-      },
-      {
-        path: 'usercenter',
-        element: (
-          <ProtectedRoute>
-            <div>用户中心（占位符）</div>
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'message',
-        element: (
-          <ProtectedRoute>
-            <div>消息中心（占位符）</div>
-          </ProtectedRoute>
-        ),
-      },
-      // 404 页面
-      {
-        path: '*',
-        element: <Navigate to="/" replace />,
-      },
-    ],
+// 定义 Query Options
+export const homeQueryOptions = () => ({
+  queryKey: ['config', 'index'],
+  queryFn: () => configService.getIndex(),
+  staleTime: 1000 * 60, // 1 分钟
+})
+
+export const Route = createFileRoute('/')({
+  loader: async ({ context }) => {
+    // 在路由级别预加载数据
+    await context.queryClient.ensureQueryData(homeQueryOptions())
   },
-])
+  component: HomePage,
+})

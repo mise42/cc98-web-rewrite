@@ -1,22 +1,22 @@
 import { apiClient } from './client'
-import type { IBoard } from '@/types/api'
+import type { IBoard, IChildBoard, IPost, IRootBoard, ITopic } from '@/types/api'
 
-/**
- * 版块相关接口
- */
 export const boardService = {
-  /**
-   * 获取版块详情
-   */
   async getBoard(boardId: string): Promise<IBoard> {
     return apiClient.get<IBoard>(`/board/${boardId}`)
   },
 
-  /**
-   * 获取所有版块列表
-   */
-  async getAllBoards(): Promise<IBoard[]> {
-    return apiClient.get<IBoard[]>('/board')
+  async getAllBoards(): Promise<IRootBoard[]> {
+    return apiClient.get<IRootBoard[]>('/board/all')
+  },
+
+  async getChildBoard(boardId: number): Promise<IChildBoard | undefined> {
+    const rootBoards = await this.getAllBoards()
+    for (const root of rootBoards) {
+      const child = root.boards.find(b => b.id === boardId)
+      if (child) return child
+    }
+    return undefined
   },
 
   /**
@@ -27,12 +27,12 @@ export const boardService = {
     page: number = 1,
     pageSize: number = 20,
     type?: number
-  ): Promise<{ list: IBoard[]; total: number }> {
+  ): Promise<{ list: ITopic[]; total: number }> {
     let url = `/board/${boardId}/topic?page=${page}&pageSize=${pageSize}`
     if (type !== undefined) {
       url += `&type=${type}`
     }
-    return apiClient.get<{ list: IBoard[]; total: number }>(url)
+    return apiClient.get<{ list: ITopic[]; total: number }>(url)
   },
 
   /**

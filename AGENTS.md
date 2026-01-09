@@ -4,23 +4,28 @@ This guide is for AI coding agents working on the CC98 Forum Rewrite project.
 
 ## Quick Reference
 
-```bash
+bash
+
 # Development
-bun run dev              # Start dev server (http://localhost:5173)
-bun run build            # TypeScript compile + Vite build
-bun run preview          # Preview production build
+
+bun run dev # Start dev server (http://localhost:5173) with auto route generation
+bun run build # TypeScript compile + Vite build
+bun run preview # Preview production build
 
 # Testing
-bun run test             # Run all unit tests
-bun run test:ui          # Run Vitest with UI
-bun run test:e2e         # Run all E2E tests
+
+bun run test # Run all unit tests
+bun run test:ui # Run Vitest with UI
+bun run test:e2e # Run all E2E tests
 
 # Code Quality
-bun run lint             # ESLint check (max 0 warnings)
-bun run lint:fix         # ESLint auto-fix
-bun run format           # Prettier format
-bun run format:check     # Prettier check
-```
+
+bun run lint # ESLint check (max 0 warnings)
+bun run lint:fix # ESLint auto-fix
+bun run format # Prettier format
+bun run format:check # Prettier check
+
+````
 
 ## Running Single Tests
 
@@ -35,7 +40,7 @@ bun run test -- --grep "test name pattern"
 
 # Interactive UI mode
 bun run test:ui
-```
+````
 
 ### E2E Tests (Playwright)
 
@@ -54,7 +59,7 @@ bun run test:e2e -- --project=chromium
 
 - **Framework**: React 19.2.0 + TypeScript (strict mode)
 - **Build**: Vite 7.2.4 + SWC
-- **Router**: React Router v7
+- **Router**: TanStack Router 1.145.7 (file-based routing)
 - **State**: Zustand 5.0.9 (client state), TanStack Query 5.90.16 (server state)
 - **UI**: Ant Design v6.1.4
 - **Real-time**: SignalR 10.0.0
@@ -76,6 +81,82 @@ import { useAuthStore } from '@/stores/auth'
 import type { IUser } from '@/types/api'
 ```
 
+## TanStack Router (File-Based Routing)
+
+This project uses TanStack Router with file-based routing. Routes are automatically generated from files in `src/routes/`.
+
+### File-Based Routing Conventions
+
+```
+src/routes/
+├── __root.tsx              # Root layout (Header, Footer, ErrorBoundary)
+├── index.tsx               # / (home page)
+├── login.tsx               # /login
+├── about.tsx               # /about
+├── _authenticated.tsx      # Protected route layout
+├── _authenticated/
+│   ├── usercenter.tsx      # /usercenter (protected)
+│   └── message.tsx         # /message (protected)
+└── posts/
+    ├── index.tsx           # /posts
+    └── $postId.tsx         # /posts/:postId (dynamic)
+```
+
+### Route File Patterns
+
+- `__root.tsx` - Root layout (required)
+- `index.tsx` - Index route for the path (`/`)
+- `$param.tsx` - Dynamic route parameter (`/posts/$postId` → `/posts/123`)
+- `_layout.tsx` - Pathless layout route (logical grouping without path)
+- `file.tsx` - Regular route file
+
+### Route Protection
+
+Use `beforeLoad` hook in layout routes to protect child routes:
+
+```typescript
+// src/routes/_authenticated.tsx
+export const Route = createFileRoute('/_authenticated')({
+  beforeLoad: () => {
+    if (!isAuthenticated()) {
+      throw redirect({ to: '/login' })
+    }
+  },
+})
+```
+
+### Navigation
+
+```typescript
+import { Link, useNavigate } from '@tanstack/react-router'
+
+// Declarative navigation
+<Link to="/posts">Posts</Link>
+
+// Programmatic navigation
+const navigate = useNavigate()
+navigate({ to: '/posts', search: { page: 2 } })
+```
+
+### Route Integration with TanStack Query
+
+```typescript
+export const Route = createFileRoute('/posts')({
+  loader: ({ context }) => {
+    // Preload data before component renders
+    return context.queryClient.ensureQueryData(postsQuery)
+  },
+  component: PostsPage,
+})
+```
+
+### Auto-Generated Files
+
+- `src/routeTree.gen.ts` - Auto-generated route tree (DO NOT EDIT, but COMMIT to git)
+  - **Should be committed to version control** for CI/CD and type stability
+  - Regenerated automatically by Vite plugin on file changes during development
+  - Format/lint this file to prevent it from being checked
+
 ### Path Aliases (Required)
 
 Use these instead of relative imports:
@@ -92,6 +173,24 @@ Use these instead of relative imports:
 '@styles/*' → './src/styles/*'
 '@types/*' → './src/types/*'
 '@config/*' → './src/config/*'
+```
+
+## Architecture Patterns
+
+### Directory Structure
+
+```
+src/
+├── components/      # Reusable UI components (by feature)
+├── pages/          # Route pages (by feature)
+├── services/       # API client & service layer
+├── stores/         # Zustand state stores
+├── hooks/          # Custom React hooks
+├── lib/            # Utilities, token manager, IndexedDB
+├── types/          # TypeScript type definitions
+├── config/         # Runtime constants
+├── styles/         # Global styles, CSS variables
+└── routes/         # TanStack Router file-based routes
 ```
 
 ### Component/Function Structure
@@ -250,6 +349,16 @@ import { apiClient } from '@/services/client'
 const data = await apiClient.get<IUser>('/user/me')
 ```
 
+### API Reference
+
+See **[API_REFERENCE.md](API_REFERENCE.md)** for complete backend API documentation including:
+
+- All API endpoints with request/response types
+- Data models (UserInfo, Topic, Post, BoardInfo, etc.)
+- Authentication mechanism (OAuth 2.0 Bearer Token)
+- Pagination format (`from`, `size` parameters)
+- Error handling and HTTP status codes
+
 ## Testing Guidelines
 
 ### Test Structure
@@ -284,6 +393,18 @@ Husky runs `lint-staged` on every commit:
 - All `.ts`/`.tsx` files must pass ESLint (max 0 warnings)
 - All `.ts`/`.tsx`/`.css` files must be Prettier-formatted
 - Fix issues with: `bun run lint:fix && bun run format`
+
+## Visual Verification with Playwright
+
+**IMPORTANT**: After completing UI changes, always verify the result visually using Playwright MCP:
+
+1. Navigate to the page: `playwright_browser_navigate` to `http://localhost:5173/{route}`
+2. Take a snapshot: `playwright_browser_snapshot` to capture the accessibility tree
+3. Take a screenshot if needed: `playwright_browser_take_screenshot`
+4. Verify elements are rendering correctly
+5. Close when done: `playwright_browser_close`
+
+This ensures UI changes work as expected before marking tasks complete.
 
 ## Important Notes
 
