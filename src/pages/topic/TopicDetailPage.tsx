@@ -1,10 +1,12 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams, Link } from '@tanstack/react-router'
 import React from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
+import { ApiError } from '@/services/client'
+import { toast } from 'sonner'
 import {
   ArrowLeft,
   MessageSquare,
@@ -35,6 +37,7 @@ export function TopicDetailPage() {
   const { topicId } = useParams({ from: '/topic/$topicId' })
   const numericTopicId = parseInt(topicId, 10)
   const { isAuthenticated, user } = useAuthStore()
+  const queryClient = useQueryClient()
 
   // 获取视图模式状态
   const {
@@ -237,18 +240,6 @@ export function TopicDetailPage() {
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-[900px]">
-      {/* 临时调试信息 */}
-      <div className="text-xs text-muted-foreground mb-4 p-2 bg-muted/50 rounded">
-        <span>
-          认证: {isAuthenticated ? '✅' : '❌'} | 用户: {user?.name || 'N/A'} | 帖子ID:{' '}
-          {numericTopicId}
-        </span>
-        <span className="ml-4">
-          回复数: {displayPosts.length} / 总数: {totalCount}
-        </span>
-        <span className="ml-4">模式: {viewMode === 'pagination' ? '分页' : '无限滚动'}</span>
-      </div>
-
       <div className="mb-6">
         {board && (
           <Link
@@ -324,7 +315,14 @@ export function TopicDetailPage() {
       {/* 帖子列表 */}
       <div className="space-y-4">
         {displayPosts && displayPosts.length > 0 ? (
-          displayPosts.map(post => <PostItem key={post.id} post={post} />)
+          displayPosts.map(post => (
+            <PostItem
+              key={post.id}
+              post={post}
+              queryClient={queryClient}
+              topicId={numericTopicId}
+            />
+          ))
         ) : (
           <Card className="shadow-md bg-card/50 backdrop-blur-sm">
             <CardContent className="p-8 text-center text-muted-foreground">
@@ -347,11 +345,50 @@ export function TopicDetailPage() {
 
 interface PostItemProps {
   post: IPost
+  queryClient: ReturnType<typeof useQueryClient>
+  topicId: number
 }
 
-function PostItem({ post }: PostItemProps) {
+function PostItem({ post, queryClient, topicId }: PostItemProps) {
   const { setTracePost, resetPosts, tracePostId } = useTopicViewStore()
+  const [likeState, setLikeState] = React.useState<0 | 1 | 2>(post.likeState)
+  const [likeCount, setLikeCount] = React.useState(post.likeCount)
+  const [dislikeCount, setDislikeCount] = React.useState(post.dislikeCount)
   const [isLiking, setIsLiking] = React.useState(false)
+
+  // 当 post 对象变化时，同步状态（例如切换追踪模式、翻页等）
+  React.useEffect(() => {
+    console.log('[PostItem] Initializing like state from post', post.id, ':', {
+      likeState: post.likeState,
+      likeCount: post.likeCount,
+      dislikeCount: post.dislikeCount,
+    })
+    setLikeState(post.likeState)
+    setLikeCount(post.likeCount)
+    setDislikeCount(post.dislikeCount)
+  }, [post.id, post.likeState, post.likeCount, post.dislikeCount])
+
+  // 更新Query缓存中的帖子数据
+  const updatePostsCache = (
+    newLikeState: 0 | 1 | 2,
+    newLikeCount: number,
+    newDislikeCount: number
+  ) => {
+    // 更新所有相关的query缓存
+    queryClient.setQueriesData<IPost[]>({ queryKey: ['topic', topicId, 'posts'] }, oldData => {
+      if (!oldData) return oldData
+      return oldData.map(p =>
+        p.id === post.id
+          ? {
+              ...p,
+              likeState: newLikeState,
+              likeCount: newLikeCount,
+              dislikeCount: newDislikeCount,
+            }
+          : p
+      )
+    })
+  }
 
   // 进入追踪模式
   const enterTraceMode = () => {
@@ -363,12 +400,48 @@ function PostItem({ post }: PostItemProps) {
   // 点赞
   const handleLike = async () => {
     if (isLiking) return
+
+    // 保存原始状态用于回滚
+    const originalState = { likeState, likeCount, dislikeCount }
+
+    // 乐观更新：假设会切换状态（后端决定最终状态）
+    // 如果当前已点赞，假设会取消；否则假设会点赞
+    const willCancel = likeState === 1
+    const optimisticState = willCancel
+      ? { likeState: 0 as const, likeCount: likeCount - 1, dislikeCount }
+      : { likeState: 1 as const, likeCount: likeCount + 1, dislikeCount }
+
+    // 立即更新UI（乐观更新）
+    setLikeState(optimisticState.likeState)
+    setLikeCount(optimisticState.likeCount)
+    setDislikeCount(optimisticState.dislikeCount)
     setIsLiking(true)
+
     try {
+      // 调用API（后端会根据当前状态自动决定是点赞还是取消）
+      console.log('[PostItem] Calling likePost API for post', post.id)
       await topicService.likePost(post.id)
-      // 可以添加成功提示或刷新数据
+      console.log('[PostItem] likePost API succeeded for post', post.id)
+
+      // 成功：保持乐观状态，更新Query缓存
+      updatePostsCache(
+        optimisticState.likeState,
+        optimisticState.likeCount,
+        optimisticState.dislikeCount
+      )
     } catch (error) {
-      console.error('点赞失败:', error)
+      console.error('[PostItem] likePost API failed for post', post.id, ':', error)
+      // 失败：回滚到原始状态
+      setLikeState(originalState.likeState)
+      setLikeCount(originalState.likeCount)
+      setDislikeCount(originalState.dislikeCount)
+
+      // 检查是否是403错误（频率限制）
+      if (error instanceof ApiError && error.status === 403) {
+        toast.error('操作太快，请稍后再试', {
+          description: '请等待几秒后再继续操作',
+        })
+      }
     } finally {
       setIsLiking(false)
     }
@@ -377,12 +450,46 @@ function PostItem({ post }: PostItemProps) {
   // 点踩
   const handleDislike = async () => {
     if (isLiking) return
+
+    // 保存原始状态用于回滚
+    const originalState = { likeState, likeCount, dislikeCount }
+
+    // 乐观更新：假设会切换状态（后端决定最终状态）
+    // 如果当前已点踩，假设会取消；否则假设会点踩
+    const willCancel = likeState === 2
+    const optimisticState = willCancel
+      ? { likeState: 0 as const, likeCount, dislikeCount: dislikeCount - 1 }
+      : { likeState: 2 as const, likeCount, dislikeCount: dislikeCount + 1 }
+
+    // 立即更新UI（乐观更新）
+    setLikeState(optimisticState.likeState)
+    setLikeCount(optimisticState.likeCount)
+    setDislikeCount(optimisticState.dislikeCount)
     setIsLiking(true)
+
     try {
+      // 调用API（后端会根据当前状态自动决定是点踩还是取消）
       await topicService.dislikePost(post.id)
-      // 可以添加成功提示或刷新数据
+
+      // 成功：保持乐观状态，更新Query缓存
+      updatePostsCache(
+        optimisticState.likeState,
+        optimisticState.likeCount,
+        optimisticState.dislikeCount
+      )
     } catch (error) {
-      console.error('点踩失败:', error)
+      console.error('[PostItem] dislike failed for post', post.id, ':', error)
+      // 失败：回滚到原始��态
+      setLikeState(originalState.likeState)
+      setLikeCount(originalState.likeCount)
+      setDislikeCount(originalState.dislikeCount)
+
+      // 检查是否是403错误（频率限制）
+      if (error instanceof ApiError && error.status === 403) {
+        toast.error('操作太快，请稍后再试', {
+          description: '请等待几秒后再继续操作',
+        })
+      }
     } finally {
       setIsLiking(false)
     }
@@ -437,18 +544,22 @@ function PostItem({ post }: PostItemProps) {
             <button
               onClick={handleLike}
               disabled={isLiking}
-              className="flex items-center gap-1 hover:text-primary transition-colors disabled:opacity-50"
+              className={`flex items-center gap-1 transition-colors disabled:opacity-50 ${
+                likeState === 1 ? 'text-red-500 hover:text-red-600' : 'hover:text-primary'
+              }`}
             >
               <ThumbsUp className="w-4 h-4" />
-              <span>{post.likeCount}</span>
+              <span>{likeCount}</span>
             </button>
             <button
               onClick={handleDislike}
               disabled={isLiking}
-              className="flex items-center gap-1 hover:text-destructive transition-colors disabled:opacity-50"
+              className={`flex items-center gap-1 transition-colors disabled:opacity-50 ${
+                likeState === 2 ? 'text-red-500 hover:text-red-600' : 'hover:text-destructive'
+              }`}
             >
               <ThumbsDown className="w-4 h-4" />
-              <span>{post.dislikeCount}</span>
+              <span>{dislikeCount}</span>
             </button>
           </div>
           <div className="flex items-center gap-2">

@@ -74,7 +74,13 @@ export class ApiClient {
         throw new ApiError(response.status, errorText || response.statusText)
       }
 
-      return response.json() as Promise<T>
+      // 处理空响应体（例如 204 No Content 或某些 200 响应）
+      const text = await response.text()
+      if (!text) {
+        return undefined as T
+      }
+
+      return JSON.parse(text) as T
     } catch (error) {
       if (error instanceof ApiError) {
         throw error
@@ -147,7 +153,13 @@ export class ApiClient {
       throw new ApiError(response.status, await response.text())
     }
 
-    return (await response.json()) as T
+    // 处理空响应体
+    const text = await response.text()
+    if (!text) {
+      return undefined as T
+    }
+
+    return JSON.parse(text) as T
   }
 }
 

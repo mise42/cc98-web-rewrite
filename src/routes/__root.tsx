@@ -3,6 +3,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { Button } from '@/components/ui/button'
+import { Toaster } from 'sonner'
 
 interface RouterContext {
   queryClient: QueryClient
@@ -16,6 +17,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         <Outlet />
       </main>
       <Footer />
+      <Toaster position="top-center" richColors />
     </div>
   ),
   errorComponent: ({ error }) => (
