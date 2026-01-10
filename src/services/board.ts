@@ -28,7 +28,8 @@ export const boardService = {
     pageSize: number = 20,
     type?: number
   ): Promise<{ list: ITopic[]; total: number }> {
-    let url = `/board/${boardId}/topic?page=${page}&pageSize=${pageSize}`
+    const from = (page - 1) * pageSize
+    let url = `/board/${boardId}/topic?from=${from}&size=${pageSize}`
     if (type !== undefined) {
       url += `&type=${type}`
     }
