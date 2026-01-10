@@ -39,7 +39,7 @@ export function BoardDetailPage() {
   })
 
   const {
-    data: topicsData,
+    data: topics,
     isLoading: topicsLoading,
     error: topicsError,
     refetch: refetchTopics,
@@ -90,8 +90,8 @@ export function BoardDetailPage() {
     )
   }
 
-  const topics = topicsData?.list || []
-  const totalCount = topicsData?.total || 0
+  const topicList = topics || []
+  const totalCount = board.topicCount || 0
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-[1200px]">
@@ -150,12 +150,12 @@ export function BoardDetailPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          {topics.length === 0 ? (
+          {topicList.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">暂无帖子</div>
           ) : (
             <>
               <div className="divide-y divide-border">
-                {topics.map(topic => (
+                {topicList.map(topic => (
                   <TopicItem key={topic.id} topic={topic} />
                 ))}
               </div>
