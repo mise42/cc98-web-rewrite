@@ -333,14 +333,18 @@ interface AuthenticatedUsercenterRouteChildren {
   AuthenticatedUsercenterMytopicsPageRoute: typeof AuthenticatedUsercenterMytopicsPageRoute
 }
 
-const AuthenticatedUsercenterRouteChildren: AuthenticatedUsercenterRouteChildren = {
-  AuthenticatedUsercenterMypostsPageRoute: AuthenticatedUsercenterMypostsPageRoute,
-  AuthenticatedUsercenterMytopicsPageRoute: AuthenticatedUsercenterMytopicsPageRoute,
-}
+const AuthenticatedUsercenterRouteChildren: AuthenticatedUsercenterRouteChildren =
+  {
+    AuthenticatedUsercenterMypostsPageRoute:
+      AuthenticatedUsercenterMypostsPageRoute,
+    AuthenticatedUsercenterMytopicsPageRoute:
+      AuthenticatedUsercenterMytopicsPageRoute,
+  }
 
-const AuthenticatedUsercenterRouteWithChildren = AuthenticatedUsercenterRoute._addFileChildren(
-  AuthenticatedUsercenterRouteChildren
-)
+const AuthenticatedUsercenterRouteWithChildren =
+  AuthenticatedUsercenterRoute._addFileChildren(
+    AuthenticatedUsercenterRouteChildren,
+  )
 
 interface AuthenticatedRouteChildren {
   AuthenticatedMessageRoute: typeof AuthenticatedMessageRoute
@@ -353,7 +357,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren
+  AuthenticatedRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
