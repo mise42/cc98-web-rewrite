@@ -15,8 +15,22 @@ export const topicService = {
   /**
    * 获取帖子回复列表
    */
-  async getTopicPosts(topicId: number, page: number = 1, pageSize: number = 20): Promise<IPost[]> {
-    return apiClient.get<IPost[]>(`/topic/${topicId}/post?page=${page}&pageSize=${pageSize}`)
+  async getTopicPosts(topicId: number, from: number = 0, size: number = 20): Promise<IPost[]> {
+    return apiClient.get<IPost[]>(`/topic/${topicId}/post?from=${from}&size=${size}`)
+  },
+
+  /**
+   * 获取特定用户在主题中的帖子（通过postId追踪该用户的所有回复）
+   */
+  async getUserPostsInTopic(
+    topicId: number,
+    postId: number,
+    from: number = 0,
+    size: number = 20
+  ): Promise<IPost[]> {
+    return apiClient.get<IPost[]>(
+      `/post/topic/specific-user?topicid=${topicId}&postid=${postId}&from=${from}&size=${size}`
+    )
   },
 
   /**
@@ -74,6 +88,39 @@ export const topicService = {
     order: 'desc' | 'asc' = 'desc'
   ): Promise<ITopic[]> {
     return apiClient.get<ITopic[]>(`/topic/me/favorite?from=${from}&size=${size}&order=${order}`)
+  },
+
+  /**
+   * 点赞帖子
+   */
+  async likePost(postId: number): Promise<void> {
+    return apiClient.put<void>(`/post/${postId}/like`, '1', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+  },
+
+  /**
+   * 点踩帖子
+   */
+  async dislikePost(postId: number): Promise<void> {
+    return apiClient.put<void>(`/post/${postId}/like`, '2', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+  },
+
+  /**
+   * 获取帖子点赞状态
+   */
+  async getPostLikeState(
+    postId: number
+  ): Promise<{ likeCount: number; dislikeCount: number; likeState: number }> {
+    return apiClient.get<{ likeCount: number; dislikeCount: number; likeState: number }>(
+      `/post/${postId}/like`
+    )
   },
 }
 
