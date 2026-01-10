@@ -1,10 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-import { useParams, Link } from '@tanstack/react-router'
+import { useParams, Link, useNavigate } from '@tanstack/react-router'
+import { Route as BoardRoute } from '@/routes/board/$boardId'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, MessageSquare, Eye, Clock, User, Pin, Star, Lock } from 'lucide-react'
 import { boardService } from '@/services/board'
+import { BoardPagination } from '@/components/board/BoardPagination'
 import type { IBoard, ITopic } from '@/types/api'
 import { formatDistanceToNow } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
@@ -12,6 +14,11 @@ import { ErrorState } from '@/components/ui/error-state'
 
 export function BoardDetailPage() {
   const { boardId } = useParams({ from: '/board/$boardId' })
+  const navigate = useNavigate()
+
+  // 从 URL 读取页码
+  const search = BoardRoute.useSearch()
+  const currentPage = search.page
 
   const {
     data: board,
@@ -37,8 +44,8 @@ export function BoardDetailPage() {
     error: topicsError,
     refetch: refetchTopics,
   } = useQuery({
-    queryKey: ['board', boardId, 'topics'],
-    queryFn: () => boardService.getBoardTopics(boardId, 1, 20),
+    queryKey: ['board', boardId, 'topics', currentPage],
+    queryFn: () => boardService.getBoardTopics(boardId, currentPage, 20),
     staleTime: 1000 * 60,
     enabled: !!board, // 只有获取到版面信息后才加载帖子
     retry: (failureCount, error) => {
@@ -58,6 +65,15 @@ export function BoardDetailPage() {
     if (topicsError) refetchTopics()
   }
 
+  // 页码变化处理
+  const handlePageChange = (page: number) => {
+    navigate({
+      to: '/board/$boardId',
+      params: { boardId },
+      search: { page },
+    })
+  }
+
   if (isLoading) {
     return <BoardDetailSkeleton />
   }
@@ -75,6 +91,7 @@ export function BoardDetailPage() {
   }
 
   const topics = topicsData?.list || []
+  const totalCount = topicsData?.total || 0
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-[1200px]">
@@ -136,11 +153,21 @@ export function BoardDetailPage() {
           {topics.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">暂无帖子</div>
           ) : (
-            <div className="divide-y divide-border">
-              {topics.map(topic => (
-                <TopicItem key={topic.id} topic={topic} />
-              ))}
-            </div>
+            <>
+              <div className="divide-y divide-border">
+                {topics.map(topic => (
+                  <TopicItem key={topic.id} topic={topic} />
+                ))}
+              </div>
+              {totalCount > 0 && (
+                <BoardPagination
+                  currentPage={currentPage}
+                  totalCount={totalCount}
+                  pageSize={20}
+                  onPageChange={handlePageChange}
+                />
+              )}
+            </>
           )}
         </CardContent>
       </Card>
