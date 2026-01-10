@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useParams, Link } from '@tanstack/react-router'
+import { useParams, Link, useNavigate } from '@tanstack/react-router'
+import { Route as TopicRoute } from '@/routes/topic/$topicId'
 import React from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -38,6 +39,12 @@ export function TopicDetailPage() {
   const numericTopicId = parseInt(topicId, 10)
   const { isAuthenticated, user } = useAuthStore()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
+
+  // 从 URL 读取查询参数
+  const search = TopicRoute.useSearch()
+  const urlPage = search.page
+  const urlMode = search.mode
 
   // 获取视图模式状态
   const {
@@ -54,8 +61,28 @@ export function TopicDetailPage() {
     setIsLoadingMore,
     resetPosts,
     setCurrentPage,
+    setViewMode,
     setTracePost,
   } = useTopicViewStore()
+
+  // 同步 URL 状态到 store（仅初始化时）
+  React.useEffect(() => {
+    if (urlMode !== viewMode) {
+      setViewMode(urlMode)
+    }
+    if (urlPage !== currentPage) {
+      setCurrentPage(urlPage)
+    }
+  }, [])
+
+  // 更新 URL 的辅助函数
+  const updateURL = (page: number, mode: 'pagination' | 'infinite') => {
+    navigate({
+      to: '/topic/$topicId',
+      params: { topicId },
+      search: { page, mode },
+    })
+  }
 
   const {
     data: topic,
@@ -293,7 +320,7 @@ export function TopicDetailPage() {
 
       {/* 视图模式切换 */}
       <div className="mb-4">
-        <ViewModeToggle />
+        <ViewModeToggle onModeChange={mode => updateURL(urlPage, mode)} />
       </div>
 
       {/* 追踪模式提示条 */}
@@ -335,7 +362,13 @@ export function TopicDetailPage() {
       {/* 分页控件或无限滚动触发器（追踪模式下不显示） */}
       {!tracePostId &&
         (viewMode === 'pagination' ? (
-          <PaginationControls totalCount={totalCount} onPageChange={setCurrentPage} />
+          <PaginationControls
+            totalCount={totalCount}
+            onPageChange={page => {
+              setCurrentPage(page)
+              updateURL(page, urlMode)
+            }}
+          />
         ) : (
           <InfiniteScrollTrigger onLoadMore={loadMore} totalCount={totalCount} />
         ))}
