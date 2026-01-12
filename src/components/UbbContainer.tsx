@@ -19,6 +19,12 @@ export function UbbContainer({ content, className }: UbbContainerProps) {
 
   processedContent = processedContent.replace(/\[ac(\d{2}|\d{4})\]/g, '[ac id=$1][/ac]')
 
+  processedContent = processedContent.replace(/\[ms(\d+)\]/g, '[ms id=$1][/ms]')
+
+  processedContent = processedContent.replace(/\[tb(\d+)\]/g, '[tb id=$1][/tb]')
+
+  processedContent = processedContent.replace(/\[CC98(\d+)\]/g, '[cc98 id=$1][/cc98]')
+
   processedContent = processedContent.replace(
     /\[([acf]):(\d{3})\]/g,
     '[mahjong type=$1 id=$2][/mahjong]'

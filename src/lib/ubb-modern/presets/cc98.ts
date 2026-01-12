@@ -10,7 +10,7 @@ import { BoardLink } from '../components/BoardLink'
 import { UserLink } from '../components/UserLink'
 import { Bold, Italic, Underline, Delete, Url, Color, Size, Align } from '../components/Standard'
 import { Table, TableRow, TableCell } from '../components/Table'
-import { Emotion, Ac, Mahjong } from '../components/Emotion'
+import { Emotion, Ac, Mahjong, Ms, Tb, Cc98 } from '../components/Emotion'
 import { List, ListItem } from '../components/List'
 import { Audio, Video } from '../components/Media'
 import { Font, HorizontalRule, Cursor } from '../components/Utility'
@@ -230,20 +230,16 @@ export const cc98Preset = () => {
           break
         case 'em':
           node.tag = Emotion
-          {
-            const emotionKeys = Object.keys(attrs)
-            if (emotionKeys.length > 0) {
-              node.attrs = { emotionId: emotionKeys[0] }
-            }
+          node.attrs = {
+            emotionId: attrs.id || attrs.em || Object.values(attrs)[0],
+            baseUrl: '',
           }
           break
         case 'ac':
           node.tag = Ac
-          {
-            const acKeys = Object.keys(attrs)
-            if (acKeys.length > 0) {
-              node.attrs = { acId: acKeys[0] }
-            }
+          node.attrs = {
+            acId: attrs.id || attrs.ac || Object.values(attrs)[0],
+            baseUrl: '',
           }
           break
         case 'mahjong':
@@ -251,6 +247,29 @@ export const cc98Preset = () => {
           node.attrs = {
             type: attrs.type as 'a' | 'c' | 'f',
             mahjongId: attrs.id,
+            baseUrl: '',
+          }
+          break
+        case 'ms':
+          node.tag = Ms
+          node.attrs = {
+            msId: attrs.id || attrs.ms || Object.values(attrs)[0],
+            baseUrl: '',
+          }
+          break
+        case 'tb':
+          node.tag = Tb
+          node.attrs = {
+            tbId: attrs.id || attrs.tb || Object.values(attrs)[0],
+            baseUrl: '',
+          }
+          break
+        case 'cc98':
+        case 'CC98':
+          node.tag = Cc98
+          node.attrs = {
+            cc98Id: attrs.id || attrs.cc98 || attrs.CC98 || Object.values(attrs)[0],
+            baseUrl: '',
           }
           break
         default:
@@ -258,7 +277,7 @@ export const cc98Preset = () => {
             const acMatch = tag.match(/^ac(\d+)$/)
             if (acMatch) {
               node.tag = Ac
-              node.attrs = { acId: acMatch[1] }
+              node.attrs = { acId: acMatch[1], baseUrl: '' }
             }
           } else if (/^[acf]:\d{3}$/.test(tag)) {
             const mahjongMatch = tag.match(/^([acf]):(\d{3})$/)
@@ -267,7 +286,26 @@ export const cc98Preset = () => {
               node.attrs = {
                 type: mahjongMatch[1] as 'a' | 'c' | 'f',
                 mahjongId: mahjongMatch[2],
+                baseUrl: '',
               }
+            }
+          } else if (tag.match(/^ms\d+$/)) {
+            const msMatch = tag.match(/^ms(\d+)$/)
+            if (msMatch) {
+              node.tag = Ms
+              node.attrs = { msId: msMatch[1], baseUrl: '' }
+            }
+          } else if (tag.match(/^tb\d+$/)) {
+            const tbMatch = tag.match(/^tb(\d+)$/)
+            if (tbMatch) {
+              node.tag = Tb
+              node.attrs = { tbId: tbMatch[1], baseUrl: '' }
+            }
+          } else if (tag.match(/^CC98\d+$/i)) {
+            const cc98Match = tag.match(/^CC98(\d+)$/i)
+            if (cc98Match) {
+              node.tag = Cc98
+              node.attrs = { cc98Id: cc98Match[1], baseUrl: '' }
             }
           }
       }

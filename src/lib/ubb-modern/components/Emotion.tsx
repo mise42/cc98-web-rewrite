@@ -103,3 +103,59 @@ export function Mahjong({ type, mahjongId, baseUrl }: MahjongProps) {
     />
   )
 }
+
+interface MsProps {
+  msId: string
+  baseUrl: string
+}
+
+export function Ms({ msId, baseUrl }: MsProps) {
+  const num = parseInt(msId, 10)
+  if (isNaN(num) || num < 1 || num > 54) {
+    console.warn(`Invalid msId: ${msId}`)
+    return <span>[ms{msId}]</span>
+  }
+
+  const url = `${baseUrl}/static/images/ms/ms${msId}.png`
+
+  return <img src={url} alt={`ms${msId}`} className="inline-block align-middle" loading="lazy" />
+}
+
+interface TbProps {
+  tbId: string
+  baseUrl: string
+}
+
+export function Tb({ tbId, baseUrl }: TbProps) {
+  const num = parseInt(tbId, 10)
+  if (isNaN(num) || num < 1 || num > 33) {
+    console.warn(`Invalid tbId: ${tbId}`)
+    return <span>[tb{tbId}]</span>
+  }
+
+  const url = `${baseUrl}/static/images/tb/tb${tbId}.png`
+
+  return <img src={url} alt={`tb${tbId}`} className="inline-block align-middle" loading="lazy" />
+}
+
+interface Cc98Props {
+  cc98Id: string
+  baseUrl: string
+}
+
+export function Cc98({ cc98Id, baseUrl }: Cc98Props) {
+  const num = parseInt(cc98Id, 10)
+  if (isNaN(num) || num < 1 || num > 37) {
+    console.warn(`Invalid cc98Id: ${cc98Id}`)
+    return <span>[CC98{cc98Id}]</span>
+  }
+
+  // CC9801-CC9814 are .gif, CC9815-CC9837 are .png
+  const ext = num <= 14 ? 'gif' : 'png'
+  const paddedId = cc98Id.padStart(2, '0')
+  const url = `${baseUrl}/static/images/CC98/CC98${paddedId}.${ext}`
+
+  return (
+    <img src={url} alt={`CC98${cc98Id}`} className="inline-block align-middle" loading="lazy" />
+  )
+}
