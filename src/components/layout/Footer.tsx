@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { Separator } from '@/components/ui/separator'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
