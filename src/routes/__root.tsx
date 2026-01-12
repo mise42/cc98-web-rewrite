@@ -17,7 +17,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       },
       {
         name: 'description',
-        content: 'CC98 论坛 - 清华大学学生社区',
+        content: 'CC98 论坛 - 浙江大学学生社区',
       },
       {
         name: 'viewport',
