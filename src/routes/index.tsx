@@ -14,5 +14,12 @@ export const Route = createFileRoute('/')({
     // 在路由级别预加载数据
     await context.queryClient.ensureQueryData(homeQueryOptions())
   },
+  head: () => ({
+    meta: [
+      {
+        title: 'CC98 论坛',
+      },
+    ],
+  }),
   component: HomePage,
 })

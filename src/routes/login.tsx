@@ -9,6 +9,13 @@ const loginSearchSchema = z.object({
 
 export const Route = createFileRoute('/login')({
   validateSearch: loginSearchSchema,
+  head: () => ({
+    meta: [
+      {
+        title: '登录 - CC98 论坛',
+      },
+    ],
+  }),
   component: LoginRoute,
 })
 

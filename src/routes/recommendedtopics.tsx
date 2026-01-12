@@ -15,5 +15,12 @@ export const Route = createFileRoute('/recommendedtopics')({
       })
     }
   },
+  head: () => ({
+    meta: [
+      {
+        title: '推荐主题 - CC98 论坛',
+      },
+    ],
+  }),
   component: RecommendedTopicsPage,
 })

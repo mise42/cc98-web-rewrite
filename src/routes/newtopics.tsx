@@ -21,6 +21,13 @@ export const Route = createFileRoute('/newtopics')({
       })
     }
   },
+  head: () => ({
+    meta: [
+      {
+        title: '查看新帖 - CC98 论坛',
+      },
+    ],
+  }),
   component: NewTopicsPage,
   validateSearch: newTopicsSearchSchema,
 })
