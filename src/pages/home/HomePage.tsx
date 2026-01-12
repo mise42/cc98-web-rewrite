@@ -27,6 +27,12 @@ import {
   BookOpen,
   Zap,
   Sparkles,
+  Dices,
+  BadgeCheck,
+  CreditCard,
+  ShieldCheck,
+  Crown,
+  Gamepad2,
 } from 'lucide-react'
 import type { IIndex } from '@/types/config'
 import { UbbContainer } from '@/components/UbbContainer'
@@ -146,6 +152,50 @@ function getIconForFunction(title: string): LucideIcon {
   // 快速/闪电
   if (t.includes('快速') || t.includes('速') || t.includes('quick') || t.includes('fast')) {
     return Zap
+  }
+
+  // 抽卡游戏/卡牌游戏
+  if (
+    t.includes('抽卡') ||
+    t.includes('卡牌') ||
+    t.includes('卡片') ||
+    t.includes('card') ||
+    t.includes('gacha')
+  ) {
+    return CreditCard
+  }
+
+  // 认证用户/VIP/大V
+  if (
+    t.includes('认证') ||
+    t.includes('vip') ||
+    t.includes('大v') ||
+    t.includes('verified') ||
+    t.includes('认证用户')
+  ) {
+    return BadgeCheck
+  }
+
+  // 竞猜中心/博彩/下注
+  if (
+    t.includes('竞猜') ||
+    t.includes('博彩') ||
+    t.includes('下注') ||
+    t.includes('betting') ||
+    t.includes('gambling') ||
+    t.includes('赌')
+  ) {
+    return Dices
+  }
+
+  // 游戏/娱乐
+  if (t.includes('游戏') || t.includes('娱乐') || t.includes('game') || t.includes('play')) {
+    return Gamepad2
+  }
+
+  // 攻略/指南/教程
+  if (t.includes('攻略') || t.includes('指南') || t.includes('guide')) {
+    return BookOpen
   }
 
   // 默认返回文档图标
