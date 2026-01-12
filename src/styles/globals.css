@@ -39,6 +39,47 @@
     sans-serif;
 }
 
+/* Explicit utility classes for theme colors */
+.text-foreground {
+  color: var(--color-foreground);
+}
+
+.bg-background {
+  background-color: var(--color-background);
+}
+
+.text-card-foreground {
+  color: var(--color-card-foreground);
+}
+
+.bg-card {
+  background-color: var(--color-card);
+}
+
+.text-muted-foreground {
+  color: var(--color-muted-foreground);
+}
+
+.text-primary {
+  color: var(--color-primary);
+}
+
+.bg-muted {
+  background-color: var(--color-muted);
+}
+
+.bg-destructive {
+  background-color: var(--color-destructive);
+}
+
+.text-destructive {
+  color: var(--color-destructive);
+}
+
+.border-border {
+  border-color: var(--color-border);
+}
+
 :root {
   color-scheme: light;
 }
