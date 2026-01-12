@@ -3,9 +3,154 @@ import { Carousel } from '@/components/ui/carousel'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { MessageSquare, Flame, BarChart3, Users, FileText } from 'lucide-react'
+import {
+  MessageSquare,
+  Flame,
+  BarChart3,
+  Users,
+  FileText,
+  Star,
+  Search,
+  Calendar,
+  HelpCircle,
+  Megaphone,
+  Newspaper,
+  Trophy,
+  Tag,
+  TrendingUp,
+  MessageCircle,
+  Home,
+  Grid3x3,
+  Clock,
+  Award,
+  Heart,
+  BookOpen,
+  Zap,
+  Sparkles,
+} from 'lucide-react'
 import type { IIndex } from '@/types/config'
 import { UbbContainer } from '@/components/UbbContainer'
+import type { LucideIcon } from 'lucide-react'
+
+// 根据功能标题匹配图标
+function getIconForFunction(title: string): LucideIcon {
+  const t = title.toLowerCase()
+
+  // 新帖/最新
+  if (t.includes('新') || t.includes('new') || t.includes('latest') || t.includes('最新')) {
+    return Sparkles
+  }
+
+  // 热门/热门话题
+  if (t.includes('热门') || t.includes('hot') || t.includes('热') || t.includes('流行')) {
+    return Flame
+  }
+
+  // 精华/精选
+  if (t.includes('精华') || t.includes('精选') || t.includes('best') || t.includes('star')) {
+    return Star
+  }
+
+  // 问答/提问
+  if (
+    t.includes('问答') ||
+    t.includes('提问') ||
+    t.includes('question') ||
+    t.includes('help') ||
+    t.includes('疑问')
+  ) {
+    return HelpCircle
+  }
+
+  // 活动/赛事
+  if (t.includes('活动') || t.includes('赛事') || t.includes('event') || t.includes('calendar')) {
+    return Calendar
+  }
+
+  // 公告/通知
+  if (
+    t.includes('公告') ||
+    t.includes('通知') ||
+    t.includes('announcement') ||
+    t.includes('notice')
+  ) {
+    return Megaphone
+  }
+
+  // 新闻/资讯
+  if (t.includes('新闻') || t.includes('资讯') || t.includes('news')) {
+    return Newspaper
+  }
+
+  // 排行榜/榜单
+  if (t.includes('排行') || t.includes('榜单') || t.includes('rank') || t.includes('top')) {
+    return Trophy
+  }
+
+  // 标签/分类
+  if (t.includes('标签') || t.includes('分类') || t.includes('tag') || t.includes('category')) {
+    return Tag
+  }
+
+  // 趋势/关注
+  if (t.includes('趋势') || t.includes('关注') || t.includes('trending') || t.includes('follow')) {
+    return TrendingUp
+  }
+
+  // 搜索/查找
+  if (t.includes('搜索') || t.includes('查找') || t.includes('search') || t.includes('find')) {
+    return Search
+  }
+
+  // 消息/评论
+  if (t.includes('消息') || t.includes('评论') || t.includes('message') || t.includes('comment')) {
+    return MessageCircle
+  }
+
+  // 首页/主页
+  if (t.includes('首页') || t.includes('主页') || t.includes('home') || t.includes('index')) {
+    return Home
+  }
+
+  // 版块/广场
+  if (t.includes('版块') || t.includes('广场') || t.includes('board') || t.includes('forum')) {
+    return Grid3x3
+  }
+
+  // 最近/时间
+  if (t.includes('最近') || t.includes('时间') || t.includes('recent') || t.includes('time')) {
+    return Clock
+  }
+
+  // 奖励/荣誉
+  if (t.includes('奖励') || t.includes('荣誉') || t.includes('award') || t.includes('honor')) {
+    return Award
+  }
+
+  // 收藏/喜欢
+  if (t.includes('收藏') || t.includes('喜欢') || t.includes('favorite') || t.includes('like')) {
+    return Heart
+  }
+
+  // 文档/教程/学习
+  if (
+    t.includes('文档') ||
+    t.includes('教程') ||
+    t.includes('学习') ||
+    t.includes('guide') ||
+    t.includes('tutorial')
+  ) {
+    return BookOpen
+  }
+
+  // 快速/闪电
+  if (t.includes('快速') || t.includes('速') || t.includes('quick') || t.includes('fast')) {
+    return Zap
+  }
+
+  // 默认返回文档图标
+  return FileText
+}
 
 export function HomePage() {
   const { data, isLoading, error, refetch } = useQuery<IIndex>({
@@ -66,7 +211,7 @@ export function HomePage() {
           {data.recommendationReading && data.recommendationReading.length > 0 && (
             <Card className="shadow-md bg-card/50 backdrop-blur-sm">
               <CardHeader className="pb-3 border-b border-border">
-                <CardTitle className="flex items-center gap-2 text-lg">
+                <CardTitle className="flex items-center gap-2 text-lg text-foreground">
                   <FileText className="w-5 h-5 text-primary" />
                   推荐阅读
                 </CardTitle>
@@ -113,7 +258,7 @@ export function HomePage() {
 
           <Card className="shadow-md bg-card/50 backdrop-blur-sm flex-1">
             <CardHeader className="pb-3 border-b border-border">
-              <CardTitle className="flex items-center gap-2 text-lg">
+              <CardTitle className="flex items-center gap-2 text-lg text-foreground">
                 <Flame className="w-5 h-5 text-destructive" />
                 热门话题
               </CardTitle>
@@ -162,34 +307,29 @@ export function HomePage() {
           {data.recommendationFunction && data.recommendationFunction.length > 0 && (
             <Card className="shadow-md bg-gradient-to-br from-primary/10 to-transparent border-primary/20">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base font-medium flex items-center gap-2">
+                <CardTitle className="text-base font-medium flex items-center gap-2 text-foreground">
                   <span>📌</span> 推荐功能
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
                 <div className="grid grid-cols-4 gap-4">
-                  {data.recommendationFunction.map((item, index) => (
-                    <a
-                      key={index}
-                      href={item.link || '#'}
-                      className="flex flex-col items-center gap-2 group"
-                    >
-                      <div className="w-12 h-12 rounded-xl bg-background shadow-sm flex items-center justify-center border border-border group-hover:border-primary/50 group-hover:shadow-md transition-all">
-                        {item.imageLink ? (
-                          <img
-                            src={item.imageLink}
-                            alt={item.title}
-                            className="w-8 h-8 rounded-full"
-                          />
-                        ) : (
-                          <span className="text-xl">🔗</span>
-                        )}
-                      </div>
-                      <span className="text-xs text-center text-muted-foreground group-hover:text-foreground transition-colors">
-                        {item.title}
-                      </span>
-                    </a>
-                  ))}
+                  {data.recommendationFunction.map((item, index) => {
+                    const Icon = getIconForFunction(item.title)
+                    return (
+                      <a
+                        key={index}
+                        href={item.link || '#'}
+                        className="flex flex-col items-center gap-2 group"
+                      >
+                        <div className="w-12 h-12 rounded-xl bg-background shadow-sm flex items-center justify-center border border-border group-hover:border-primary/50 group-hover:shadow-md transition-all">
+                          <Icon className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+                        </div>
+                        <span className="text-xs text-center text-muted-foreground group-hover:text-foreground transition-colors">
+                          {item.title}
+                        </span>
+                      </a>
+                    )
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -197,7 +337,7 @@ export function HomePage() {
 
           <Card className="shadow-md bg-card/50 backdrop-blur-sm">
             <CardHeader className="pb-3 border-b border-border">
-              <CardTitle className="flex items-center gap-2 text-lg">
+              <CardTitle className="flex items-center gap-2 text-lg text-foreground">
                 <BarChart3 className="w-5 h-5 text-primary" />
                 论坛统计
               </CardTitle>
