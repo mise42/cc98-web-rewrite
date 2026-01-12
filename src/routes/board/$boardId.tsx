@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 
 const boardSearchSchema = z.object({
   page: z.coerce.number().int().positive().optional().default(1),
+  mode: z.enum(['pagination', 'infinite']).optional().default('pagination'),
 })
 
 export const Route = createFileRoute('/board/$boardId')({

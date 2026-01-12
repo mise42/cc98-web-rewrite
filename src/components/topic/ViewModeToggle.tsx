@@ -1,42 +1,40 @@
-import { useTopicViewStore } from '@/stores/topic-view'
-import { Button } from '@/components/ui/button'
-import { List, ChevronDown } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { List, InfinityIcon } from 'lucide-react'
+
+type ViewMode = 'pagination' | 'infinite'
 
 interface ViewModeToggleProps {
-  onModeChange?: (mode: 'pagination' | 'infinite') => void
+  mode: ViewMode
+  onModeChange: (mode: ViewMode) => void
 }
 
-export function ViewModeToggle({ onModeChange }: ViewModeToggleProps) {
-  const { viewMode, setViewMode } = useTopicViewStore()
+const modeOptions: { value: ViewMode; label: string; icon: React.ReactNode }[] = [
+  { value: 'pagination', label: '分页浏览', icon: <List className="w-4 h-4" /> },
+  { value: 'infinite', label: '无限滚动', icon: <InfinityIcon className="w-4 h-4" /> },
+]
 
-  const handleModeChange = (mode: 'pagination' | 'infinite') => {
-    setViewMode(mode)
-    onModeChange?.(mode)
-  }
-
+export function ViewModeToggle({ mode, onModeChange }: ViewModeToggleProps) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-sm text-muted-foreground">浏览模式：</span>
-      <div className="inline-flex items-center gap-1 p-1 bg-muted rounded-lg">
-        <Button
-          variant={viewMode === 'pagination' ? 'default' : 'ghost'}
-          size="sm"
-          onClick={() => handleModeChange('pagination')}
-          className="gap-1.5"
-        >
-          <List className="w-4 h-4" />
-          分页
-        </Button>
-        <Button
-          variant={viewMode === 'infinite' ? 'default' : 'ghost'}
-          size="sm"
-          onClick={() => handleModeChange('infinite')}
-          className="gap-1.5"
-        >
-          <ChevronDown className="w-4 h-4" />
-          无限滚动
-        </Button>
-      </div>
-    </div>
+    <Select value={mode} onValueChange={onModeChange}>
+      <SelectTrigger className="w-[140px]">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {modeOptions.map(option => (
+          <SelectItem key={option.value} value={option.value}>
+            <div className="flex items-center gap-2">
+              {option.icon}
+              <span>{option.label}</span>
+            </div>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   )
 }

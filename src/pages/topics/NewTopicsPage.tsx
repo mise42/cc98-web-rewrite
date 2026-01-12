@@ -1,80 +1,191 @@
-import { useCallback, useEffect, useRef } from 'react'
-import { useInfiniteQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
+import { useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
-import { Clock, MessageSquare, Eye, User, Pin, Star, Loader2 } from 'lucide-react'
+import { Clock, Loader2 } from 'lucide-react'
 import { topicService } from '@/services/topic'
+import { TopicViewModeSelector } from '@/components/topic/TopicViewModeSelector'
+import { ViewModeToggle } from '@/components/topic/ViewModeToggle'
+import { ClassicTopicItem } from '@/components/topic/ClassicTopicItem'
+import { CardTopicItem } from '@/components/topic/CardTopicItem'
+import { PaginationControls } from '@/components/common/PaginationControls'
+import { InfiniteScrollTrigger } from '@/components/common/InfiniteScrollTrigger'
 import type { ITopic } from '@/types/api'
-import { formatDistanceToNow } from 'date-fns'
-import { zhCN } from 'date-fns/locale'
-
+import { useTopicViewModeStore } from '@/stores/topic-view-mode'
+import { useNewTopicsViewStore } from '@/stores/new-topics-view'
 import { ErrorState } from '@/components/ui/error-state'
 
 const PAGE_SIZE = 20
 const MAX_TOPICS = 500
 
 export function NewTopicsPage() {
-  const loadMoreRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
-  const { data, isLoading, error, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: ['topics', 'new'],
-      queryFn: async ({ pageParam = 0 }) => {
-        return topicService.getNewTopics(pageParam, PAGE_SIZE)
-      },
-      getNextPageParam: (lastPage, allPages) => {
-        const totalLoaded = allPages.flat().length
-        if (lastPage.length < PAGE_SIZE || totalLoaded >= MAX_TOPICS) {
-          return undefined
-        }
-        return totalLoaded
-      },
-      initialPageParam: 0,
-      staleTime: 1000 * 60,
-      retry: (failureCount, error) => {
-        // 不重试 401/403 错误
-        if (error instanceof Error && 'status' in error && (error as any).status === 401) {
-          return false
-        }
-        return failureCount < 3
-      },
-    })
+  // 从 URL 读取查询参数
+  const search = useSearch({ from: '/newtopics' })
+  const urlPage = search.page
+  const urlMode = search.mode
 
-  const handleScroll = useCallback(() => {
-    if (!loadMoreRef.current || isFetchingNextPage || !hasNextPage) return
+  // 显示模式（classic/card/media-only）
+  const displayMode = useTopicViewModeStore(state => state.mode)
 
-    const rect = loadMoreRef.current.getBoundingClientRect()
-    const isVisible = rect.top <= window.innerHeight + 200
+  // 视图模式（pagination/infinite）
+  const {
+    viewMode,
+    currentPage,
+    allTopics,
+    hasMore,
+    isLoadingMore,
+    setViewMode,
+    setCurrentPage,
+    setAllTopics,
+    appendTopics,
+    setHasMore,
+    setIsLoadingMore,
+    resetTopics,
+  } = useNewTopicsViewStore()
 
-    if (isVisible) {
-      fetchNextPage()
-    }
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
-
+  // 同步 URL 状态到 store（仅初始化时）
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [handleScroll])
+    if (urlMode !== viewMode) {
+      setViewMode(urlMode)
+    }
+    if (urlPage !== currentPage) {
+      setCurrentPage(urlPage)
+    }
+  }, [])
+
+  // 更新 URL 的辅助函数
+  const updateURL = (page: number, mode: 'pagination' | 'infinite') => {
+    navigate({
+      to: '/newtopics',
+      search: { page, mode },
+    })
+  }
+
+  // 分页模式：获取当前页的帖子
+  const {
+    data: pagedTopics,
+    isLoading: pagedLoading,
+    error: pagedError,
+  } = useQuery<ITopic[]>({
+    queryKey: ['topics', 'new', 'pagination', currentPage, displayMode],
+    queryFn: async () => {
+      const from = (currentPage - 1) * PAGE_SIZE
+      if (displayMode === 'media-only') {
+        return topicService.getNewMediaTopics(from, PAGE_SIZE)
+      } else {
+        return topicService.getNewTopics(from, PAGE_SIZE)
+      }
+    },
+    enabled: viewMode === 'pagination',
+    staleTime: 1000 * 60,
+    retry: (failureCount, error) => {
+      if (error instanceof Error && 'status' in error && (error as any).status === 401) {
+        return false
+      }
+      return failureCount < 3
+    },
+  })
+
+  // 无限滚动模式：初始加载
+  const { isLoading: initialLoading, error: initialError } = useQuery<ITopic[]>({
+    queryKey: ['topics', 'new', 'infinite', 'initial', displayMode],
+    queryFn: async () => {
+      if (displayMode === 'media-only') {
+        const data = await topicService.getNewMediaTopics(0, PAGE_SIZE)
+        if (allTopics.length === 0) {
+          setAllTopics(data)
+          setHasMore(data.length === PAGE_SIZE)
+        }
+        return data
+      } else {
+        const data = await topicService.getNewTopics(0, PAGE_SIZE)
+        if (allTopics.length === 0) {
+          setAllTopics(data)
+          setHasMore(data.length === PAGE_SIZE)
+        }
+        return data
+      }
+    },
+    enabled: viewMode === 'infinite' && allTopics.length === 0,
+    staleTime: 1000 * 60,
+    retry: (failureCount, error) => {
+      if (error instanceof Error && 'status' in error && (error as any).status === 401) {
+        return false
+      }
+      return failureCount < 3
+    },
+  })
+
+  // 无限滚动模式：加载更多
+  const loadMore = async () => {
+    if (isLoadingMore || !hasMore) return
+    setIsLoadingMore(true)
+    try {
+      const from = allTopics.length
+      let newTopics: ITopic[]
+
+      if (displayMode === 'media-only') {
+        newTopics = await topicService.getNewMediaTopics(from, PAGE_SIZE)
+      } else {
+        newTopics = await topicService.getNewTopics(from, PAGE_SIZE)
+      }
+
+      appendTopics(newTopics)
+      setHasMore(newTopics.length === PAGE_SIZE && allTopics.length + newTopics.length < MAX_TOPICS)
+    } finally {
+      setIsLoadingMore(false)
+    }
+  }
+
+  // 处理模式切换
+  const handleModeChange = (mode: 'pagination' | 'infinite') => {
+    setViewMode(mode)
+    resetTopics()
+    // 清除查询缓存
+    queryClient.invalidateQueries({ queryKey: ['topics', 'new'] })
+    updateURL(1, mode)
+  }
+
+  // 处理分页变化
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    updateURL(page, viewMode)
+  }
+
+  // 加载状态
+  const isLoading = viewMode === 'pagination' ? pagedLoading : initialLoading
+  const error = viewMode === 'pagination' ? pagedError : initialError
+  const topics = viewMode === 'pagination' ? (pagedTopics ?? []) : allTopics
 
   if (isLoading) {
     return <NewTopicsSkeleton />
   }
 
   if (error) {
-    return <ErrorState error={error as Error} retry={() => refetch()} />
+    return (
+      <ErrorState
+        error={error as Error}
+        retry={() => queryClient.invalidateQueries({ queryKey: ['topics', 'new'] })}
+      />
+    )
   }
-
-  const topics = data?.pages.flat() ?? []
 
   if (topics.length === 0) {
     return (
       <div className="container mx-auto px-4 py-12 flex justify-center">
-        <div className="text-center text-muted-foreground">暂无新帖</div>
+        <div className="text-center text-muted-foreground">
+          {displayMode === 'media-only' ? '暂无媒体帖子' : '暂无新帖'}
+        </div>
       </div>
     )
   }
+
+  const isGridLayout = displayMode === 'card' || displayMode === 'media-only'
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-[1200px]">
@@ -84,113 +195,57 @@ export function NewTopicsPage() {
         <Badge variant="secondary" className="text-xs">
           最新发布
         </Badge>
-        <span className="text-sm text-muted-foreground ml-auto">已加载 {topics.length} 条</span>
+        {displayMode === 'media-only' && (
+          <Badge variant="outline" className="text-xs ml-2">
+            只看媒体
+          </Badge>
+        )}
+        <div className="flex items-center gap-4 ml-auto">
+          <span className="text-sm text-muted-foreground">已加载 {topics.length} 条</span>
+          <TopicViewModeSelector />
+          <ViewModeToggle mode={viewMode} onModeChange={handleModeChange} />
+        </div>
       </div>
 
       <Card className="shadow-md bg-card/50 backdrop-blur-sm">
         <CardContent className="p-0">
-          <div className="divide-y divide-border">
-            {topics.map(topic => (
-              <TopicItem key={topic.id} topic={topic} />
-            ))}
-          </div>
+          {isGridLayout ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+              {topics.map(topic => (
+                <CardTopicItem key={topic.id} topic={topic} />
+              ))}
+            </div>
+          ) : (
+            <div className="divide-y divide-border">
+              {topics.map(topic => (
+                <ClassicTopicItem key={topic.id} topic={topic} />
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      <div ref={loadMoreRef} className="flex justify-center py-8">
-        {isFetchingNextPage ? (
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Loader2 className="w-5 h-5 animate-spin" />
-            <span>加载更多...</span>
-          </div>
-        ) : hasNextPage ? (
-          <button
-            onClick={() => fetchNextPage()}
-            className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted/50 rounded-md transition-colors"
-          >
-            加载更多
-          </button>
-        ) : (
-          <span className="text-sm text-muted-foreground">
-            {topics.length >= MAX_TOPICS ? '已达到最大加载数量' : '没有更多了'}
-          </span>
-        )}
-      </div>
+      {viewMode === 'pagination' ? (
+        <PaginationControls
+          currentPage={currentPage}
+          totalCount={MAX_TOPICS}
+          pageSize={PAGE_SIZE}
+          onPageChange={handlePageChange}
+          scrollToTop={true}
+        />
+      ) : (
+        <InfiniteScrollTrigger
+          onLoadMore={loadMore}
+          hasMore={hasMore}
+          isLoadingMore={isLoadingMore}
+          currentCount={allTopics.length}
+          message={
+            allTopics.length >= MAX_TOPICS ? `已达到最大加载数量 ${MAX_TOPICS} 条` : undefined
+          }
+        />
+      )}
     </div>
   )
-}
-
-interface TopicItemProps {
-  topic: ITopic
-}
-
-function TopicItem({ topic }: TopicItemProps) {
-  const isTop = topic.topState > 0
-  const isBest = topic.bestState > 0
-
-  return (
-    <Link
-      to="/topic/$topicId"
-      params={{ topicId: String(topic.id) }}
-      className="flex items-center justify-between px-6 py-4 hover:bg-muted/30 transition-colors group"
-    >
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          {isTop && (
-            <Badge variant="destructive" className="text-[10px] px-1.5 py-0 h-4">
-              <Pin className="w-3 h-3 mr-0.5" />
-              置顶
-            </Badge>
-          )}
-          {isBest && (
-            <Badge className="text-[10px] px-1.5 py-0 h-4 bg-amber-500/20 text-amber-400 border-amber-500/30">
-              <Star className="w-3 h-3 mr-0.5" />
-              精华
-            </Badge>
-          )}
-          <span className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
-            {topic.title}
-          </span>
-        </div>
-        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <User className="w-3 h-3" />
-            {topic.isAnonymous ? '匿名用户' : topic.userName}
-          </span>
-          <span className="flex items-center gap-1">
-            <Clock className="w-3 h-3" />
-            {formatDate(topic.time)}
-          </span>
-          {topic.boardName && (
-            <Badge variant="outline" className="text-[10px] px-1 py-0 h-4">
-              {topic.boardName}
-            </Badge>
-          )}
-        </div>
-      </div>
-      <div className="flex items-center gap-6 text-sm text-muted-foreground shrink-0 ml-4">
-        <div className="flex items-center gap-1">
-          <MessageSquare className="w-4 h-4" />
-          <span>{topic.replyCount}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <Eye className="w-4 h-4" />
-          <span>{topic.hitCount}</span>
-        </div>
-      </div>
-    </Link>
-  )
-}
-
-function formatDate(dateStr: string) {
-  if (!dateStr) return '未知时间'
-  try {
-    const date = new Date(dateStr)
-    if (isNaN(date.getTime())) return '无效时间'
-    return formatDistanceToNow(date, { addSuffix: true, locale: zhCN })
-  } catch (e) {
-    return '未知时间'
-  }
 }
 
 function NewTopicsSkeleton() {

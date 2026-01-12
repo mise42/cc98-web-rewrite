@@ -1,24 +1,71 @@
-import { useQuery } from '@tanstack/react-query'
-import { useParams, Link, useNavigate } from '@tanstack/react-router'
-import { Route as BoardRoute } from '@/routes/board/$boardId'
+import { useEffect, useMemo } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useParams, Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, MessageSquare, Eye, Clock, User, Pin, Star, Lock } from 'lucide-react'
+import { ArrowLeft, MessageSquare, User, Pin, Star, Lock } from 'lucide-react'
 import { boardService } from '@/services/board'
-import { BoardPagination } from '@/components/board/BoardPagination'
+import { TopicViewModeSelector } from '@/components/topic/TopicViewModeSelector'
+import { ViewModeToggle } from '@/components/topic/ViewModeToggle'
+import { ClassicTopicItem } from '@/components/topic/ClassicTopicItem'
+import { CardTopicItem } from '@/components/topic/CardTopicItem'
+import { PaginationControls } from '@/components/common/PaginationControls'
+import { InfiniteScrollTrigger } from '@/components/common/InfiniteScrollTrigger'
 import type { IBoard, ITopic } from '@/types/api'
-import { formatDistanceToNow } from 'date-fns'
-import { zhCN } from 'date-fns/locale'
 import { ErrorState } from '@/components/ui/error-state'
+import { useTopicViewModeStore } from '@/stores/topic-view-mode'
+import { useBoardTopicsViewStore } from '@/stores/board-topics-view'
+
+const PAGE_SIZE = 20
 
 export function BoardDetailPage() {
   const { boardId } = useParams({ from: '/board/$boardId' })
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
-  // 从 URL 读取页码
-  const search = BoardRoute.useSearch()
-  const currentPage = search.page
+  // 从 URL 读取查询参数
+  const search = useSearch({ from: '/board/$boardId' })
+  const urlPage = search.page
+  const urlMode = search.mode
+
+  // 显示模式（classic/card/media-only）
+  const displayMode = useTopicViewModeStore(state => state.mode)
+
+  // 视图模式（pagination/infinite）
+  const {
+    viewMode,
+    currentPage,
+    allTopics,
+    hasMore,
+    isLoadingMore,
+    setViewMode,
+    setCurrentPage,
+    setAllTopics,
+    appendTopics,
+    setHasMore,
+    setIsLoadingMore,
+    resetTopics,
+  } = useBoardTopicsViewStore()
+
+  // 同步 URL 状态到 store（仅初始化时）
+  useEffect(() => {
+    if (urlMode !== viewMode) {
+      setViewMode(urlMode)
+    }
+    if (urlPage !== currentPage) {
+      setCurrentPage(urlPage)
+    }
+  }, [])
+
+  // 更新 URL 的辅助函数
+  const updateURL = (page: number, mode: 'pagination' | 'infinite') => {
+    navigate({
+      to: '/board/$boardId',
+      params: { boardId },
+      search: { page, mode },
+    })
+  }
 
   const {
     data: board,
@@ -30,7 +77,6 @@ export function BoardDetailPage() {
     queryFn: () => boardService.getBoard(boardId),
     staleTime: 1000 * 60 * 5,
     retry: (failureCount, error) => {
-      // 不重试 401/403 错误
       if (error instanceof Error && 'status' in error && (error as any).status === 401) {
         return false
       }
@@ -38,18 +84,17 @@ export function BoardDetailPage() {
     },
   })
 
+  // 分页模式：获取当前页的帖子
   const {
-    data: topics,
-    isLoading: topicsLoading,
-    error: topicsError,
-    refetch: refetchTopics,
-  } = useQuery({
-    queryKey: ['board', boardId, 'topics', currentPage],
-    queryFn: () => boardService.getBoardTopics(boardId, currentPage, 20),
+    data: pagedTopics,
+    isLoading: pagedLoading,
+    error: pagedError,
+  } = useQuery<ITopic[]>({
+    queryKey: ['board', boardId, 'topics', 'pagination', currentPage],
+    queryFn: () => boardService.getBoardTopics(boardId, currentPage, PAGE_SIZE),
+    enabled: viewMode === 'pagination' && !!board,
     staleTime: 1000 * 60,
-    enabled: !!board, // 只有获取到版面信息后才加载帖子
     retry: (failureCount, error) => {
-      // 不重试 401/403 错误
       if (error instanceof Error && 'status' in error && (error as any).status === 401) {
         return false
       }
@@ -57,22 +102,83 @@ export function BoardDetailPage() {
     },
   })
 
-  const isLoading = boardLoading || (!!board && topicsLoading)
-  const error = boardError || topicsError
+  // 无限滚动模式：初始加载
+  const { isLoading: initialLoading, error: initialError } = useQuery<ITopic[]>({
+    queryKey: ['board', boardId, 'topics', 'infinite', 'initial'],
+    queryFn: async () => {
+      const data = await boardService.getBoardTopics(boardId, 1, PAGE_SIZE)
+      if (allTopics.length === 0) {
+        setAllTopics(data)
+        setHasMore(data.length === PAGE_SIZE)
+      }
+      return data
+    },
+    enabled: viewMode === 'infinite' && !!board && allTopics.length === 0,
+    staleTime: 1000 * 60,
+    retry: (failureCount, error) => {
+      if (error instanceof Error && 'status' in error && (error as any).status === 401) {
+        return false
+      }
+      return failureCount < 3
+    },
+  })
+
+  // 无限滚动模式：加载更多
+  const loadMore = async () => {
+    if (isLoadingMore || !hasMore) return
+    setIsLoadingMore(true)
+    try {
+      const page = Math.floor(allTopics.length / PAGE_SIZE) + 1
+      const newTopics = await boardService.getBoardTopics(boardId, page, PAGE_SIZE)
+      appendTopics(newTopics)
+      setHasMore(newTopics.length === PAGE_SIZE)
+    } finally {
+      setIsLoadingMore(false)
+    }
+  }
+
+  // 处理模式切换
+  const handleModeChange = (mode: 'pagination' | 'infinite') => {
+    setViewMode(mode)
+    resetTopics()
+    // 清除查询缓存
+    queryClient.invalidateQueries({ queryKey: ['board', boardId, 'topics'] })
+    updateURL(1, mode)
+  }
+
+  // 处理分页变化
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    updateURL(page, viewMode)
+  }
 
   const handleRetry = () => {
     if (boardError) refetchBoard()
-    if (topicsError) refetchTopics()
+    queryClient.invalidateQueries({ queryKey: ['board', boardId, 'topics'] })
   }
 
-  // 页码变化处理
-  const handlePageChange = (page: number) => {
-    navigate({
-      to: '/board/$boardId',
-      params: { boardId },
-      search: { page },
-    })
+  // 加载状态
+  const isLoading =
+    boardLoading || (!!board && (viewMode === 'pagination' ? pagedLoading : initialLoading))
+  const error = boardError || (viewMode === 'pagination' ? pagedError : initialError)
+
+  // 根据显示模式过滤帖子
+  const filterTopics = (topics: ITopic[] | undefined) => {
+    const topicList = topics || []
+    if (displayMode === 'media-only') {
+      return topicList.filter(
+        topic => topic.contentType && topic.contentType >= 2 && topic.contentType <= 4
+      )
+    }
+    return topicList
   }
+
+  // 分页模式使用过滤后的帖子
+  const filteredPagedTopics = useMemo(() => filterTopics(pagedTopics), [pagedTopics, displayMode])
+  // 无限滚动模式使用过滤后的帖子
+  const filteredAllTopics = useMemo(() => filterTopics(allTopics), [allTopics, displayMode])
+
+  const topics = viewMode === 'pagination' ? filteredPagedTopics : filteredAllTopics
 
   if (isLoading) {
     return <BoardDetailSkeleton />
@@ -90,8 +196,8 @@ export function BoardDetailPage() {
     )
   }
 
-  const topicList = topics || []
   const totalCount = board.topicCount || 0
+  const isGridLayout = displayMode === 'card' || displayMode === 'media-only'
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-[1200px]">
@@ -107,7 +213,7 @@ export function BoardDetailPage() {
         <Card className="shadow-md bg-card/50 backdrop-blur-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <div>
+              <div className="flex-1">
                 <CardTitle className="text-2xl font-bold flex items-center gap-2">
                   {board.name}
                   {board.isLock && <Lock className="w-5 h-5 text-muted-foreground" />}
@@ -116,20 +222,24 @@ export function BoardDetailPage() {
                   <p className="text-muted-foreground mt-2">{board.description}</p>
                 )}
               </div>
-              <div className="flex items-center gap-6 text-sm">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-foreground">{board.topicCount}</div>
-                  <div className="text-xs text-muted-foreground">主题</div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-6 text-sm">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-foreground">{board.topicCount}</div>
+                    <div className="text-xs text-muted-foreground">主题</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-foreground">{board.postCount}</div>
+                    <div className="text-xs text-muted-foreground">帖子</div>
+                  </div>
+                  {board.todayCount > 0 && (
+                    <Badge variant="destructive" className="text-sm px-3 py-1">
+                      今日 +{board.todayCount}
+                    </Badge>
+                  )}
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-foreground">{board.postCount}</div>
-                  <div className="text-xs text-muted-foreground">帖子</div>
-                </div>
-                {board.todayCount > 0 && (
-                  <Badge variant="destructive" className="text-sm px-3 py-1">
-                    今日 +{board.todayCount}
-                  </Badge>
-                )}
+                <TopicViewModeSelector />
+                <ViewModeToggle mode={viewMode} onModeChange={handleModeChange} />
               </div>
             </div>
             {board.boardMasters && board.boardMasters.length > 0 && (
@@ -147,24 +257,48 @@ export function BoardDetailPage() {
           <CardTitle className="text-lg flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-primary" />
             帖子列表
+            {displayMode === 'media-only' && (
+              <Badge variant="secondary" className="ml-2">
+                只看媒体
+              </Badge>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          {topicList.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground">暂无帖子</div>
+          {topics.length === 0 ? (
+            <div className="p-8 text-center text-muted-foreground">
+              {displayMode === 'media-only' ? '本版块暂无媒体帖子' : '暂无帖子'}
+            </div>
           ) : (
             <>
-              <div className="divide-y divide-border">
-                {topicList.map(topic => (
-                  <TopicItem key={topic.id} topic={topic} />
-                ))}
-              </div>
-              {totalCount > 0 && (
-                <BoardPagination
+              {isGridLayout ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                  {topics.map(topic => (
+                    <CardTopicItem key={topic.id} topic={topic} />
+                  ))}
+                </div>
+              ) : (
+                <div className="divide-y divide-border">
+                  {topics.map(topic => (
+                    <ClassicTopicItem key={topic.id} topic={topic} />
+                  ))}
+                </div>
+              )}
+              {viewMode === 'pagination' ? (
+                <PaginationControls
                   currentPage={currentPage}
                   totalCount={totalCount}
-                  pageSize={20}
+                  pageSize={PAGE_SIZE}
                   onPageChange={handlePageChange}
+                  scrollToTop={true}
+                />
+              ) : (
+                <InfiniteScrollTrigger
+                  onLoadMore={loadMore}
+                  hasMore={hasMore}
+                  isLoadingMore={isLoadingMore}
+                  currentCount={allTopics.length}
+                  message="没有更多帖子了"
                 />
               )}
             </>
@@ -172,63 +306,6 @@ export function BoardDetailPage() {
         </CardContent>
       </Card>
     </div>
-  )
-}
-
-interface TopicItemProps {
-  topic: ITopic
-}
-
-function TopicItem({ topic }: TopicItemProps) {
-  const isTop = topic.topState > 0
-  const isBest = topic.bestState > 0
-
-  return (
-    <Link
-      to="/topic/$topicId"
-      params={{ topicId: String(topic.id) }}
-      className="flex items-center justify-between px-6 py-4 hover:bg-muted/30 transition-colors group"
-    >
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          {isTop && (
-            <Badge variant="destructive" className="text-[10px] px-1.5 py-0 h-4">
-              <Pin className="w-3 h-3 mr-0.5" />
-              置顶
-            </Badge>
-          )}
-          {isBest && (
-            <Badge className="text-[10px] px-1.5 py-0 h-4 bg-amber-500/20 text-amber-400 border-amber-500/30">
-              <Star className="w-3 h-3 mr-0.5" />
-              精华
-            </Badge>
-          )}
-          <span className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
-            {topic.title}
-          </span>
-        </div>
-        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <User className="w-3 h-3" />
-            {topic.isAnonymous ? '匿名用户' : topic.userName}
-          </span>
-          <span className="flex items-center gap-1">
-            <Clock className="w-3 h-3" />
-            {formatDistanceToNow(new Date(topic.time), { addSuffix: true, locale: zhCN })}
-          </span>
-        </div>
-      </div>
-      <div className="flex items-center gap-6 text-sm text-muted-foreground shrink-0 ml-4">
-        <div className="flex items-center gap-1">
-          <MessageSquare className="w-4 h-4" />
-          <span>{topic.replyCount}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <Eye className="w-4 h-4" />
-          <span>{topic.hitCount}</span>
-        </div>
-      </div>
-    </Link>
   )
 }
 

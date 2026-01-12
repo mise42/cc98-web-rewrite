@@ -75,6 +75,13 @@ export const topicService = {
     return apiClient.get<ITopic[]>(`/topic/new?from=${from}&size=${size}`)
   },
 
+  /**
+   * 获取最新媒体主题
+   */
+  async getNewMediaTopics(from: number = 0, size: number = 20): Promise<ITopic[]> {
+    return apiClient.get<ITopic[]>(`/topic/new-media?from=${from}&size=${size}`)
+  },
+
   async getRecommendedTopics(size: number = 10): Promise<IRandomRecommendation[]> {
     return apiClient.get<IRandomRecommendation[]>(`/topic/random-recommendation?size=${size}`)
   },

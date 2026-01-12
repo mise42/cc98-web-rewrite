@@ -1,6 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useParams, Link, useNavigate } from '@tanstack/react-router'
-import { Route as TopicRoute } from '@/routes/topic/$topicId'
+import { useParams, Link, useNavigate, useSearch } from '@tanstack/react-router'
 import React from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -42,7 +41,7 @@ export function TopicDetailPage() {
   const navigate = useNavigate()
 
   // 从 URL 读取查询参数
-  const search = TopicRoute.useSearch()
+  const search = useSearch({ from: '/topic/$topicId' })
   const urlPage = search.page
   const urlMode = search.mode
 
@@ -320,7 +319,7 @@ export function TopicDetailPage() {
 
       {/* 视图模式切换 */}
       <div className="mb-4">
-        <ViewModeToggle onModeChange={mode => updateURL(urlPage, mode)} />
+        <ViewModeToggle mode={viewMode} onModeChange={mode => updateURL(urlPage, mode)} />
       </div>
 
       {/* 追踪模式提示条 */}
