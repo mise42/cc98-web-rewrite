@@ -49,13 +49,13 @@ class TokenManager {
 
     try {
       const params = new URLSearchParams({
-        client_id: import.meta.env.VITE_OAUTH_CLIENT_ID,
-        client_secret: import.meta.env.VITE_OAUTH_CLIENT_SECRET || '',
+        client_id: process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID || '',
+        client_secret: process.env.NEXT_PUBLIC_OAUTH_CLIENT_SECRET || '',
         grant_type: 'refresh_token',
         refresh_token: refreshToken,
       })
 
-      const response = await fetch(import.meta.env.VITE_OPENID_URL + '/connect/token', {
+      const response = await fetch(process.env.NEXT_PUBLIC_OPENID_URL + '/connect/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

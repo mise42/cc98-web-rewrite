@@ -123,7 +123,7 @@ test.describe('Topic Detail Page', () => {
     await authenticateUser(page)
 
     // Mock topic API
-    await page.route('**/api.cc98.top/topic/6399262', async route => {
+    await page.route('**/*cc98.top/topic/6399262', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -132,7 +132,7 @@ test.describe('Topic Detail Page', () => {
     })
 
     // Mock board API
-    await page.route('**/api.cc98.top/board/7', async route => {
+    await page.route('**/*cc98.top/board/7', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -141,7 +141,7 @@ test.describe('Topic Detail Page', () => {
     })
 
     // Mock posts API
-    await page.route('**/api.cc98.top/topic/6399262/post*', async route => {
+    await page.route('**/*cc98.top/topic/6399262/post*', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -150,7 +150,7 @@ test.describe('Topic Detail Page', () => {
     })
 
     // Mock user trace API
-    await page.route('**/api.cc98.top/post/topic/specific-user*', async route => {
+    await page.route('**/*cc98.top/post/topic/specific-user*', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -159,7 +159,7 @@ test.describe('Topic Detail Page', () => {
     })
 
     // Mock like/dislike API
-    await page.route('**/api.cc98.top/post/*/like', async route => {
+    await page.route('**/*cc98.top/post/*/like', async route => {
       const method = route.request().method()
       if (method === 'PUT') {
         await route.fulfill({
@@ -187,7 +187,7 @@ test.describe('Topic Detail Page', () => {
     await expect(page.getByText('测试主题')).toBeVisible()
 
     // Check posts are displayed
-    const posts = page.locator('.shadow-md.bg-card\\/50')
+    const posts = page.locator('.shadow-md.bg-card\\/50').filter({ hasText: /#\d+楼/ })
     await expect(posts).toHaveCount(3)
 
     // Check first post content
@@ -220,20 +220,20 @@ test.describe('Topic Detail Page', () => {
     await page.waitForSelector('.shadow-md')
 
     // Find view mode toggle buttons
-    const paginationButton = page.getByText('分页')
-    const infiniteScrollButton = page.getByText('无限滚动')
+    const viewModeTrigger = page.getByRole('combobox')
+    await viewModeTrigger.click()
+    const listbox = page.getByRole('listbox')
 
-    // Both buttons should be visible
-    await expect(paginationButton).toBeVisible()
-    await expect(infiniteScrollButton).toBeVisible()
+    const infiniteScrollOption = listbox.getByRole('option', { name: '无限滚动' })
+    await expect(infiniteScrollOption).toBeVisible()
+    await infiniteScrollOption.click()
+    await expect(viewModeTrigger).toContainText('无限滚动')
 
-    // Click infinite scroll
-    await infiniteScrollButton.click()
-    await expect(page.getByText('浏览模式：')).toBeVisible()
-
-    // Click pagination
-    await paginationButton.click()
-    await expect(page.getByText('浏览模式：')).toBeVisible()
+    await viewModeTrigger.click()
+    const paginationOption = listbox.getByRole('option', { name: '分页浏览' })
+    await expect(paginationOption).toBeVisible()
+    await paginationOption.click()
+    await expect(viewModeTrigger).toContainText('分页浏览')
   })
 
   test('should enter and exit trace mode', async ({ page }) => {
@@ -270,7 +270,7 @@ test.describe('Topic Detail Page', () => {
 
   test('should not show trace button for anonymous users', async ({ page }) => {
     // Add an anonymous post
-    await page.route('**/api.cc98.top/topic/6399262/post*', async route => {
+    await page.route('**/*cc98.top/topic/6399262/post*', async route => {
       const anonymousPosts = [
         {
           id: 10,
@@ -313,14 +313,14 @@ test.describe('Topic Detail Page', () => {
     await page.waitForSelector('.shadow-md')
 
     // Check first post
-    const firstPost = page.locator('.shadow-md').first()
+    const firstPost = page.locator('.shadow-md.bg-card\\/50').filter({ hasText: '#1楼' })
 
     // Like button with count
     const likeButton = firstPost.getByRole('button').filter({ hasText: /5/ }).first()
     await expect(likeButton).toBeVisible()
 
     // Dislike button with count
-    const dislikeButton = firstPost.locator('button').filter({ hasText: /1/ }).nth(1)
+    const dislikeButton = firstPost.getByRole('button', { name: /1/ })
     await expect(dislikeButton).toBeVisible()
   })
 
@@ -329,7 +329,7 @@ test.describe('Topic Detail Page', () => {
 
     await page.waitForSelector('.shadow-md')
 
-    const firstPost = page.locator('.shadow-md').first()
+    const firstPost = page.locator('.shadow-md.bg-card\\/50').filter({ hasText: '#1楼' })
     const likeButton = firstPost.getByRole('button').filter({ hasText: /5/ }).first()
 
     // Click like button
@@ -347,7 +347,7 @@ test.describe('Topic Detail Page', () => {
 
     await page.waitForSelector('.shadow-md')
 
-    const firstPost = page.locator('.shadow-md').first()
+    const firstPost = page.locator('.shadow-md.bg-card\\/50').filter({ hasText: '#1楼' })
 
     // Quote button
     const quoteButton = firstPost.getByRole('button', { name: /引用/ })
@@ -363,7 +363,7 @@ test.describe('Topic Detail Page', () => {
 
     await page.waitForSelector('.shadow-md')
 
-    const firstPost = page.locator('.shadow-md').first()
+    const firstPost = page.locator('.shadow-md.bg-card\\/50').filter({ hasText: '#1楼' })
     const quoteButton = firstPost.getByRole('button', { name: /引用/ })
 
     // Click quote button
@@ -394,14 +394,14 @@ test.describe('Topic Detail Page', () => {
 
     // Check topic info
     await expect(page.getByText('楼主')).toBeVisible()
-    await expect(page.getByText('2025-01-10')).toBeVisible()
-    await expect(page.getByText('1000', { exact: true })).toBeVisible() // hitCount
-    await expect(page.getByText('25')).toBeVisible() // replyCount
+    await expect(page.getByText('2025-01-10 10:00', { exact: true })).toBeVisible()
+    await expect(page.getByText('1000', { exact: true }).first()).toBeVisible() // hitCount
+    await expect(page.getByText('25', { exact: true }).first()).toBeVisible() // replyCount
   })
 
   test('should handle loading state', async ({ page }) => {
     // Slow down the API response
-    await page.route('**/api.cc98.top/topic/6399262', async route => {
+    await page.route('**/*cc98.top/topic/6399262', async route => {
       await new Promise(resolve => setTimeout(resolve, 1000))
       await route.fulfill({
         status: 200,
@@ -418,7 +418,7 @@ test.describe('Topic Detail Page', () => {
 
   test('should show empty state when no posts in trace mode', async ({ page }) => {
     // Mock empty user posts
-    await page.route('**/api.cc98.top/post/topic/specific-user*', async route => {
+    await page.route('**/*cc98.top/post/topic/specific-user*', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',

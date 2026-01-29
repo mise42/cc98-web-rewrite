@@ -1,17 +1,26 @@
 import { useState } from 'react'
-import { Link, useLocation } from '@tanstack/react-router'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { Bell, Search, LogOut, User } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useAuth } from '@/hooks/useAuth'
 import { useMessageStore } from '@/stores/message'
 import { cn } from '@/lib/utils'
 
 export function Header() {
-  const location = useLocation()
+  const pathname = usePathname()
   const { user, isAuthenticated, logout } = useAuth()
   const { unreadCount } = useMessageStore()
   const [searchValue, setSearchValue] = useState('')
+  const [searchType, setSearchType] = useState<'topics' | 'boards' | 'users'>('topics')
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showMessageMenu, setShowMessageMenu] = useState(false)
 
@@ -25,15 +34,21 @@ export function Header() {
   const handleSearch = () => {
     if (!searchValue.trim()) return
 
-    const boardMatch = location.pathname.match(/\/board\/(\d+)/)
-    const boardId = boardMatch ? boardMatch[1] : '0'
-    window.location.href = `/search?boardId=${boardId}&keyword=${encodeURIComponent(searchValue)}`
+    const keyword = encodeURIComponent(searchValue)
+    if (searchType === 'topics') {
+      const boardMatch = pathname.match(/\/board\/(\d+)/)
+      const boardId = boardMatch ? boardMatch[1] : '0'
+      window.location.href = `/search?tab=topics&boardId=${boardId}&keyword=${keyword}`
+      return
+    }
+
+    window.location.href = `/search?tab=${searchType}&keyword=${keyword}`
   }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center px-4">
-        <Link to="/" className="mr-8 flex items-center space-x-2 no-underline">
+        <Link href="/" className="mr-8 flex items-center space-x-2 no-underline">
           <span className="text-xl font-bold tracking-tight text-foreground">CC98</span>
         </Link>
 
@@ -41,10 +56,10 @@ export function Header() {
           {navItems.map(item => (
             <Link
               key={item.path}
-              to={item.path}
+              href={item.path}
               className={cn(
                 'transition-colors hover:text-primary',
-                location.pathname === item.path ? 'text-primary' : 'text-muted-foreground'
+                pathname === item.path ? 'text-primary' : 'text-muted-foreground'
               )}
             >
               {item.label}
@@ -54,7 +69,20 @@ export function Header() {
 
         <div className="flex-1" />
 
-        <div className="mr-4 hidden md:flex items-center">
+        <div className="mr-4 hidden md:flex items-center gap-2">
+          <Select
+            value={searchType}
+            onValueChange={value => setSearchType(value as typeof searchType)}
+          >
+            <SelectTrigger className="h-9 w-[90px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="topics">主题</SelectItem>
+              <SelectItem value="boards">版面</SelectItem>
+              <SelectItem value="users">用户</SelectItem>
+            </SelectContent>
+          </Select>
           <div className="relative w-64">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -101,7 +129,7 @@ export function Header() {
                     ].map(item => (
                       <Link
                         key={item.path}
-                        to="/message"
+                        href="/message"
                         className="block px-2 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                         onClick={() => setShowMessageMenu(false)}
                       >
@@ -141,7 +169,7 @@ export function Header() {
                     </div>
                     <div className="h-px bg-border my-1" />
                     <Link
-                      to="/usercenter"
+                      href="/usercenter"
                       className="flex items-center gap-2 px-2 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                       onClick={() => setShowUserMenu(false)}
                     >
@@ -149,7 +177,7 @@ export function Header() {
                       个人中心
                     </Link>
                     <Link
-                      to="/message"
+                      href="/message"
                       className="flex items-center gap-2 px-2 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                       onClick={() => setShowUserMenu(false)}
                     >
@@ -173,7 +201,7 @@ export function Header() {
             </>
           ) : (
             <div className="flex items-center gap-2">
-              <Link to="/login">
+              <Link href="/login">
                 <Button variant="ghost" size="sm">
                   登录
                 </Button>

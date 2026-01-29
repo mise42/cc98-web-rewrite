@@ -1,17 +1,5 @@
 import { create } from 'zustand'
-
-/**
- * 消息内容类型（占位符）
- */
-interface IMessageContent {
-  id: number
-  content: string
-  userId: number
-  userName: string
-  userPortraitUrl: string
-  time: string
-  isRead: boolean
-}
+import type { IMessageContent } from '@/types/api'
 
 /**
  * 消息状态

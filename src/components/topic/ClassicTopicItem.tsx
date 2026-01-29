@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { MessageSquare, Eye, User, Clock, Pin, Star } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
@@ -17,8 +17,7 @@ export function ClassicTopicItem({ topic }: ClassicTopicItemProps) {
 
   return (
     <Link
-      to="/topic/$topicId"
-      params={{ topicId: String(topic.id) }}
+      href={`/topic/${topic.id}`}
       className="flex items-center justify-between px-6 py-4 hover:bg-muted/30 transition-colors group"
     >
       <div className="flex-1 min-w-0">

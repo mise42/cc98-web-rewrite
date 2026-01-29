@@ -9,6 +9,8 @@ export default tseslint.config(
     name: 'cc98/global-ignores',
     ignores: [
       'dist',
+      '.next',
+      '.next',
       'node_modules',
       'vendor',
       'build',
@@ -18,7 +20,6 @@ export default tseslint.config(
       'playwright.config.ts',
       'vitest.config.ts',
       'tests/setup.ts',
-      'vite.config.ts',
       'eslint.config.js',
     ],
   },

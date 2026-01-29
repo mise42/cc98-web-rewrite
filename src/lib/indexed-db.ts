@@ -44,7 +44,7 @@ export const userCache = {
   /**
    * 保存用户信息
    */
-  async set(user: IUser): Promise<void> {
+  async set(user: IUser): Promise<IDBValidKey> {
     return db.put('userInfo', user)
   },
 

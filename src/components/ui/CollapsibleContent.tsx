@@ -5,13 +5,11 @@ import { ChevronDown, ChevronUp } from 'lucide-react'
 interface CollapsibleContentProps {
   children: React.ReactNode
   threshold?: number // 高度阈值，默认200px
-  previewLines?: number // 预览行数，默认3行
 }
 
 export const CollapsibleContent: React.FC<CollapsibleContentProps> = ({
   children,
   threshold = 200,
-  previewLines = 3,
 }) => {
   const [isCollapsible, setIsCollapsible] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)

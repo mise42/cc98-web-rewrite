@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import Link from 'next/link'
 import { Separator } from '@/components/ui/separator'
 
 export function Footer() {
@@ -37,7 +37,7 @@ export function Footer() {
             {cc98Links.map((link, index) => (
               <div key={index} className="flex items-center">
                 {link.url.startsWith('/user') ? (
-                  <Link to={link.url} className="hover:text-primary transition-colors">
+                  <Link href={link.url} className="hover:text-primary transition-colors">
                     {link.name}
                   </Link>
                 ) : (
@@ -83,13 +83,13 @@ export function Footer() {
           <p>&copy; {currentYear} CC98. All rights reserved.</p>
 
           <div className="flex items-center gap-4">
-            <Link to="/about" className="hover:text-primary transition-colors">
+            <Link href="/about" className="hover:text-primary transition-colors">
               关于我们
             </Link>
-            <Link to="/contact" className="hover:text-primary transition-colors">
+            <Link href="/contact" className="hover:text-primary transition-colors">
               联系我们
             </Link>
-            <Link to="/privacy" className="hover:text-primary transition-colors">
+            <Link href="/privacy" className="hover:text-primary transition-colors">
               隐私政策
             </Link>
             <a href="mailto:contact@cc98.org" className="hover:text-primary transition-colors">

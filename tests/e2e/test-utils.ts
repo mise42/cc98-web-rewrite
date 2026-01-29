@@ -1,9 +1,9 @@
-import { test as base } from '@playwright/test'
+import { test as base, type Page } from '@playwright/test'
 
 /**
  * 设置已登录的测试用户
  */
-export async function authenticateUser(page: any, username: string = 'testuser') {
+export async function authenticateUser(page: Page, username: string = 'testuser') {
   const mockUser = {
     id: 1,
     name: username,

@@ -10,6 +10,14 @@ export const boardService = {
     return apiClient.get<IRootBoard[]>('/board/all')
   },
 
+  /**
+   * 搜索版面
+   */
+  async searchBoards(keyword: string): Promise<IBoard[]> {
+    const encodedKeyword = encodeURIComponent(keyword)
+    return apiClient.get<IBoard[]>(`/board/search?keyword=${encodedKeyword}`)
+  },
+
   async getChildBoard(boardId: number): Promise<IChildBoard | undefined> {
     const rootBoards = await this.getAllBoards()
     for (const root of rootBoards) {

@@ -1,6 +1,26 @@
 import { apiClient } from './client'
 import type { IUser, IBasicUser } from '@/types/api'
 
+export interface IRecentTopic {
+  id: number
+  boardId: number
+  title: string
+  replyCount: number
+  hitCount: number
+  time: string
+  lastPostTime?: string | null
+}
+
+export interface IRecentPost {
+  id: number
+  boardId: number
+  topicId: number
+  topicTitle: string
+  content: string
+  floor: number
+  time: string
+}
+
 /**
  * 用户相关接口
  */
@@ -89,8 +109,8 @@ export const userService = {
   /**
    * 获取当前用户最近发表的主题
    */
-  async getRecentTopics(from: number = 0, size: number = 10): Promise<any[]> {
-    return apiClient.get<any[]>(`/me/recent-topic?from=${from}&size=${size}`)
+  async getRecentTopics(from: number = 0, size: number = 10): Promise<IRecentTopic[]> {
+    return apiClient.get<IRecentTopic[]>(`/me/recent-topic?from=${from}&size=${size}`)
   },
 
   /**
@@ -99,8 +119,8 @@ export const userService = {
   async getRecentPosts(
     from: number = 0,
     size: number = 10
-  ): Promise<{ data: any[]; count: number }> {
-    return apiClient.get<{ data: any[]; count: number }>(
+  ): Promise<{ data: IRecentPost[]; count: number }> {
+    return apiClient.get<{ data: IRecentPost[]; count: number }>(
       `/me/recent-post?from=${from}&size=${size}`
     )
   },
@@ -108,14 +128,23 @@ export const userService = {
   /**
    * 获取当前用户的热门回复
    */
-  async getHotPosts(from: number = 0, size: number = 10): Promise<{ data: any[]; count: number }> {
-    return apiClient.get<{ data: any[]; count: number }>(`/me/hot-post?from=${from}&size=${size}`)
+  async getHotPosts(
+    from: number = 0,
+    size: number = 10
+  ): Promise<{ data: IRecentPost[]; count: number }> {
+    return apiClient.get<{ data: IRecentPost[]; count: number }>(
+      `/me/hot-post?from=${from}&size=${size}`
+    )
   },
 
   /**
    * 获取指定用户最近发表的主题
    */
-  async getUserRecentTopics(userId: number, from: number = 0, size: number = 10): Promise<any[]> {
-    return apiClient.get<any[]>(`/user/${userId}/recent-topic?from=${from}&size=${size}`)
+  async getUserRecentTopics(
+    userId: number,
+    from: number = 0,
+    size: number = 10
+  ): Promise<IRecentTopic[]> {
+    return apiClient.get<IRecentTopic[]>(`/user/${userId}/recent-topic?from=${from}&size=${size}`)
   },
 }

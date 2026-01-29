@@ -1,9 +1,9 @@
-import { Link } from '@tanstack/react-router'
+import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { User, Clock, Pin, Star, Play, FileText, MessageSquare, Eye } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
-import type { ITopic, TopicContentType } from '@/types/api'
+import type { ITopic } from '@/types/api'
 import { getBoardNameById } from '@/lib/board-utils'
 
 interface CardTopicItemProps {
@@ -34,8 +34,7 @@ export function CardTopicItem({ topic }: CardTopicItemProps) {
 
   return (
     <Link
-      to="/topic/$topicId"
-      params={{ topicId: String(topic.id) }}
+      href={`/topic/${topic.id}`}
       className="block p-4 bg-card hover:bg-muted/30 transition-colors rounded-lg border border-border h-full flex flex-col"
     >
       {/* 标题和标签 */}

@@ -20,6 +20,26 @@ export const topicService = {
   },
 
   /**
+   * 搜索主题（全站或版面内）
+   */
+  async searchTopics(
+    keyword: string,
+    from: number = 0,
+    size: number = 20,
+    boardId?: number
+  ): Promise<ITopic[]> {
+    const encodedKeyword = encodeURIComponent(keyword)
+    if (boardId && boardId > 0) {
+      return apiClient.get<ITopic[]>(
+        `/topic/search/board/${boardId}?keyword=${encodedKeyword}&from=${from}&size=${size}`
+      )
+    }
+    return apiClient.get<ITopic[]>(
+      `/topic/search?keyword=${encodedKeyword}&from=${from}&size=${size}`
+    )
+  },
+
+  /**
    * 获取特定用户在主题中的帖子（通过postId追踪该用户的所有回复）
    */
   async getUserPostsInTopic(

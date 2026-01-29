@@ -1,9 +1,55 @@
-import { test, expect } from '@playwright/test'
+import type { Page } from '@playwright/test'
+
+interface TopicMock {
+  id: number
+  title: string
+  content: string
+  time: string
+  userName: string
+  userId: number
+  state: number
+  boardId: number
+  replyCount: number
+  hitCount: number
+  floorCount: number
+  isAnonymous: boolean
+  isLZ: boolean
+  bestState: number
+  topState: number
+}
+
+interface BoardMock {
+  id: number
+  name: string
+  description: string
+  parentId: number
+  topicCount: number
+  postCount: number
+  todayCount: number
+  boardMasters: string[]
+}
+
+interface PostMock {
+  id: number
+  content: string
+  contentType: number
+  floor: number
+  time: string
+  userName: string
+  userId: number
+  isLZ: boolean
+  likeCount: number
+  dislikeCount: number
+  isAnonymous: boolean
+  isDeleted: boolean
+  topicId: number
+  boardId: number
+}
 
 /**
  * Mock topic API response
  */
-export const mockTopicResponse = (overrides = {}) => ({
+export const mockTopicResponse = (overrides: Partial<TopicMock> = {}) => ({
   id: 6399262,
   title: '测试主题',
   content: '这是一个测试主题',
@@ -25,7 +71,7 @@ export const mockTopicResponse = (overrides = {}) => ({
 /**
  * Mock board API response
  */
-export const mockBoardResponse = (overrides = {}) => ({
+export const mockBoardResponse = (overrides: Partial<BoardMock> = {}) => ({
   id: 7,
   name: '技术交流',
   description: '技术交流板块',
@@ -40,7 +86,7 @@ export const mockBoardResponse = (overrides = {}) => ({
 /**
  * Mock post API response
  */
-export const mockPostResponse = (overrides = {}) => ({
+export const mockPostResponse = (overrides: Partial<PostMock> = {}) => ({
   id: 1,
   content: '测试回复内容',
   contentType: 0,
@@ -62,18 +108,16 @@ export const mockPostResponse = (overrides = {}) => ({
  * Setup common API mocks for topic detail page
  */
 export async function setupTopicPageMocks(
-  page: any,
+  page: Page,
   options: {
-    topic?: any
-    board?: any
-    posts?: any[]
+    topic?: Partial<TopicMock>
+    board?: Partial<BoardMock>
+    posts?: PostMock[]
   } = {}
 ) {
-  const {
-    topic = mockTopicResponse(),
-    board = mockBoardResponse(),
-    posts = [mockPostResponse()],
-  } = options
+  const topic = mockTopicResponse(options.topic)
+  const board = mockBoardResponse(options.board)
+  const posts = options.posts ?? [mockPostResponse()]
 
   // Mock topic API
   await page.route(`**/topic/${topic.id}`, async route => {
@@ -124,7 +168,7 @@ export async function setupTopicPageMocks(
  * Setup like/dislike API mock
  */
 export async function setupLikeMocks(
-  page: any,
+  page: Page,
   options: {
     likeState?: 0 | 1 | 2
     likeCount?: number
@@ -163,21 +207,21 @@ export async function setupLikeMocks(
 /**
  * Wait for posts to load on the page
  */
-export async function waitForPosts(page: any) {
+export async function waitForPosts(page: Page) {
   await page.waitForSelector('.shadow-md.bg-card\\/50')
 }
 
 /**
  * Get post card element by floor number
  */
-export function getPostByFloor(page: any, floor: number) {
+export function getPostByFloor(page: Page, floor: number) {
   return page.locator('.shadow-md').filter({ hasText: `#${floor}楼` })
 }
 
 /**
  * Get like button for a specific floor
  */
-export function getLikeButton(page: any, floor: number) {
+export function getLikeButton(page: Page, floor: number) {
   const post = getPostByFloor(page, floor)
   return post.getByRole('button').filter({ hasText: /^\d+$/ }).first()
 }
@@ -185,7 +229,7 @@ export function getLikeButton(page: any, floor: number) {
 /**
  * Get dislike button for a specific floor
  */
-export function getDislikeButton(page: any, floor: number) {
+export function getDislikeButton(page: Page, floor: number) {
   const post = getPostByFloor(page, floor)
   return post.locator('button').filter({ hasText: /^\d+$/ }).nth(1)
 }
@@ -193,7 +237,7 @@ export function getDislikeButton(page: any, floor: number) {
 /**
  * Get trace button for a specific floor
  */
-export function getTraceButton(page: any, floor: number) {
+export function getTraceButton(page: Page, floor: number) {
   const post = getPostByFloor(page, floor)
   return post.getByRole('button', { name: '追踪' })
 }
@@ -201,7 +245,7 @@ export function getTraceButton(page: any, floor: number) {
 /**
  * Get quote button for a specific floor
  */
-export function getQuoteButton(page: any, floor: number) {
+export function getQuoteButton(page: Page, floor: number) {
   const post = getPostByFloor(page, floor)
   return post.getByRole('button', { name: /引用/ })
 }
