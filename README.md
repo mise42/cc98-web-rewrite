@@ -110,6 +110,16 @@ docker run -d --name cc98-web -p 8080:3000 cc98-web-rewrite
 
 访问 `http://localhost:8080` 即可。容器内使用 **Hono** 提供静态资源与 SPA 路由回退（`/index.html`），并提供健康检查接口：`/health`。
 
+### 3. 一键远程部署（omarchy）
+
+仓库根目录提供了 `deploy.sh`，用于：本机构建 `linux/amd64` 镜像 → SSH 传输到远端 → `docker compose` 重建服务。
+
+```bash
+./deploy.sh \
+  --redirect-uri https://omarchy.tail665f63.ts.net:13000/auth/callback \
+  --tailnet-health-url https://omarchy.tail665f63.ts.net:13000/health
+```
+
 ## 测试
 
 ### 运行单元测试
