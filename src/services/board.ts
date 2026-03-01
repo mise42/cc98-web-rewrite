@@ -50,4 +50,25 @@ export const boardService = {
   async getEssenceTopics(boardId: string, page: number = 1): Promise<IPost[]> {
     return apiClient.get<IPost[]>(`/board/${boardId}/essence?page=${page}`)
   },
+
+  /**
+   * 获取关注版面的帖子流
+   */
+  async getFollowedBoardTopics(from: number = 0, size: number = 20): Promise<ITopic[]> {
+    return apiClient.get<ITopic[]>(`/me/custom-board/topic?from=${from}&size=${size}`)
+  },
+
+  /**
+   * 关注版面
+   */
+  async followBoard(boardId: number): Promise<void> {
+    return apiClient.put<void>(`/me/custom-board/${boardId}`)
+  },
+
+  /**
+   * 取消关注版面
+   */
+  async unfollowBoard(boardId: number): Promise<void> {
+    return apiClient.delete<void>(`/me/custom-board/${boardId}`)
+  },
 }

@@ -1,5 +1,5 @@
 import React from 'react'
-import Link from 'next/link'
+import { Link } from '@tanstack/react-router'
 import { Layout } from 'lucide-react'
 
 interface BoardLinkProps {
@@ -12,7 +12,8 @@ export const BoardLink: React.FC<BoardLinkProps> = ({ children, boardId }) => {
 
   return (
     <Link
-      href={`/board/${id}`}
+      to="/board/$boardId"
+      params={{ boardId: String(id) }}
       className="inline-flex items-center gap-1 text-primary hover:underline"
     >
       <Layout className="w-3 h-3" />

@@ -3,7 +3,7 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: dark;
+  color-scheme: light;
   color: var(--color-foreground);
   background-color: var(--color-background);
 
@@ -21,7 +21,7 @@ a {
 }
 
 a:hover {
-  color: #aebbf5;
+  color: color-mix(in srgb, var(--color-primary), #ffffff 20%);
 }
 
 body {
@@ -36,7 +36,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: #ffffff;
+  color: var(--color-foreground);
   font-weight: 600;
 }
 

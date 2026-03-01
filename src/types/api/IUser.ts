@@ -106,6 +106,10 @@ export interface IUser {
    */
   followCount: number
   /**
+   * 收到的点赞数
+   */
+  receivedLikeCount?: number
+  /**
    * 用户选择的主题
    */
   theme: number

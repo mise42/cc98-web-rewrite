@@ -1,15 +1,19 @@
-// TODO: Implement theme store
-// import { useThemeStore } from '@/stores/theme'
+import { useThemeStore } from '@/stores/theme'
 
 /**
  * 主题 Hook
  */
 export function useTheme() {
+  const { mode, legacyThemeId, setMode, setLegacyThemeId, toggleMode } = useThemeStore()
+
   return {
-    theme: 'light',
-    setTheme: () => {},
-    toggleTheme: () => {},
-    isDark: false,
-    isLight: true,
+    mode,
+    legacyThemeId,
+    setMode,
+    setLegacyThemeId,
+    toggleMode,
+    isDark: mode === 'dark',
+    isLight: mode === 'light',
+    isSystem: mode === 'system',
   }
 }

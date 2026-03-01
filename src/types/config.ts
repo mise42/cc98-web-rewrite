@@ -36,8 +36,12 @@ export interface IHotTopic {
 export interface IMainpageEditableContent {
   title: string
   content: string
-  link: string
-  imageLink: string
+  /** 兼容旧字段 */
+  link?: string
+  imageLink?: string
+  /** 后端当前字段 */
+  url?: string
+  imageUrl?: string
 }
 
 export interface IMainpageAutoContent {

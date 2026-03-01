@@ -15,7 +15,7 @@ export const Markdown: React.FC<{ children?: React.ReactNode }> = ({ children })
         components={{
           // 自定义 blockquote 渲染器，添加折叠功能
           blockquote: ({ children }) => (
-            <CollapsibleContent threshold={200}>
+            <CollapsibleContent threshold={200} previewLines={3}>
               <blockquote>{children}</blockquote>
             </CollapsibleContent>
           ),

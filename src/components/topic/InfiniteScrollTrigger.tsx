@@ -4,9 +4,10 @@ import { Loader2 } from 'lucide-react'
 
 interface InfiniteScrollTriggerProps {
   onLoadMore: () => void
+  totalCount: number
 }
 
-export function InfiniteScrollTrigger({ onLoadMore }: InfiniteScrollTriggerProps) {
+export function InfiniteScrollTrigger({ onLoadMore, totalCount }: InfiniteScrollTriggerProps) {
   const { allPosts, hasMore, isLoadingMore } = useTopicViewStore()
   const triggerRef = useRef<HTMLDivElement>(null)
   const observerRef = useRef<IntersectionObserver | null>(null)

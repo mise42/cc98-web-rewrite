@@ -3,26 +3,26 @@
 
 export const Constants = {
   // 应用信息
-  appName: process.env.NEXT_PUBLIC_APP_NAME,
-  version: process.env.NEXT_PUBLIC_APP_VERSION,
+  appName: import.meta.env.VITE_APP_NAME,
+  version: import.meta.env.VITE_APP_VERSION,
 
   // API 配置
-  apiUrl: process.env.NEXT_PUBLIC_API_URL,
-  openIdUrl: process.env.NEXT_PUBLIC_OPENID_URL,
-  imageUploadUrl: process.env.NEXT_PUBLIC_IMAGE_UPLOAD_URL,
+  apiUrl: import.meta.env.VITE_API_URL,
+  openIdUrl: import.meta.env.VITE_OPENID_URL,
+  imageUploadUrl: import.meta.env.VITE_IMAGE_UPLOAD_URL,
 
   // OAuth 配置
   oauth: {
-    clientId: process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID,
-    clientSecret: process.env.NEXT_PUBLIC_OAUTH_CLIENT_SECRET || '',
-    redirectUri: process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URI,
-    tokenEndpoint: `${process.env.NEXT_PUBLIC_OPENID_URL}/connect/token`,
-    authorizeEndpoint: `${process.env.NEXT_PUBLIC_OPENID_URL}/connect/authorize`,
+    clientId: import.meta.env.VITE_OAUTH_CLIENT_ID,
+    clientSecret: import.meta.env.VITE_OAUTH_CLIENT_SECRET || '',
+    redirectUri: import.meta.env.VITE_OAUTH_REDIRECT_URI,
+    tokenEndpoint: `${import.meta.env.VITE_OPENID_URL}/connect/token`,
+    authorizeEndpoint: `${import.meta.env.VITE_OPENID_URL}/connect/authorize`,
     scope: 'cc98-api openid offline_access',
   },
 
   // SignalR 配置
-  signalrUrl: process.env.NEXT_PUBLIC_SIGNALR_URL,
+  signalrUrl: import.meta.env.VITE_SIGNALR_URL,
   signalrHubName: 'notification',
 
   // 本地存储键

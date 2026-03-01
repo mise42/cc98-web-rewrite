@@ -9,7 +9,7 @@
 - **包管理**: [Bun](https://bun.sh/)
 - **构建工具**: [Vite](https://vitejs.dev/) + [SWC](https://swc.rs/)
 - **UI 框架**: [React 19](https://react.dev/)
-- **路由**: [React Router v7](https://reactrouter.com/)
+- **路由**: [TanStack Router](https://tanstack.com/router)（文件路由）
 - **状态管理**: [Zustand](https://zustand-demo.pmnd.rs/)
 - **服务器状态**: [@tanstack/react-query](https://tanstack.com/query/latest)
 - **UI 组件库**: [Ant Design v6](https://ant.design/)
@@ -39,7 +39,7 @@
 ```
 cc98-web-rewrite/
 ├── src/
-│   ├── routes/          # React Router v7 路由配置
+│   ├── routes/          # TanStack Router 文件路由配置
 │   ├── pages/           # 页面组件
 │   ├── components/      # 通用组件
 │   ├── stores/          # Zustand 状态管理
@@ -83,6 +83,32 @@ bun run build
 ```bash
 bun run preview
 ```
+
+## Docker 自部署
+
+### 1. 构建镜像
+
+```bash
+docker build -t cc98-web-rewrite .
+```
+
+如需覆盖 `VITE_*` 构建变量，可通过 `--build-arg` 传入，例如：
+
+```bash
+docker build \
+  --build-arg VITE_API_URL=https://your-api.example.com \
+  --build-arg VITE_OPENID_URL=https://your-openid.example.com \
+  --build-arg VITE_OAUTH_REDIRECT_URI=https://your-domain.com/auth/callback \
+  -t cc98-web-rewrite .
+```
+
+### 2. 运行容器
+
+```bash
+docker run -d --name cc98-web -p 8080:80 cc98-web-rewrite
+```
+
+访问 `http://localhost:8080` 即可。容器内已配置 SPA 路由回退（`/index.html`）。
 
 ## 测试
 
@@ -140,7 +166,7 @@ git submodule update --init --recursive
 - ✅ React 16 → React 19
 - ✅ Webpack → Vite + SWC
 - ✅ Redux → Zustand
-- ✅ React Router v4 → React Router v7
+- ✅ React Router v4 → TanStack Router（文件路由）
 - ✅ Ant Design v3 → Ant Design v6
 - ✅ 手动 fetch → TanStack Query
 - ✅ jQuery 依赖移除

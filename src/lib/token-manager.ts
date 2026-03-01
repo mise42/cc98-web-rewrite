@@ -49,13 +49,13 @@ class TokenManager {
 
     try {
       const params = new URLSearchParams({
-        client_id: process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID || '',
-        client_secret: process.env.NEXT_PUBLIC_OAUTH_CLIENT_SECRET || '',
+        client_id: import.meta.env.VITE_OAUTH_CLIENT_ID,
+        client_secret: import.meta.env.VITE_OAUTH_CLIENT_SECRET || '',
         grant_type: 'refresh_token',
         refresh_token: refreshToken,
       })
 
-      const response = await fetch(process.env.NEXT_PUBLIC_OPENID_URL + '/connect/token', {
+      const response = await fetch(import.meta.env.VITE_OPENID_URL + '/connect/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -122,7 +122,7 @@ class TokenManager {
   }
 
   /**
-   * 检查是否有有效的 token
+   * 检查是否有有效的 access token
    */
   hasValidToken(): boolean {
     const token = localStorage.getItem(TokenManager.ACCESS_TOKEN_KEY)
@@ -133,6 +133,31 @@ class TokenManager {
     }
 
     return Date.now() < Number(expiresAt)
+  }
+
+  /**
+   * 检查 refresh token 是否可用
+   */
+  hasValidRefreshToken(): boolean {
+    const refreshToken = localStorage.getItem(TokenManager.REFRESH_TOKEN_KEY)
+    const refreshExpiresAt = localStorage.getItem(TokenManager.REFRESH_TOKEN_EXPIRES_AT)
+
+    if (!refreshToken) {
+      return false
+    }
+
+    if (!refreshExpiresAt) {
+      return true
+    }
+
+    return Date.now() < Number(refreshExpiresAt)
+  }
+
+  /**
+   * 是否存在可恢复会话（access 或 refresh 任一可用）
+   */
+  hasSession(): boolean {
+    return this.hasValidToken() || this.hasValidRefreshToken()
   }
 }
 

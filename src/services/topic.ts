@@ -6,6 +6,25 @@ import type { ITopic, IPost, IRandomRecommendation } from '@/types/api'
  */
 export const topicService = {
   /**
+   * 搜索主题（全站或版面内）
+   */
+  async searchTopics(
+    keyword: string,
+    from: number = 0,
+    size: number = 20,
+    boardId: number = 0
+  ): Promise<ITopic[]> {
+    const encodedKeyword = encodeURIComponent(keyword)
+    if (boardId > 0) {
+      return apiClient.get<ITopic[]>(
+        `/topic/search/board/${boardId}?keyword=${encodedKeyword}&from=${from}&size=${size}`
+      )
+    }
+
+    return apiClient.get<ITopic[]>(`/topic/search?keyword=${encodedKeyword}&from=${from}&size=${size}`)
+  },
+
+  /**
    * 获取帖子详情
    */
   async getTopic(topicId: number): Promise<ITopic> {
@@ -17,26 +36,6 @@ export const topicService = {
    */
   async getTopicPosts(topicId: number, from: number = 0, size: number = 20): Promise<IPost[]> {
     return apiClient.get<IPost[]>(`/topic/${topicId}/post?from=${from}&size=${size}`)
-  },
-
-  /**
-   * 搜索主题（全站或版面内）
-   */
-  async searchTopics(
-    keyword: string,
-    from: number = 0,
-    size: number = 20,
-    boardId?: number
-  ): Promise<ITopic[]> {
-    const encodedKeyword = encodeURIComponent(keyword)
-    if (boardId && boardId > 0) {
-      return apiClient.get<ITopic[]>(
-        `/topic/search/board/${boardId}?keyword=${encodedKeyword}&from=${from}&size=${size}`
-      )
-    }
-    return apiClient.get<ITopic[]>(
-      `/topic/search?keyword=${encodedKeyword}&from=${from}&size=${size}`
-    )
   },
 
   /**
@@ -109,12 +108,17 @@ export const topicService = {
   /**
    * 获取收藏的主题
    */
-  async getFavoriteTopics(
-    from: number = 0,
-    size: number = 20,
-    order: 'desc' | 'asc' = 'desc'
-  ): Promise<ITopic[]> {
-    return apiClient.get<ITopic[]>(`/topic/me/favorite?from=${from}&size=${size}&order=${order}`)
+  async getFavoriteTopics(from: number = 0, size: number = 20, order?: 0 | 1): Promise<ITopic[]> {
+    const params = new URLSearchParams({
+      from: String(from),
+      size: String(size),
+    })
+
+    if (order !== undefined) {
+      params.set('order', String(order))
+    }
+
+    return apiClient.get<ITopic[]>(`/topic/me/favorite?${params.toString()}`)
   },
 
   /**

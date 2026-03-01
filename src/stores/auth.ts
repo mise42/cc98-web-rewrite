@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { authService } from '@/services/auth'
+import tokenManager from '@/lib/token-manager'
 import type { IUser } from '@/types/api'
 
 /**
@@ -83,6 +84,27 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => state => {
+        if (!state) return
+
+        // 若本地已无可恢复会话，清理持久化登录态
+        if (!tokenManager.hasSession()) {
+          state.logout()
+          return
+        }
+
+        // 重新校准用户信息，避免仅有头像但权限已失效
+        if (state.isAuthenticated) {
+          void authService
+            .refreshUserInfo()
+            .then(user => {
+              state.setUser(user)
+            })
+            .catch(() => {
+              state.logout()
+            })
+        }
+      },
     }
   )
 )

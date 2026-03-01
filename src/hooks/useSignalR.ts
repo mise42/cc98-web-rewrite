@@ -9,30 +9,41 @@ import { useMessageStore } from '@/stores/message'
  */
 export function useSignalR() {
   const { isAuthenticated } = useAuthStore()
-  const { addMessage, setUnreadCount } = useMessageStore()
+  const { addMessage, setUnreadCount, setUnreadSummary, clearMessages } = useMessageStore()
 
   useEffect(() => {
-    if (isAuthenticated) {
-      // 连接 SignalR
-      signalrService.connect().catch(error => {
-        console.error('Failed to connect to SignalR:', error)
-      })
-
-      // 注册消息处理器
-      signalrService.onReceiveMessage(message => {
-        addMessage(message)
-      })
-
-      signalrService.onUpdateUnreadCount(count => {
-        setUnreadCount(count)
-      })
-
-      // 清理函数
-      return () => {
-        signalrService.disconnect()
-      }
+    if (!isAuthenticated) {
+      clearMessages()
+      signalrService.disconnect()
+      return
     }
-  }, [isAuthenticated, addMessage, setUnreadCount])
+
+    // 连接 SignalR
+    signalrService.connect().catch(error => {
+      console.error('Failed to connect to SignalR:', error)
+    })
+
+    // 注册消息处理器
+    signalrService.onReceiveMessage(message => {
+      addMessage(message)
+    })
+
+    signalrService.onUpdateUnreadCount(payload => {
+      if (typeof payload === 'number') {
+        setUnreadCount(payload)
+        return
+      }
+
+      if (payload && typeof payload === 'object') {
+        setUnreadSummary(payload)
+      }
+    })
+
+    // 清理函数
+    return () => {
+      signalrService.disconnect()
+    }
+  }, [isAuthenticated, addMessage, setUnreadCount, setUnreadSummary, clearMessages])
 
   return {
     isConnected: signalrService.isConnected,

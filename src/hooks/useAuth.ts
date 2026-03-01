@@ -18,17 +18,9 @@ export function useAuth() {
 }
 
 /**
- * 需要认证的 Hook
- * 如果未登录，自动跳转到登录页
+ * 需要认证的 Hook（辅助用途，路由保护请使用 beforeLoad）
  */
 export function useRequireAuth() {
   const { isAuthenticated, isLoading } = useAuthStore()
-
-  // TODO: 实现路由跳转（需要在 React Router 中集成）
-  // const navigate = useNavigate()
-  // if (!isLoading && !isAuthenticated) {
-  //   navigate('/login', { replace: true });
-  // }
-
   return { isAuthenticated, isLoading }
 }

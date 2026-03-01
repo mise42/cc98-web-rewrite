@@ -1,12 +1,10 @@
 import { test, expect } from '@playwright/test'
-import { authenticateUser } from './test-utils'
 
 test.describe('Topic Content Rendering', () => {
   test('should render UBB and Markdown content correctly', async ({ page }) => {
-    await authenticateUser(page)
-    await page.route('**/*cc98.top/topic/1', async route => {
+    await page.route('**/topic/1', async route => {
       const url = route.request().url()
-      if (url.includes('cc98.top')) {
+      if (url.includes('api.cc98.top')) {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -33,9 +31,9 @@ test.describe('Topic Content Rendering', () => {
       }
     })
 
-    await page.route('**/*cc98.top/topic/1/post*', async route => {
+    await page.route('**/topic/1/post*', async route => {
       const url = route.request().url()
-      if (url.includes('cc98.top')) {
+      if (url.includes('api.cc98.top')) {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -76,9 +74,9 @@ test.describe('Topic Content Rendering', () => {
       }
     })
 
-    await page.route('**/*cc98.top/board/1', async route => {
+    await page.route('**/board/1', async route => {
       const url = route.request().url()
-      if (url.includes('cc98.top')) {
+      if (url.includes('api.cc98.top')) {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',

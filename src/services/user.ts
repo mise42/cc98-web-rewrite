@@ -1,25 +1,5 @@
 import { apiClient } from './client'
-import type { IUser, IBasicUser } from '@/types/api'
-
-export interface IRecentTopic {
-  id: number
-  boardId: number
-  title: string
-  replyCount: number
-  hitCount: number
-  time: string
-  lastPostTime?: string | null
-}
-
-export interface IRecentPost {
-  id: number
-  boardId: number
-  topicId: number
-  topicTitle: string
-  content: string
-  floor: number
-  time: string
-}
+import type { IUser, ISignIn } from '@/types/api'
 
 /**
  * 用户相关接口
@@ -79,6 +59,13 @@ export const userService = {
   },
 
   /**
+   * 更新用户主题（兼容旧版主题编号）
+   */
+  async updateTheme(themeId: number): Promise<void> {
+    return apiClient.put<void>(`/me/theme?id=${themeId}`)
+  },
+
+  /**
    * 关注用户
    */
   async followUser(userId: number): Promise<void> {
@@ -93,24 +80,10 @@ export const userService = {
   },
 
   /**
-   * 获取用户关注的用户列表
-   */
-  async getFollowing(userId: number): Promise<IBasicUser[]> {
-    return apiClient.get<IBasicUser[]>(`/user/${userId}/following`)
-  },
-
-  /**
-   * 获取用户的粉丝列表
-   */
-  async getFans(userId: number): Promise<IBasicUser[]> {
-    return apiClient.get<IBasicUser[]>(`/user/${userId}/fans`)
-  },
-
-  /**
    * 获取当前用户最近发表的主题
    */
-  async getRecentTopics(from: number = 0, size: number = 10): Promise<IRecentTopic[]> {
-    return apiClient.get<IRecentTopic[]>(`/me/recent-topic?from=${from}&size=${size}`)
+  async getRecentTopics(from: number = 0, size: number = 10): Promise<any[]> {
+    return apiClient.get<any[]>(`/me/recent-topic?from=${from}&size=${size}`)
   },
 
   /**
@@ -119,8 +92,8 @@ export const userService = {
   async getRecentPosts(
     from: number = 0,
     size: number = 10
-  ): Promise<{ data: IRecentPost[]; count: number }> {
-    return apiClient.get<{ data: IRecentPost[]; count: number }>(
+  ): Promise<{ data: any[]; count: number }> {
+    return apiClient.get<{ data: any[]; count: number }>(
       `/me/recent-post?from=${from}&size=${size}`
     )
   },
@@ -128,23 +101,28 @@ export const userService = {
   /**
    * 获取当前用户的热门回复
    */
-  async getHotPosts(
-    from: number = 0,
-    size: number = 10
-  ): Promise<{ data: IRecentPost[]; count: number }> {
-    return apiClient.get<{ data: IRecentPost[]; count: number }>(
-      `/me/hot-post?from=${from}&size=${size}`
-    )
+  async getHotPosts(from: number = 0, size: number = 10): Promise<{ data: any[]; count: number }> {
+    return apiClient.get<{ data: any[]; count: number }>(`/me/hot-post?from=${from}&size=${size}`)
   },
 
   /**
    * 获取指定用户最近发表的主题
    */
-  async getUserRecentTopics(
-    userId: number,
-    from: number = 0,
-    size: number = 10
-  ): Promise<IRecentTopic[]> {
-    return apiClient.get<IRecentTopic[]>(`/user/${userId}/recent-topic?from=${from}&size=${size}`)
+  async getUserRecentTopics(userId: number, from: number = 0, size: number = 10): Promise<any[]> {
+    return apiClient.get<any[]>(`/user/${userId}/recent-topic?from=${from}&size=${size}`)
+  },
+
+  /**
+   * 获取签到状态
+   */
+  async getSignInStatus(): Promise<ISignIn> {
+    return apiClient.get<ISignIn>('/me/signin')
+  },
+
+  /**
+   * 执行签到，返回本次获得的财富值
+   */
+  async signIn(): Promise<number> {
+    return apiClient.post<number>('/me/signin', {})
   },
 }

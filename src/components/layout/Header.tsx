@@ -1,54 +1,155 @@
-import { useState } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { Bell, Search, LogOut, User } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Link, useLocation, useNavigate } from '@tanstack/react-router'
+import { Bell, Monitor, Moon, Search, Sun, User } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { useAuth } from '@/hooks/useAuth'
+import { useTheme } from '@/hooks/useTheme'
 import { useMessageStore } from '@/stores/message'
+import { userService } from '@/services/user'
 import { cn } from '@/lib/utils'
+import tokenManager from '@/lib/token-manager'
 
 export function Header() {
-  const pathname = usePathname()
+  const location = useLocation()
+  const navigate = useNavigate()
   const { user, isAuthenticated, logout } = useAuth()
-  const { unreadCount } = useMessageStore()
+  const { mode, setMode } = useTheme()
+  const { unreadCount, unreadSummary } = useMessageStore()
   const [searchValue, setSearchValue] = useState('')
-  const [searchType, setSearchType] = useState<'topics' | 'boards' | 'users'>('topics')
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showMessageMenu, setShowMessageMenu] = useState(false)
+  const [hasSignedInToday, setHasSignedInToday] = useState<boolean | null>(null)
+  const userMenuRef = useRef<HTMLDivElement>(null)
+  const messageMenuRef = useRef<HTMLDivElement>(null)
+  const userMenuHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const messageMenuHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const showAuthenticated = isAuthenticated && tokenManager.hasSession()
+
+  // 点击外部关闭菜单
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false)
+      }
+      if (messageMenuRef.current && !messageMenuRef.current.contains(event.target as Node)) {
+        setShowMessageMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      if (userMenuHideTimerRef.current) {
+        clearTimeout(userMenuHideTimerRef.current)
+      }
+      if (messageMenuHideTimerRef.current) {
+        clearTimeout(messageMenuHideTimerRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!showAuthenticated || !showUserMenu) return
+
+    let cancelled = false
+
+    userService
+      .getSignInStatus()
+      .then(status => {
+        if (!cancelled) {
+          setHasSignedInToday(status.hasSignedInToday)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setHasSignedInToday(false)
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [showAuthenticated, showUserMenu])
+
+  const openUserMenu = () => {
+    if (userMenuHideTimerRef.current) {
+      clearTimeout(userMenuHideTimerRef.current)
+      userMenuHideTimerRef.current = null
+    }
+    setShowUserMenu(true)
+  }
+
+  const closeUserMenuWithDelay = () => {
+    if (userMenuHideTimerRef.current) {
+      clearTimeout(userMenuHideTimerRef.current)
+    }
+    userMenuHideTimerRef.current = setTimeout(() => {
+      setShowUserMenu(false)
+    }, 120)
+  }
+
+  const openMessageMenu = () => {
+    if (messageMenuHideTimerRef.current) {
+      clearTimeout(messageMenuHideTimerRef.current)
+      messageMenuHideTimerRef.current = null
+    }
+    setShowMessageMenu(true)
+  }
+
+  const closeMessageMenuWithDelay = () => {
+    if (messageMenuHideTimerRef.current) {
+      clearTimeout(messageMenuHideTimerRef.current)
+    }
+    messageMenuHideTimerRef.current = setTimeout(() => {
+      setShowMessageMenu(false)
+    }, 120)
+  }
 
   const navItems = [
     { path: '/', label: '首页' },
     { path: '/boardlist', label: '版面' },
     { path: '/newtopics', label: '新帖' },
     { path: '/recommendedtopics', label: '精选' },
+    { path: '/following', label: '关注' },
   ]
 
-  const handleSearch = () => {
-    if (!searchValue.trim()) return
-
-    const keyword = encodeURIComponent(searchValue)
-    if (searchType === 'topics') {
-      const boardMatch = pathname.match(/\/board\/(\d+)/)
-      const boardId = boardMatch ? boardMatch[1] : '0'
-      window.location.href = `/search?tab=topics&boardId=${boardId}&keyword=${keyword}`
-      return
+  const isNavActive = (path: string) => {
+    if (path === '/') return location.pathname === '/'
+    if (path === '/boardlist') {
+      return location.pathname === '/boardlist' || location.pathname.startsWith('/board/')
     }
-
-    window.location.href = `/search?tab=${searchType}&keyword=${keyword}`
+    return location.pathname === path || location.pathname.startsWith(`${path}/`)
   }
 
+  const handleSearch = () => {
+    const keyword = searchValue.trim()
+    if (!keyword) return
+
+    const boardMatch = location.pathname.match(/\/board\/(\d+)/)
+    const boardId = boardMatch ? Number(boardMatch[1]) : 0
+
+    navigate({
+      to: '/search',
+      search: {
+        keyword,
+        tab: 'topics',
+        page: 1,
+        boardId,
+      },
+    })
+  }
+
+  const handleQuickThemeToggle = () => {
+    setMode(mode === 'light' ? 'dark' : mode === 'dark' ? 'system' : 'light')
+  }
+
+  const quickThemeLabel =
+    mode === 'light' ? '切换到深色模式' : mode === 'dark' ? '切换到跟随系统' : '切换到浅色模式'
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
+    <header className="app-themed-header sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center px-4">
-        <Link href="/" className="mr-8 flex items-center space-x-2 no-underline">
+        <Link to="/" className="mr-8 flex items-center space-x-2 no-underline">
           <span className="text-xl font-bold tracking-tight text-foreground">CC98</span>
         </Link>
 
@@ -56,10 +157,12 @@ export function Header() {
           {navItems.map(item => (
             <Link
               key={item.path}
-              href={item.path}
+              to={item.path}
               className={cn(
-                'transition-colors hover:text-primary',
-                pathname === item.path ? 'text-primary' : 'text-muted-foreground'
+                'px-1 py-1 transition-colors',
+                isNavActive(item.path)
+                  ? 'text-white font-semibold underline underline-offset-4 decoration-2'
+                  : 'text-white/85 hover:text-white'
               )}
             >
               {item.label}
@@ -69,20 +172,7 @@ export function Header() {
 
         <div className="flex-1" />
 
-        <div className="mr-4 hidden md:flex items-center gap-2">
-          <Select
-            value={searchType}
-            onValueChange={value => setSearchType(value as typeof searchType)}
-          >
-            <SelectTrigger className="h-9 w-[90px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="topics">主题</SelectItem>
-              <SelectItem value="boards">版面</SelectItem>
-              <SelectItem value="users">用户</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="mr-4 hidden md:flex items-center">
           <div className="relative w-64">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -97,14 +187,36 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
-          {isAuthenticated ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-foreground/85 hover:text-foreground"
+            onClick={handleQuickThemeToggle}
+            title={quickThemeLabel}
+            aria-label={quickThemeLabel}
+          >
+            {mode === 'light' ? (
+              <Sun className="h-5 w-5" />
+            ) : mode === 'dark' ? (
+              <Moon className="h-5 w-5" />
+            ) : (
+              <Monitor className="h-5 w-5" />
+            )}
+          </Button>
+
+          {showAuthenticated ? (
             <>
-              <div className="relative">
+              <div
+                className="relative"
+                ref={messageMenuRef}
+                onMouseEnter={openMessageMenu}
+                onMouseLeave={closeMessageMenuWithDelay}
+              >
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="relative text-muted-foreground hover:text-foreground"
-                  onClick={() => setShowMessageMenu(!showMessageMenu)}
+                  className="relative text-foreground/85 hover:text-foreground"
+                  onClick={() => setShowMessageMenu(prev => !prev)}
                 >
                   <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
@@ -116,35 +228,56 @@ export function Header() {
                 </Button>
 
                 {showMessageMenu && (
-                  <div className="absolute right-0 top-12 w-56 bg-popover text-popover-foreground rounded-md shadow-md border border-border p-1 z-50 animate-in fade-in zoom-in-95 duration-200">
+                  <div className="absolute right-0 top-full w-56 bg-popover text-popover-foreground rounded-md shadow-md border border-border p-1 z-50 animate-in fade-in zoom-in-95 duration-200">
                     <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
                       消息通知
                     </div>
                     <div className="h-px bg-border my-1" />
                     {[
-                      { label: '回复我的', path: '/message/reply' },
-                      { label: '@ 我的', path: '/message/at' },
-                      { label: '系统通知', path: '/message/system' },
-                      { label: '我的私信', path: '/message/private' },
+                      {
+                        label: '回复我的',
+                        path: '/message/reply',
+                        count: unreadSummary.replyCount,
+                      },
+                      { label: '@ 我的', path: '/message/at', count: unreadSummary.atCount },
+                      {
+                        label: '系统通知',
+                        path: '/message/system',
+                        count: unreadSummary.systemCount,
+                      },
+                      {
+                        label: '我的私信',
+                        path: '/message/private',
+                        count: unreadSummary.messageCount,
+                      },
                     ].map(item => (
                       <Link
                         key={item.path}
-                        href="/message"
-                        className="block px-2 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                        to={item.path}
+                        className="flex items-center justify-between px-2 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                         onClick={() => setShowMessageMenu(false)}
                       >
-                        {item.label}
+                        <span>{item.label}</span>
+                        {item.count > 0 && (
+                          <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs text-destructive">
+                            {item.count}
+                          </span>
+                        )}
                       </Link>
                     ))}
                   </div>
                 )}
               </div>
 
-              <div className="relative">
+              <div
+                className="relative"
+                ref={userMenuRef}
+                onMouseEnter={openUserMenu}
+                onMouseLeave={closeUserMenuWithDelay}
+              >
                 <Button
                   variant="ghost"
-                  className="pl-0 text-muted-foreground hover:text-foreground gap-2"
-                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="pl-0 text-foreground/90 hover:text-foreground gap-2"
                 >
                   {user?.portraitUrl ? (
                     <img
@@ -163,36 +296,27 @@ export function Header() {
                 </Button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 top-12 w-56 bg-popover text-popover-foreground rounded-md shadow-md border border-border p-1 z-50 animate-in fade-in zoom-in-95 duration-200">
-                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
-                      账号
-                    </div>
-                    <div className="h-px bg-border my-1" />
+                  <div className="absolute right-0 top-full w-44 bg-popover text-popover-foreground rounded-md shadow-md border border-border p-1 z-50 animate-in fade-in zoom-in-95 duration-200">
                     <Link
-                      href="/usercenter"
-                      className="flex items-center gap-2 px-2 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
-                      onClick={() => setShowUserMenu(false)}
+                      to="/usercenter"
+                      className="block px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors"
                     >
-                      <User className="h-4 w-4" />
                       个人中心
                     </Link>
                     <Link
-                      href="/message"
-                      className="flex items-center gap-2 px-2 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                      to="/usercenter/signin"
+                      className="block px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors"
                       onClick={() => setShowUserMenu(false)}
                     >
-                      <Bell className="h-4 w-4" />
-                      消息中心
+                      {hasSignedInToday ? '已签到' : '签到'}
                     </Link>
-                    <div className="h-px bg-border my-1" />
                     <button
                       onClick={() => {
                         logout()
                         setShowUserMenu(false)
                       }}
-                      className="flex w-full items-center gap-2 px-2 py-2 text-sm rounded-sm hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer text-left"
+                      className="block w-full px-3 py-2 text-sm rounded-sm hover:bg-destructive/10 hover:text-destructive transition-colors text-left"
                     >
-                      <LogOut className="h-4 w-4" />
                       退出登录
                     </button>
                   </div>
@@ -201,7 +325,7 @@ export function Header() {
             </>
           ) : (
             <div className="flex items-center gap-2">
-              <Link href="/login">
+              <Link to="/login">
                 <Button variant="ghost" size="sm">
                   登录
                 </Button>

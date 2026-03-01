@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from '@tanstack/react-router'
 import { Badge } from '@/components/ui/badge'
 import { User, Clock, Pin, Star, Play, FileText, MessageSquare, Eye } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
@@ -17,7 +17,7 @@ export function CardTopicItem({ topic }: CardTopicItemProps) {
   const isImage = topic.contentType === 4
   const isVideo = topic.contentType === 2
   const isAudio = topic.contentType === 3
-  const boardName = getBoardNameById(topic.boardId)
+  const boardName = topic.boardName || getBoardNameById(topic.boardId)
 
   // 获取内容预览（用于媒体帖子）
   const contentPreview = topic.content
@@ -34,7 +34,8 @@ export function CardTopicItem({ topic }: CardTopicItemProps) {
 
   return (
     <Link
-      href={`/topic/${topic.id}`}
+      to="/topic/$topicId"
+      params={{ topicId: String(topic.id) }}
       className="block p-4 bg-card hover:bg-muted/30 transition-colors rounded-lg border border-border h-full flex flex-col"
     >
       {/* 标题和标签 */}

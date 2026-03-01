@@ -3,7 +3,7 @@
 
 @theme {
   --color-background: #ffffff;
-  --color-foreground: #000000;
+  --color-foreground: #0a0a0a;
 
   --color-card: #ffffff;
   --color-card-foreground: #0a0a0a;
@@ -29,6 +29,8 @@
   --color-border: #e5e7eb;
   --color-input: #e5e7eb;
   --color-ring: #3b82f6;
+  --theme-topbar-image: none;
+  --theme-topbar-image-mobile: none;
 
   --radius-sm: 0.25rem;
   --radius-md: 0.375rem;
@@ -82,6 +84,61 @@
 
 :root {
   color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+.app-themed-header {
+  background-image: var(--theme-topbar-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@media (max-width: 768px) {
+  .app-themed-header {
+    background-image: var(--theme-topbar-image-mobile);
+    background-position: top center;
+  }
+}
+
+/* 让 Tailwind Typography 与设计系统语义 Token 对齐 */
+.prose {
+  --tw-prose-body: var(--color-foreground);
+  --tw-prose-headings: var(--color-foreground);
+  --tw-prose-lead: var(--color-muted-foreground);
+  --tw-prose-links: var(--color-primary);
+  --tw-prose-bold: var(--color-foreground);
+  --tw-prose-counters: var(--color-muted-foreground);
+  --tw-prose-bullets: var(--color-border);
+  --tw-prose-hr: var(--color-border);
+  --tw-prose-quotes: var(--color-foreground);
+  --tw-prose-quote-borders: var(--color-border);
+  --tw-prose-captions: var(--color-muted-foreground);
+  --tw-prose-code: var(--color-foreground);
+  --tw-prose-pre-code: var(--color-foreground);
+  --tw-prose-pre-bg: var(--color-muted);
+  --tw-prose-th-borders: var(--color-border);
+  --tw-prose-td-borders: var(--color-border);
+
+  --tw-prose-invert-body: var(--color-foreground);
+  --tw-prose-invert-headings: var(--color-foreground);
+  --tw-prose-invert-lead: var(--color-muted-foreground);
+  --tw-prose-invert-links: var(--color-primary);
+  --tw-prose-invert-bold: var(--color-foreground);
+  --tw-prose-invert-counters: var(--color-muted-foreground);
+  --tw-prose-invert-bullets: var(--color-border);
+  --tw-prose-invert-hr: var(--color-border);
+  --tw-prose-invert-quotes: var(--color-foreground);
+  --tw-prose-invert-quote-borders: var(--color-border);
+  --tw-prose-invert-captions: var(--color-muted-foreground);
+  --tw-prose-invert-code: var(--color-foreground);
+  --tw-prose-invert-pre-code: var(--color-foreground);
+  --tw-prose-invert-pre-bg: var(--color-muted);
+  --tw-prose-invert-th-borders: var(--color-border);
+  --tw-prose-invert-td-borders: var(--color-border);
 }
 
 body {

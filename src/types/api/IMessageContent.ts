@@ -20,4 +20,10 @@ export interface IMessageContent {
    * 发信内容
    */
   content: string
+  /**
+   * 是否为留言
+   */
+  isBookMessage?: boolean
+  senderDeleted?: boolean
+  receiverDeleted?: boolean
 }

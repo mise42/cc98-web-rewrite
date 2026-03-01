@@ -1,6 +1,6 @@
 import { AlertCircle, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link'
+import { Link } from '@tanstack/react-router'
 import { ApiError } from '@/services/client'
 
 interface ErrorStateProps {
@@ -25,10 +25,10 @@ export function ErrorState({ error, retry }: ErrorStateProps) {
           <p className="text-muted-foreground mb-6">您没有权限访问此内容，请先登录或注册账号。</p>
           <div className="flex gap-4 justify-center">
             <Button asChild className="text-white">
-              <Link href="/login">立即登录</Link>
+              <Link to="/login">立即登录</Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link href="/">返回首页</Link>
+              <Link to="/">返回首页</Link>
             </Button>
           </div>
         </div>

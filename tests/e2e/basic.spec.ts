@@ -14,7 +14,7 @@ test.describe('Basic Page Tests', () => {
     await authenticateUser(page)
 
     // Setup mock
-    await page.route('**/*cc98.top/topic/6399262', async route => {
+    await page.route('**/api.cc98.top/topic/6399262', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -38,7 +38,7 @@ test.describe('Basic Page Tests', () => {
       })
     })
 
-    await page.route('**/*cc98.top/board/7', async route => {
+    await page.route('**/api.cc98.top/board/7', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -55,7 +55,7 @@ test.describe('Basic Page Tests', () => {
       })
     })
 
-    await page.route('**/*cc98.top/topic/6399262/post*', async route => {
+    await page.route('**/api.cc98.top/topic/6399262/post*', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -89,8 +89,8 @@ test.describe('Basic Page Tests', () => {
     // Take screenshot for debugging
     await page.screenshot({ path: 'test-debug.png' })
 
-    // Check URL
-    await expect(page).toHaveURL('/topic/6399262')
+    // Check URL（允许默认查询参数）
+    await expect(page).toHaveURL(/\/topic\/6399262(\?.*)?$/)
 
     // Try to find any text
     const bodyText = await page.textContent('body')
