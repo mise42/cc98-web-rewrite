@@ -105,10 +105,10 @@ docker build \
 ### 2. 运行容器
 
 ```bash
-docker run -d --name cc98-web -p 8080:80 cc98-web-rewrite
+docker run -d --name cc98-web -p 8080:3000 cc98-web-rewrite
 ```
 
-访问 `http://localhost:8080` 即可。容器内已配置 SPA 路由回退（`/index.html`）。
+访问 `http://localhost:8080` 即可。容器内使用 **Hono** 提供静态资源与 SPA 路由回退（`/index.html`），并提供健康检查接口：`/health`。
 
 ## 测试
 
