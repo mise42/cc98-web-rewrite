@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import { Bell, Monitor, Moon, Search, Sun, User } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button-variants'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
 import { useMessageStore } from '@/stores/message'
@@ -174,14 +175,20 @@ export function Header() {
 
         <div className="mr-4 hidden md:flex items-center">
           <div className="relative w-64">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search
+              aria-hidden="true"
+              className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground"
+            />
             <Input
               type="text"
-              placeholder="搜索..."
+              aria-label="搜索"
+              autoComplete="off"
+              name="keyword"
+              placeholder="搜索…"
               value={searchValue}
               onChange={e => setSearchValue(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSearch()}
-              className="pl-8 bg-muted/50 border-transparent focus-visible:bg-background focus-visible:ring-1 focus-visible:ring-primary h-9 transition-all"
+              className="h-9 border-transparent bg-muted/50 pl-8 transition-[background-color,border-color,box-shadow] focus-visible:bg-background focus-visible:ring-1 focus-visible:ring-primary"
             />
           </div>
         </div>
@@ -196,11 +203,11 @@ export function Header() {
             aria-label={quickThemeLabel}
           >
             {mode === 'light' ? (
-              <Sun className="h-5 w-5" />
+              <Sun aria-hidden="true" className="h-5 w-5" />
             ) : mode === 'dark' ? (
-              <Moon className="h-5 w-5" />
+              <Moon aria-hidden="true" className="h-5 w-5" />
             ) : (
-              <Monitor className="h-5 w-5" />
+              <Monitor aria-hidden="true" className="h-5 w-5" />
             )}
           </Button>
 
@@ -215,10 +222,13 @@ export function Header() {
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label="打开消息通知"
+                  aria-expanded={showMessageMenu}
+                  aria-haspopup="true"
                   className="relative text-foreground/85 hover:text-foreground"
                   onClick={() => setShowMessageMenu(prev => !prev)}
                 >
-                  <Bell className="h-5 w-5" />
+                  <Bell aria-hidden="true" className="h-5 w-5" />
                   {unreadCount > 0 && (
                     <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75"></span>
@@ -228,7 +238,7 @@ export function Header() {
                 </Button>
 
                 {showMessageMenu && (
-                  <div className="absolute right-0 top-full w-56 bg-popover text-popover-foreground rounded-md shadow-md border border-border p-1 z-50 animate-in fade-in zoom-in-95 duration-200">
+                  <div className="absolute right-0 top-full z-50 w-56 rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-md animate-in fade-in zoom-in-95 duration-200 motion-reduce:animate-none motion-reduce:duration-0">
                     <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
                       消息通知
                     </div>
@@ -277,17 +287,23 @@ export function Header() {
               >
                 <Button
                   variant="ghost"
+                  aria-expanded={showUserMenu}
+                  aria-haspopup="true"
                   className="pl-0 text-foreground/90 hover:text-foreground gap-2"
                 >
                   {user?.portraitUrl ? (
                     <img
                       src={user.portraitUrl}
                       alt={user.name}
+                      width="32"
+                      height="32"
+                      loading="lazy"
+                      decoding="async"
                       className="h-8 w-8 rounded-full border border-border"
                     />
                   ) : (
                     <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center border border-border">
-                      <User className="h-4 w-4" />
+                      <User aria-hidden="true" className="h-4 w-4" />
                     </div>
                   )}
                   <span className="hidden sm:inline-block max-w-[100px] truncate">
@@ -296,7 +312,7 @@ export function Header() {
                 </Button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 top-full w-44 bg-popover text-popover-foreground rounded-md shadow-md border border-border p-1 z-50 animate-in fade-in zoom-in-95 duration-200">
+                  <div className="absolute right-0 top-full z-50 w-44 rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-md animate-in fade-in zoom-in-95 duration-200 motion-reduce:animate-none motion-reduce:duration-0">
                     <Link
                       to="/usercenter"
                       className="block px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors"
@@ -325,10 +341,8 @@ export function Header() {
             </>
           ) : (
             <div className="flex items-center gap-2">
-              <Link to="/login">
-                <Button variant="ghost" size="sm">
-                  登录
-                </Button>
+              <Link to="/login" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+                登录
               </Link>
             </div>
           )}
