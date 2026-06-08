@@ -1,12 +1,12 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
-import useEmblaCarousel from 'embla-carousel-react'
+import { useState, useCallback, useEffect, useRef } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 
 interface CarouselProps<T = unknown> {
-  items: T[]
-  renderItem: (item: T, index: number) => React.ReactNode
-  autoPlay?: boolean
-  interval?: number
-  className?: string
+  items: T[];
+  renderItem: (item: T, index: number) => React.ReactNode;
+  autoPlay?: boolean;
+  interval?: number;
+  className?: string;
 }
 
 export function Carousel<T = unknown>({
@@ -16,70 +16,70 @@ export function Carousel<T = unknown>({
   interval = 5000,
   className,
 }: CarouselProps<T>) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, skipSnaps: false })
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  const [isPaused, setIsPaused] = useState(false)
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, skipSnaps: false });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext()
-  }, [emblaApi])
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
 
   const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev()
-  }, [emblaApi])
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
 
   const scrollTo = useCallback(
     (index: number) => {
-      if (emblaApi) emblaApi.scrollTo(index)
+      if (emblaApi) emblaApi.scrollTo(index);
     },
-    [emblaApi]
-  )
+    [emblaApi],
+  );
 
   useEffect(() => {
     if (!autoPlay || !emblaApi || items.length <= 1 || isPaused) {
       if (timerRef.current) {
-        clearInterval(timerRef.current)
-        timerRef.current = null
+        clearInterval(timerRef.current);
+        timerRef.current = null;
       }
-      return
+      return;
     }
 
     timerRef.current = setInterval(() => {
-      scrollNext()
-    }, interval)
+      scrollNext();
+    }, interval);
 
     return () => {
       if (timerRef.current) {
-        clearInterval(timerRef.current)
-        timerRef.current = null
+        clearInterval(timerRef.current);
+        timerRef.current = null;
       }
-    }
-  }, [autoPlay, interval, emblaApi, scrollNext, items.length, isPaused])
+    };
+  }, [autoPlay, interval, emblaApi, scrollNext, items.length, isPaused]);
 
   useEffect(() => {
-    if (!emblaApi) return
+    if (!emblaApi) return;
 
     const onSelect = () => {
-      setSelectedIndex(emblaApi.selectedScrollSnap())
-    }
+      setSelectedIndex(emblaApi.selectedScrollSnap());
+    };
 
-    emblaApi.on('select', onSelect)
+    emblaApi.on("select", onSelect);
     return () => {
-      emblaApi.off('select', onSelect)
-    }
-  }, [emblaApi])
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi]);
 
   const onMouseEnter = useCallback(() => {
-    setIsPaused(true)
-  }, [])
+    setIsPaused(true);
+  }, []);
 
   const onMouseLeave = useCallback(() => {
-    setIsPaused(false)
-  }, [])
+    setIsPaused(false);
+  }, []);
 
   if (!items || items.length === 0) {
-    return null
+    return null;
   }
 
   return (
@@ -88,16 +88,16 @@ export function Carousel<T = unknown>({
       ref={emblaRef}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      style={{ overflow: 'hidden' }}
+      style={{ overflow: "hidden" }}
     >
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: "flex" }}>
         {items.map((item, index) => (
           <div
             key={index}
             style={{
-              flex: '0 0 100%',
+              flex: "0 0 100%",
               minWidth: 0,
-              maxWidth: '100%',
+              maxWidth: "100%",
             }}
           >
             {renderItem(item, index)}
@@ -131,7 +131,7 @@ export function Carousel<T = unknown>({
               key={index}
               onClick={() => scrollTo(index)}
               className={`w-2 h-2 rounded-full transition-all ${
-                selectedIndex === index ? 'bg-primary w-6' : 'bg-muted-foreground/30'
+                selectedIndex === index ? "bg-primary w-6" : "bg-muted-foreground/30"
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
@@ -139,5 +139,5 @@ export function Carousel<T = unknown>({
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -2,25 +2,25 @@ export interface IAward {
   /**
    * 操作内容
    */
-  content: string
+  content: string;
   /**
    * 操作人
    */
-  operatorName: string
+  operatorName: string;
   /**
    * 操作理由
    */
-  reason: string
+  reason: string;
   /**
    * 时间
    */
-  time: Date
+  time: Date;
   /**
    * 类型
    */
-  type: number
+  type: number;
   /**
    * TODO:
    */
-  id: number
+  id: number;
 }

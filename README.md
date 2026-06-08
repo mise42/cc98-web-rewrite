@@ -6,8 +6,8 @@
 
 ### 核心框架
 
-- **包管理**: [Bun](https://bun.sh/)
-- **构建工具**: [Vite](https://vitejs.dev/) + [SWC](https://swc.rs/)
+- **工具链**: [Vite+](https://viteplus.dev/)（`vp`，使用 Bun 作为包管理后端）
+- **构建工具**: Vite 8 + OXC
 - **UI 框架**: [React 19](https://react.dev/)
 - **路由**: [TanStack Router](https://tanstack.com/router)（文件路由）
 - **状态管理**: [Zustand](https://zustand-demo.pmnd.rs/)
@@ -30,8 +30,8 @@
 
 ### 开发工具
 
-- **代码规范**: [ESLint](https://eslint.org/) + [Prettier](https://prettier.io/)
-- **Git Hooks**: [Husky](https://typicode.github.io/husky/) + [lint-staged](https://github.com/okonet/lint-staged)
+- **代码检查**: Vite+ 默认 `vp check`（Oxlint + Oxfmt）
+- **Git Hooks**: Vite+ `.vite-hooks` + `vp staged`
 - **TypeScript**: 严格模式
 
 ## 项目结构
@@ -61,13 +61,13 @@ cc98-web-rewrite/
 ### 安装依赖
 
 ```bash
-bun install
+vp install
 ```
 
 ### 启动开发服务器
 
 ```bash
-bun run dev
+vp dev --host --port 5173
 ```
 
 开发服务器将在 `http://localhost:5173` 启动。
@@ -75,13 +75,31 @@ bun run dev
 ### 构建生产版本
 
 ```bash
-bun run build
+vp build
 ```
 
 ### 预览生产构建
 
 ```bash
-bun run preview
+vp preview
+```
+
+### 代码检查
+
+```bash
+vp check
+```
+
+自动修复 Vite+ 默认格式和 lint 问题：
+
+```bash
+vp check --fix
+```
+
+Git pre-commit hook 由 Vite+ 管理，提交时会运行：
+
+```bash
+vp staged
 ```
 
 ## Docker 自部署
@@ -125,33 +143,13 @@ docker run -d --name cc98-web -p 8080:3000 cc98-web-rewrite
 ### 运行单元测试
 
 ```bash
-bun run test
+vp test run
 ```
 
 ### 运行 E2E 测试
 
 ```bash
 bun run test:e2e
-```
-
-## 代码规范
-
-### 运行 ESLint
-
-```bash
-bun run lint
-```
-
-### 自动修复
-
-```bash
-bun run lint:fix
-```
-
-### 格式化代码
-
-```bash
-bun run format
 ```
 
 ## 环境变量
@@ -174,7 +172,8 @@ git submodule update --init --recursive
 ### 技术栈升级
 
 - ✅ React 16 → React 19
-- ✅ Webpack → Vite + SWC
+- ✅ Webpack → Vite 8 + OXC
+- ✅ Bun scripts → Vite+ (`vp`) toolchain entrypoints
 - ✅ Redux → Zustand
 - ✅ React Router v4 → TanStack Router（文件路由）
 - ✅ Ant Design v3 → Ant Design v6

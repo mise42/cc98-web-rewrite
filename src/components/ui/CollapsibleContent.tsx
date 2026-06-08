@@ -1,74 +1,73 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { Button } from '@/components/ui/button'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface CollapsibleContentProps {
-  children: React.ReactNode
-  threshold?: number // 高度阈值，默认200px
-  previewLines?: number // 预览行数，默认3行
+  children: React.ReactNode;
+  threshold?: number; // 高度阈值，默认200px
+  previewLines?: number; // 预览行数，默认3行
 }
 
 export const CollapsibleContent: React.FC<CollapsibleContentProps> = ({
   children,
   threshold = 200,
-  previewLines = 3,
 }) => {
-  const [isCollapsible, setIsCollapsible] = useState(false)
-  const [isExpanded, setIsExpanded] = useState(false)
-  const contentRef = useRef<HTMLDivElement>(null)
-  const contentWrapperRef = useRef<HTMLDivElement>(null)
-  const resizeObserverRef = useRef<ResizeObserver | null>(null)
+  const [isCollapsible, setIsCollapsible] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const contentWrapperRef = useRef<HTMLDivElement>(null);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
   // 测量内容高度
   const measureHeight = useCallback(() => {
     if (contentWrapperRef.current) {
-      const height = contentWrapperRef.current.scrollHeight
-      setIsCollapsible(height > threshold)
+      const height = contentWrapperRef.current.scrollHeight;
+      setIsCollapsible(height > threshold);
     }
-  }, [threshold])
+  }, [threshold]);
 
   // 使用 ref callback 确保 DOM 元素可用时立即测量
   const setContentWrapperRef = useCallback(
     (node: HTMLDivElement | null) => {
-      contentWrapperRef.current = node
+      contentWrapperRef.current = node;
 
       if (node) {
         // 延迟测量以确保内容完全渲染
-        setTimeout(measureHeight, 50)
+        setTimeout(measureHeight, 50);
 
         // 设置 ResizeObserver
         if (resizeObserverRef.current) {
-          resizeObserverRef.current.disconnect()
+          resizeObserverRef.current.disconnect();
         }
 
         resizeObserverRef.current = new ResizeObserver(() => {
-          measureHeight()
-        })
-        resizeObserverRef.current.observe(node)
+          measureHeight();
+        });
+        resizeObserverRef.current.observe(node);
       }
     },
-    [measureHeight]
-  )
+    [measureHeight],
+  );
 
   // 清理
   useEffect(() => {
     return () => {
       if (resizeObserverRef.current) {
-        resizeObserverRef.current.disconnect()
+        resizeObserverRef.current.disconnect();
       }
-    }
-  }, [])
+    };
+  }, []);
 
   return (
     <div>
       <div
         ref={contentRef}
         style={{
-          maxHeight: isCollapsible && !isExpanded ? `${threshold}px` : 'none',
-          overflow: isCollapsible && !isExpanded ? 'hidden' : 'visible',
-          transition: 'max-height 0.3s ease',
+          maxHeight: isCollapsible && !isExpanded ? `${threshold}px` : "none",
+          overflow: isCollapsible && !isExpanded ? "hidden" : "visible",
+          transition: "max-height 0.3s ease",
         }}
-        className={isCollapsible && !isExpanded ? 'masked-content' : ''}
+        className={isCollapsible && !isExpanded ? "masked-content" : ""}
       >
         <div ref={setContentWrapperRef}>{children}</div>
       </div>
@@ -104,5 +103,5 @@ export const CollapsibleContent: React.FC<CollapsibleContentProps> = ({
         }
       `}</style>
     </div>
-  )
-}
+  );
+};

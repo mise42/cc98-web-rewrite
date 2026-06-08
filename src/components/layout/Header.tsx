@@ -1,151 +1,151 @@
-import { useState, useEffect, useRef } from 'react'
-import { Link, useLocation, useNavigate } from '@tanstack/react-router'
-import { Bell, Monitor, Moon, Search, Sun, User } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { buttonVariants } from '@/components/ui/button-variants'
-import { useAuth } from '@/hooks/useAuth'
-import { useTheme } from '@/hooks/useTheme'
-import { useMessageStore } from '@/stores/message'
-import { userService } from '@/services/user'
-import { cn } from '@/lib/utils'
-import tokenManager from '@/lib/token-manager'
+import { useState, useEffect, useRef } from "react";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { Bell, Monitor, Moon, Search, Sun, User } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
+import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/hooks/useTheme";
+import { useMessageStore } from "@/stores/message";
+import { userService } from "@/services/user";
+import { cn } from "@/lib/utils";
+import tokenManager from "@/lib/token-manager";
 
 export function Header() {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const { user, isAuthenticated, logout } = useAuth()
-  const { mode, setMode } = useTheme()
-  const { unreadCount, unreadSummary } = useMessageStore()
-  const [searchValue, setSearchValue] = useState('')
-  const [showUserMenu, setShowUserMenu] = useState(false)
-  const [showMessageMenu, setShowMessageMenu] = useState(false)
-  const [hasSignedInToday, setHasSignedInToday] = useState<boolean | null>(null)
-  const userMenuRef = useRef<HTMLDivElement>(null)
-  const messageMenuRef = useRef<HTMLDivElement>(null)
-  const userMenuHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const messageMenuHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const showAuthenticated = isAuthenticated && tokenManager.hasSession()
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
+  const { mode, setMode } = useTheme();
+  const { unreadCount, unreadSummary } = useMessageStore();
+  const [searchValue, setSearchValue] = useState("");
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showMessageMenu, setShowMessageMenu] = useState(false);
+  const [hasSignedInToday, setHasSignedInToday] = useState<boolean | null>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const messageMenuRef = useRef<HTMLDivElement>(null);
+  const userMenuHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const messageMenuHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showAuthenticated = isAuthenticated && tokenManager.hasSession();
 
   // 点击外部关闭菜单
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-        setShowUserMenu(false)
+        setShowUserMenu(false);
       }
       if (messageMenuRef.current && !messageMenuRef.current.contains(event.target as Node)) {
-        setShowMessageMenu(false)
+        setShowMessageMenu(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener("mousedown", handleClickOutside);
       if (userMenuHideTimerRef.current) {
-        clearTimeout(userMenuHideTimerRef.current)
+        clearTimeout(userMenuHideTimerRef.current);
       }
       if (messageMenuHideTimerRef.current) {
-        clearTimeout(messageMenuHideTimerRef.current)
+        clearTimeout(messageMenuHideTimerRef.current);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   useEffect(() => {
-    if (!showAuthenticated || !showUserMenu) return
+    if (!showAuthenticated || !showUserMenu) return;
 
-    let cancelled = false
+    let cancelled = false;
 
     userService
       .getSignInStatus()
-      .then(status => {
+      .then((status) => {
         if (!cancelled) {
-          setHasSignedInToday(status.hasSignedInToday)
+          setHasSignedInToday(status.hasSignedInToday);
         }
       })
       .catch(() => {
         if (!cancelled) {
-          setHasSignedInToday(false)
+          setHasSignedInToday(false);
         }
-      })
+      });
 
     return () => {
-      cancelled = true
-    }
-  }, [showAuthenticated, showUserMenu])
+      cancelled = true;
+    };
+  }, [showAuthenticated, showUserMenu]);
 
   const openUserMenu = () => {
     if (userMenuHideTimerRef.current) {
-      clearTimeout(userMenuHideTimerRef.current)
-      userMenuHideTimerRef.current = null
+      clearTimeout(userMenuHideTimerRef.current);
+      userMenuHideTimerRef.current = null;
     }
-    setShowUserMenu(true)
-  }
+    setShowUserMenu(true);
+  };
 
   const closeUserMenuWithDelay = () => {
     if (userMenuHideTimerRef.current) {
-      clearTimeout(userMenuHideTimerRef.current)
+      clearTimeout(userMenuHideTimerRef.current);
     }
     userMenuHideTimerRef.current = setTimeout(() => {
-      setShowUserMenu(false)
-    }, 120)
-  }
+      setShowUserMenu(false);
+    }, 120);
+  };
 
   const openMessageMenu = () => {
     if (messageMenuHideTimerRef.current) {
-      clearTimeout(messageMenuHideTimerRef.current)
-      messageMenuHideTimerRef.current = null
+      clearTimeout(messageMenuHideTimerRef.current);
+      messageMenuHideTimerRef.current = null;
     }
-    setShowMessageMenu(true)
-  }
+    setShowMessageMenu(true);
+  };
 
   const closeMessageMenuWithDelay = () => {
     if (messageMenuHideTimerRef.current) {
-      clearTimeout(messageMenuHideTimerRef.current)
+      clearTimeout(messageMenuHideTimerRef.current);
     }
     messageMenuHideTimerRef.current = setTimeout(() => {
-      setShowMessageMenu(false)
-    }, 120)
-  }
+      setShowMessageMenu(false);
+    }, 120);
+  };
 
   const navItems = [
-    { path: '/', label: '首页' },
-    { path: '/boardlist', label: '版面' },
-    { path: '/newtopics', label: '新帖' },
-    { path: '/recommendedtopics', label: '精选' },
-    { path: '/following', label: '关注' },
-  ]
+    { path: "/", label: "首页" },
+    { path: "/boardlist", label: "版面" },
+    { path: "/newtopics", label: "新帖" },
+    { path: "/recommendedtopics", label: "精选" },
+    { path: "/following", label: "关注" },
+  ];
 
   const isNavActive = (path: string) => {
-    if (path === '/') return location.pathname === '/'
-    if (path === '/boardlist') {
-      return location.pathname === '/boardlist' || location.pathname.startsWith('/board/')
+    if (path === "/") return location.pathname === "/";
+    if (path === "/boardlist") {
+      return location.pathname === "/boardlist" || location.pathname.startsWith("/board/");
     }
-    return location.pathname === path || location.pathname.startsWith(`${path}/`)
-  }
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
 
   const handleSearch = () => {
-    const keyword = searchValue.trim()
-    if (!keyword) return
+    const keyword = searchValue.trim();
+    if (!keyword) return;
 
-    const boardMatch = location.pathname.match(/\/board\/(\d+)/)
-    const boardId = boardMatch ? Number(boardMatch[1]) : 0
+    const boardMatch = location.pathname.match(/\/board\/(\d+)/);
+    const boardId = boardMatch ? Number(boardMatch[1]) : 0;
 
     navigate({
-      to: '/search',
+      to: "/search",
       search: {
         keyword,
-        tab: 'topics',
+        tab: "topics",
         page: 1,
         boardId,
       },
-    })
-  }
+    });
+  };
 
   const handleQuickThemeToggle = () => {
-    setMode(mode === 'light' ? 'dark' : mode === 'dark' ? 'system' : 'light')
-  }
+    setMode(mode === "light" ? "dark" : mode === "dark" ? "system" : "light");
+  };
 
   const quickThemeLabel =
-    mode === 'light' ? '切换到深色模式' : mode === 'dark' ? '切换到跟随系统' : '切换到浅色模式'
+    mode === "light" ? "切换到深色模式" : mode === "dark" ? "切换到跟随系统" : "切换到浅色模式";
 
   return (
     <header className="app-themed-header sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
@@ -155,15 +155,15 @@ export function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-          {navItems.map(item => (
+          {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
               className={cn(
-                'px-1 py-1 transition-colors',
+                "px-1 py-1 transition-colors",
                 isNavActive(item.path)
-                  ? 'text-white font-semibold underline underline-offset-4 decoration-2'
-                  : 'text-white/85 hover:text-white'
+                  ? "text-white font-semibold underline underline-offset-4 decoration-2"
+                  : "text-white/85 hover:text-white",
               )}
             >
               {item.label}
@@ -186,8 +186,8 @@ export function Header() {
               name="keyword"
               placeholder="搜索…"
               value={searchValue}
-              onChange={e => setSearchValue(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="h-9 border-transparent bg-muted/50 pl-8 transition-[background-color,border-color,box-shadow] focus-visible:bg-background focus-visible:ring-1 focus-visible:ring-primary"
             />
           </div>
@@ -202,9 +202,9 @@ export function Header() {
             title={quickThemeLabel}
             aria-label={quickThemeLabel}
           >
-            {mode === 'light' ? (
+            {mode === "light" ? (
               <Sun aria-hidden="true" className="h-5 w-5" />
-            ) : mode === 'dark' ? (
+            ) : mode === "dark" ? (
               <Moon aria-hidden="true" className="h-5 w-5" />
             ) : (
               <Monitor aria-hidden="true" className="h-5 w-5" />
@@ -226,7 +226,7 @@ export function Header() {
                   aria-expanded={showMessageMenu}
                   aria-haspopup="true"
                   className="relative text-foreground/85 hover:text-foreground"
-                  onClick={() => setShowMessageMenu(prev => !prev)}
+                  onClick={() => setShowMessageMenu((prev) => !prev)}
                 >
                   <Bell aria-hidden="true" className="h-5 w-5" />
                   {unreadCount > 0 && (
@@ -245,22 +245,22 @@ export function Header() {
                     <div className="h-px bg-border my-1" />
                     {[
                       {
-                        label: '回复我的',
-                        path: '/message/reply',
+                        label: "回复我的",
+                        path: "/message/reply",
                         count: unreadSummary.replyCount,
                       },
-                      { label: '@ 我的', path: '/message/at', count: unreadSummary.atCount },
+                      { label: "@ 我的", path: "/message/at", count: unreadSummary.atCount },
                       {
-                        label: '系统通知',
-                        path: '/message/system',
+                        label: "系统通知",
+                        path: "/message/system",
                         count: unreadSummary.systemCount,
                       },
                       {
-                        label: '我的私信',
-                        path: '/message/private',
+                        label: "我的私信",
+                        path: "/message/private",
                         count: unreadSummary.messageCount,
                       },
-                    ].map(item => (
+                    ].map((item) => (
                       <Link
                         key={item.path}
                         to={item.path}
@@ -324,12 +324,12 @@ export function Header() {
                       className="block px-3 py-2 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors"
                       onClick={() => setShowUserMenu(false)}
                     >
-                      {hasSignedInToday ? '已签到' : '签到'}
+                      {hasSignedInToday ? "已签到" : "签到"}
                     </Link>
                     <button
                       onClick={() => {
-                        logout()
-                        setShowUserMenu(false)
+                        logout();
+                        setShowUserMenu(false);
                       }}
                       className="block w-full px-3 py-2 text-sm rounded-sm hover:bg-destructive/10 hover:text-destructive transition-colors text-left"
                     >
@@ -341,7 +341,7 @@ export function Header() {
             </>
           ) : (
             <div className="flex items-center gap-2">
-              <Link to="/login" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+              <Link to="/login" className={buttonVariants({ variant: "ghost", size: "sm" })}>
                 登录
               </Link>
             </div>
@@ -349,5 +349,5 @@ export function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }

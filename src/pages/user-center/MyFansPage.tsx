@@ -1,18 +1,18 @@
-import { useQuery } from '@tanstack/react-query'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Users } from 'lucide-react'
-import { userService } from '@/services/user'
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Users } from "lucide-react";
+import { userService } from "@/services/user";
 
 export function MyFansPage() {
   const { data: userInfo, isLoading } = useQuery({
-    queryKey: ['user', 'me', 'info'],
+    queryKey: ["user", "me", "info"],
     queryFn: () => userService.getCurrentUser(),
     staleTime: 1000 * 60 * 5,
-  })
+  });
 
   if (isLoading) {
-    return <Skeleton className="h-56 w-full rounded-lg" />
+    return <Skeleton className="h-56 w-full rounded-lg" />;
   }
 
   return (
@@ -40,5 +40,5 @@ export function MyFansPage() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

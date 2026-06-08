@@ -1,14 +1,14 @@
-import React from 'react'
-import { Link } from '@tanstack/react-router'
-import { FileText } from 'lucide-react'
+import React from "react";
+import { Link } from "@tanstack/react-router";
+import { FileText } from "lucide-react";
 
 interface TopicLinkProps {
-  children?: React.ReactNode
-  topicId?: string
+  children?: React.ReactNode;
+  topicId?: string;
 }
 
 export const TopicLink: React.FC<TopicLinkProps> = ({ children, topicId }) => {
-  const id = topicId || (typeof children === 'string' ? children : '')
+  const id = topicId || (typeof children === "string" ? children : "");
 
   return (
     <Link
@@ -19,5 +19,5 @@ export const TopicLink: React.FC<TopicLinkProps> = ({ children, topicId }) => {
       <FileText className="w-3 h-3" />
       {children || `Topic ${id}`}
     </Link>
-  )
-}
+  );
+};

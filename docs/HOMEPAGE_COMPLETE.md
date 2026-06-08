@@ -71,12 +71,12 @@
 
 ```typescript
 // 路由级别预加载
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(homeQueryOptions())
+    await context.queryClient.ensureQueryData(homeQueryOptions());
   },
   component: HomePage,
-})
+});
 ```
 
 **优势：**
@@ -99,11 +99,11 @@ HomePage
 
 ```typescript
 interface CarouselProps {
-  items: unknown[]
-  renderItem: (item: unknown, index: number) => React.ReactNode
-  autoPlay?: boolean
-  interval?: number
-  className?: string
+  items: unknown[];
+  renderItem: (item: unknown, index: number) => React.ReactNode;
+  autoPlay?: boolean;
+  interval?: number;
+  className?: string;
 }
 ```
 

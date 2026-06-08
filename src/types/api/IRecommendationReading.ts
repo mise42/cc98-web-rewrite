@@ -2,27 +2,27 @@ export interface IRecommendationReading {
   /**
    * 标题
    */
-  title: string
+  title: string;
   /**
    * 内容
    */
-  content: string
+  content: string;
   /**
    * 帖子链接
    */
-  url: string
+  url: string;
   /**
    * 图标链接
    */
-  imageUrl: string
+  imageUrl: string;
 
-  id: number
+  id: number;
 
-  type: number
+  type: number;
 
-  enable: boolean
+  enable: boolean;
 
-  time: string
+  time: string;
 
-  expiredTime: string
+  expiredTime: string;
 }

@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
-import { MyFavoritesPage } from '@/pages/user-center'
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
+import { MyFavoritesPage } from "@/pages/user-center";
 
 function MyFavoritesRoute() {
   return (
@@ -17,9 +17,9 @@ function MyFavoritesRoute() {
       </div>
       <MyFavoritesPage />
     </div>
-  )
+  );
 }
 
-export const Route = createFileRoute('/_authenticated/usercenter/favorites/$page')({
+export const Route = createFileRoute("/_authenticated/usercenter/favorites/$page")({
   component: MyFavoritesRoute,
-})
+});

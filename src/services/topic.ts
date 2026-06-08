@@ -1,5 +1,5 @@
-import { apiClient } from './client'
-import type { ITopic, IPost, IRandomRecommendation } from '@/types/api'
+import { apiClient } from "./client";
+import type { ITopic, IPost, IRandomRecommendation } from "@/types/api";
 
 /**
  * 帖子相关接口
@@ -12,30 +12,32 @@ export const topicService = {
     keyword: string,
     from: number = 0,
     size: number = 20,
-    boardId: number = 0
+    boardId: number = 0,
   ): Promise<ITopic[]> {
-    const encodedKeyword = encodeURIComponent(keyword)
+    const encodedKeyword = encodeURIComponent(keyword);
     if (boardId > 0) {
       return apiClient.get<ITopic[]>(
-        `/topic/search/board/${boardId}?keyword=${encodedKeyword}&from=${from}&size=${size}`
-      )
+        `/topic/search/board/${boardId}?keyword=${encodedKeyword}&from=${from}&size=${size}`,
+      );
     }
 
-    return apiClient.get<ITopic[]>(`/topic/search?keyword=${encodedKeyword}&from=${from}&size=${size}`)
+    return apiClient.get<ITopic[]>(
+      `/topic/search?keyword=${encodedKeyword}&from=${from}&size=${size}`,
+    );
   },
 
   /**
    * 获取帖子详情
    */
   async getTopic(topicId: number): Promise<ITopic> {
-    return apiClient.get<ITopic>(`/topic/${topicId}`)
+    return apiClient.get<ITopic>(`/topic/${topicId}`);
   },
 
   /**
    * 获取帖子回复列表
    */
   async getTopicPosts(topicId: number, from: number = 0, size: number = 20): Promise<IPost[]> {
-    return apiClient.get<IPost[]>(`/topic/${topicId}/post?from=${from}&size=${size}`)
+    return apiClient.get<IPost[]>(`/topic/${topicId}/post?from=${from}&size=${size}`);
   },
 
   /**
@@ -45,18 +47,18 @@ export const topicService = {
     topicId: number,
     postId: number,
     from: number = 0,
-    size: number = 20
+    size: number = 20,
   ): Promise<IPost[]> {
     return apiClient.get<IPost[]>(
-      `/post/topic/specific-user?topicid=${topicId}&postid=${postId}&from=${from}&size=${size}`
-    )
+      `/post/topic/specific-user?topicid=${topicId}&postid=${postId}&from=${from}&size=${size}`,
+    );
   },
 
   /**
    * 创建新帖子
    */
   async createTopic(boardId: number, data: CreateTopicRequest): Promise<ITopic> {
-    return apiClient.post<ITopic>(`/board/${boardId}/topic`, data)
+    return apiClient.post<ITopic>(`/board/${boardId}/topic`, data);
   },
 
   /**
@@ -66,43 +68,43 @@ export const topicService = {
     return apiClient.post<IPost>(`/topic/${topicId}/post`, {
       content,
       contentType,
-    })
+    });
   },
 
   /**
    * 点赞帖子
    */
   async likeTopic(topicId: number): Promise<void> {
-    return apiClient.post<void>(`/topic/${topicId}/like`)
+    return apiClient.post<void>(`/topic/${topicId}/like`);
   },
 
   /**
    * 取消点赞
    */
   async dislikeTopic(topicId: number): Promise<void> {
-    return apiClient.post<void>(`/topic/${topicId}/dislike`)
+    return apiClient.post<void>(`/topic/${topicId}/dislike`);
   },
 
   /**
    * 获取热门话题
    */
   async getHotTopics(): Promise<ITopic[]> {
-    return apiClient.get<ITopic[]>('/topic/hot')
+    return apiClient.get<ITopic[]>("/topic/hot");
   },
 
   async getNewTopics(from: number = 0, size: number = 20): Promise<ITopic[]> {
-    return apiClient.get<ITopic[]>(`/topic/new?from=${from}&size=${size}`)
+    return apiClient.get<ITopic[]>(`/topic/new?from=${from}&size=${size}`);
   },
 
   /**
    * 获取最新媒体主题
    */
   async getNewMediaTopics(from: number = 0, size: number = 20): Promise<ITopic[]> {
-    return apiClient.get<ITopic[]>(`/topic/new-media?from=${from}&size=${size}`)
+    return apiClient.get<ITopic[]>(`/topic/new-media?from=${from}&size=${size}`);
   },
 
   async getRecommendedTopics(size: number = 10): Promise<IRandomRecommendation[]> {
-    return apiClient.get<IRandomRecommendation[]>(`/topic/random-recommendation?size=${size}`)
+    return apiClient.get<IRandomRecommendation[]>(`/topic/random-recommendation?size=${size}`);
   },
 
   /**
@@ -112,54 +114,54 @@ export const topicService = {
     const params = new URLSearchParams({
       from: String(from),
       size: String(size),
-    })
+    });
 
     if (order !== undefined) {
-      params.set('order', String(order))
+      params.set("order", String(order));
     }
 
-    return apiClient.get<ITopic[]>(`/topic/me/favorite?${params.toString()}`)
+    return apiClient.get<ITopic[]>(`/topic/me/favorite?${params.toString()}`);
   },
 
   /**
    * 点赞帖子
    */
   async likePost(postId: number): Promise<void> {
-    return apiClient.put<void>(`/post/${postId}/like`, '1', {
+    return apiClient.put<void>(`/post/${postId}/like`, "1", {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-    })
+    });
   },
 
   /**
    * 点踩帖子
    */
   async dislikePost(postId: number): Promise<void> {
-    return apiClient.put<void>(`/post/${postId}/like`, '2', {
+    return apiClient.put<void>(`/post/${postId}/like`, "2", {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-    })
+    });
   },
 
   /**
    * 获取帖子点赞状态
    */
   async getPostLikeState(
-    postId: number
+    postId: number,
   ): Promise<{ likeCount: number; dislikeCount: number; likeState: number }> {
     return apiClient.get<{ likeCount: number; dislikeCount: number; likeState: number }>(
-      `/post/${postId}/like`
-    )
+      `/post/${postId}/like`,
+    );
   },
-}
+};
 
 /**
  * 创建帖子请求类型
  */
 export interface CreateTopicRequest {
-  title: string
-  content: string
-  contentType: 0 | 1 // 0: UBB, 1: Markdown
+  title: string;
+  content: string;
+  contentType: 0 | 1; // 0: UBB, 1: Markdown
 }

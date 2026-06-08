@@ -1,37 +1,37 @@
-import { useEffect, useMemo } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link, useNavigate, useSearch } from '@tanstack/react-router'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Badge } from '@/components/ui/badge'
-import { LayoutGrid } from 'lucide-react'
-import { TopicViewModeSelector } from '@/components/topic/TopicViewModeSelector'
-import { ViewModeToggle } from '@/components/topic/ViewModeToggle'
-import { ClassicTopicItem } from '@/components/topic/ClassicTopicItem'
-import { CardTopicItem } from '@/components/topic/CardTopicItem'
-import { PaginationControls } from '@/components/common/PaginationControls'
-import { InfiniteScrollTrigger } from '@/components/common/InfiniteScrollTrigger'
-import { ErrorState } from '@/components/ui/error-state'
-import { userService } from '@/services/user'
-import { boardService } from '@/services/board'
-import type { ITopic } from '@/types/api'
-import { useTopicViewModeStore } from '@/stores/topic-view-mode'
-import { useFollowedBoardsViewStore } from '@/stores/followed-boards-view'
+import { useEffect, useMemo } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { LayoutGrid } from "lucide-react";
+import { TopicViewModeSelector } from "@/components/topic/TopicViewModeSelector";
+import { ViewModeToggle } from "@/components/topic/ViewModeToggle";
+import { ClassicTopicItem } from "@/components/topic/ClassicTopicItem";
+import { CardTopicItem } from "@/components/topic/CardTopicItem";
+import { PaginationControls } from "@/components/common/PaginationControls";
+import { InfiniteScrollTrigger } from "@/components/common/InfiniteScrollTrigger";
+import { ErrorState } from "@/components/ui/error-state";
+import { userService } from "@/services/user";
+import { boardService } from "@/services/board";
+import type { ITopic } from "@/types/api";
+import { useTopicViewModeStore } from "@/stores/topic-view-mode";
+import { useFollowedBoardsViewStore } from "@/stores/followed-boards-view";
 
-const PAGE_SIZE = 20
-const MAX_TOPICS = 500
+const PAGE_SIZE = 20;
+const MAX_TOPICS = 500;
 
 function isMediaTopic(topic: ITopic): boolean {
-  return typeof topic.contentType === 'number' && topic.contentType >= 2 && topic.contentType <= 4
+  return typeof topic.contentType === "number" && topic.contentType >= 2 && topic.contentType <= 4;
 }
 
 export function FollowedBoardsPage() {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const search = useSearch({ from: '/_authenticated/following/boards' })
-  const urlPage = search.page
-  const urlMode = search.mode
-  const displayMode = useTopicViewModeStore(state => state.mode)
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const search = useSearch({ from: "/_authenticated/following/boards" });
+  const urlPage = search.page;
+  const urlMode = search.mode;
+  const displayMode = useTopicViewModeStore((state) => state.mode);
   const {
     viewMode,
     currentPage,
@@ -45,116 +45,118 @@ export function FollowedBoardsPage() {
     setHasMore,
     setIsLoadingMore,
     resetTopics,
-  } = useFollowedBoardsViewStore()
+  } = useFollowedBoardsViewStore();
 
   useEffect(() => {
     if (urlMode !== viewMode) {
-      setViewMode(urlMode)
+      setViewMode(urlMode);
     }
     if (urlPage !== currentPage) {
-      setCurrentPage(urlPage)
+      setCurrentPage(urlPage);
     }
-  }, [urlMode, viewMode, setViewMode, urlPage, currentPage, setCurrentPage])
+  }, [urlMode, viewMode, setViewMode, urlPage, currentPage, setCurrentPage]);
 
-  const updateURL = (page: number, mode: 'pagination' | 'infinite') => {
+  const updateURL = (page: number, mode: "pagination" | "infinite") => {
     navigate({
-      to: '/following/boards',
+      to: "/following/boards",
       search: { page, mode },
-    })
-  }
+    });
+  };
 
   const { data: userInfo, isLoading: userLoading } = useQuery({
-    queryKey: ['user', 'me', 'info'],
+    queryKey: ["user", "me", "info"],
     queryFn: () => userService.getCurrentUser(),
     staleTime: 1000 * 60 * 5,
-  })
+  });
 
   const {
     data: pagedTopics,
     isLoading: pagedLoading,
     error: pagedError,
   } = useQuery({
-    queryKey: ['user', 'me', 'custom-board-topics', 'following-boards', 'pagination', currentPage],
+    queryKey: ["user", "me", "custom-board-topics", "following-boards", "pagination", currentPage],
     queryFn: () => boardService.getFollowedBoardTopics((currentPage - 1) * PAGE_SIZE, PAGE_SIZE),
-    enabled: viewMode === 'pagination',
+    enabled: viewMode === "pagination",
     staleTime: 1000 * 60,
-  })
+  });
 
   const { isLoading: initialLoading, error: initialError } = useQuery({
-    queryKey: ['user', 'me', 'custom-board-topics', 'following-boards', 'infinite', 'initial'],
+    queryKey: ["user", "me", "custom-board-topics", "following-boards", "infinite", "initial"],
     queryFn: async () => {
-      const data = await boardService.getFollowedBoardTopics(0, PAGE_SIZE)
+      const data = await boardService.getFollowedBoardTopics(0, PAGE_SIZE);
       if (allTopics.length === 0) {
-        setAllTopics(data)
-        setHasMore(data.length === PAGE_SIZE)
+        setAllTopics(data);
+        setHasMore(data.length === PAGE_SIZE);
       }
-      return data
+      return data;
     },
-    enabled: viewMode === 'infinite' && allTopics.length === 0,
+    enabled: viewMode === "infinite" && allTopics.length === 0,
     staleTime: 1000 * 60,
-  })
+  });
 
-  const boardIds = userInfo?.customBoards ?? []
+  const boardIds = userInfo?.customBoards ?? [];
   const { data: boards, isLoading: boardsLoading } = useQuery({
-    queryKey: ['boards', 'followed', boardIds],
-    queryFn: () => Promise.all(boardIds.map(id => boardService.getBoard(String(id)))),
+    queryKey: ["boards", "followed", boardIds],
+    queryFn: () => Promise.all(boardIds.map((id) => boardService.getBoard(String(id)))),
     enabled: boardIds.length > 0,
     staleTime: 1000 * 60 * 5,
-  })
+  });
 
   const boardNameMap = useMemo(
-    () => new Map((boards ?? []).map(board => [board.id, board.name])),
-    [boards]
-  )
+    () => new Map((boards ?? []).map((board) => [board.id, board.name])),
+    [boards],
+  );
 
   const loadMore = async () => {
-    if (isLoadingMore || !hasMore) return
-    setIsLoadingMore(true)
+    if (isLoadingMore || !hasMore) return;
+    setIsLoadingMore(true);
     try {
-      const from = allTopics.length
-      const newTopics = await boardService.getFollowedBoardTopics(from, PAGE_SIZE)
-      appendTopics(newTopics)
-      setHasMore(newTopics.length === PAGE_SIZE && allTopics.length + newTopics.length < MAX_TOPICS)
+      const from = allTopics.length;
+      const newTopics = await boardService.getFollowedBoardTopics(from, PAGE_SIZE);
+      appendTopics(newTopics);
+      setHasMore(
+        newTopics.length === PAGE_SIZE && allTopics.length + newTopics.length < MAX_TOPICS,
+      );
     } finally {
-      setIsLoadingMore(false)
+      setIsLoadingMore(false);
     }
-  }
+  };
 
-  const handleModeChange = (mode: 'pagination' | 'infinite') => {
-    setViewMode(mode)
-    resetTopics()
+  const handleModeChange = (mode: "pagination" | "infinite") => {
+    setViewMode(mode);
+    resetTopics();
     queryClient.invalidateQueries({
-      queryKey: ['user', 'me', 'custom-board-topics', 'following-boards'],
-    })
-    updateURL(1, mode)
-  }
+      queryKey: ["user", "me", "custom-board-topics", "following-boards"],
+    });
+    updateURL(1, mode);
+  };
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-    updateURL(page, viewMode)
-  }
+    setCurrentPage(page);
+    updateURL(page, viewMode);
+  };
 
-  const isLoading = userLoading || (viewMode === 'pagination' ? pagedLoading : initialLoading)
-  const error = viewMode === 'pagination' ? pagedError : initialError
+  const isLoading = userLoading || (viewMode === "pagination" ? pagedLoading : initialLoading);
+  const error = viewMode === "pagination" ? pagedError : initialError;
   const topics = useMemo(
-    () => (viewMode === 'pagination' ? (pagedTopics ?? []) : allTopics),
-    [viewMode, pagedTopics, allTopics]
-  )
+    () => (viewMode === "pagination" ? (pagedTopics ?? []) : allTopics),
+    [viewMode, pagedTopics, allTopics],
+  );
 
   const topicsWithBoardName = useMemo(
     () =>
-      topics.map(topic => ({
+      topics.map((topic) => ({
         ...topic,
         boardName: topic.boardName || boardNameMap.get(topic.boardId),
       })),
-    [topics, boardNameMap]
-  )
+    [topics, boardNameMap],
+  );
 
   const displayTopics =
-    displayMode === 'media-only' ? topicsWithBoardName.filter(isMediaTopic) : topicsWithBoardName
+    displayMode === "media-only" ? topicsWithBoardName.filter(isMediaTopic) : topicsWithBoardName;
 
   if (isLoading) {
-    return <FollowedBoardsSkeleton />
+    return <FollowedBoardsSkeleton />;
   }
 
   if (error) {
@@ -163,14 +165,14 @@ export function FollowedBoardsPage() {
         error={error as Error}
         retry={() =>
           queryClient.invalidateQueries({
-            queryKey: ['user', 'me', 'custom-board-topics', 'following-boards'],
+            queryKey: ["user", "me", "custom-board-topics", "following-boards"],
           })
         }
       />
-    )
+    );
   }
 
-  const isGridLayout = displayMode === 'card' || displayMode === 'media-only'
+  const isGridLayout = displayMode === "card" || displayMode === "media-only";
 
   return (
     <div className="space-y-6">
@@ -185,7 +187,7 @@ export function FollowedBoardsPage() {
             <div className="text-sm text-muted-foreground">暂未关注任何版面</div>
           ) : (
             <div className="flex flex-wrap gap-2">
-              {boards.map(board => (
+              {boards.map((board) => (
                 <Link key={board.id} to="/board/$boardId" params={{ boardId: String(board.id) }}>
                   <Badge
                     variant="secondary"
@@ -218,27 +220,27 @@ export function FollowedBoardsPage() {
 
           {displayTopics.length === 0 ? (
             <div className="text-sm text-muted-foreground">
-              {displayMode === 'media-only' ? '暂无媒体帖子' : '暂无动态'}
+              {displayMode === "media-only" ? "暂无媒体帖子" : "暂无动态"}
             </div>
           ) : (
             <div
               className={
-                isGridLayout ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'divide-y divide-border'
+                isGridLayout ? "grid grid-cols-1 md:grid-cols-2 gap-4" : "divide-y divide-border"
               }
             >
-              {displayTopics.map(topic =>
+              {displayTopics.map((topic) =>
                 isGridLayout ? (
                   <CardTopicItem key={topic.id} topic={topic} />
                 ) : (
                   <ClassicTopicItem key={topic.id} topic={topic} />
-                )
+                ),
               )}
             </div>
           )}
         </CardContent>
       </Card>
 
-      {viewMode === 'pagination' ? (
+      {viewMode === "pagination" ? (
         <PaginationControls
           currentPage={currentPage}
           totalCount={MAX_TOPICS}
@@ -257,7 +259,7 @@ export function FollowedBoardsPage() {
         />
       )}
     </div>
-  )
+  );
 }
 
 function FollowedBoardsSkeleton() {
@@ -267,5 +269,5 @@ function FollowedBoardsSkeleton() {
       <Skeleton className="h-12 w-full rounded-lg" />
       <Skeleton className="h-64 w-full rounded-lg" />
     </div>
-  )
+  );
 }

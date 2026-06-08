@@ -8,22 +8,23 @@ bash
 
 # Development
 
-bun run dev # Start dev server (http://localhost:5173) with auto route generation
-bun run build # TypeScript compile + Vite build
-bun run preview # Preview production build
+vp dev --host --port 5173 # Start dev server with auto route generation
+vp build # Vite+ production build
+vp preview # Preview production build
 
 # Testing
 
-bun run test # Run all unit tests
-bun run test:ui # Run Vitest with UI
+vp test run # Run all unit tests
+vp test --ui # Run Vitest with UI
 bun run test:e2e # Run all E2E tests
 
 # Code Quality
 
-bun run lint # ESLint check (max 0 warnings)
-bun run lint:fix # ESLint auto-fix
-bun run format # Prettier format
-bun run format:check # Prettier check
+vp check # Run Vite+ default format/lint checks
+vp check --fix # Auto-fix Vite+ default format/lint issues
+vp lint # Run Oxlint through Vite+
+vp fmt # Run Oxfmt through Vite+
+vp staged # Run Vite+ staged-file checks used by git hooks
 
 ````
 
@@ -33,13 +34,13 @@ bun run format:check # Prettier check
 
 ```bash
 # Run specific test file
-bun run test path/to/test.test.ts
+vp test run path/to/test.test.ts
 
 # Watch mode with filter
-bun run test -- --grep "test name pattern"
+vp test watch -t "test name pattern"
 
 # Interactive UI mode
-bun run test:ui
+vp test --ui
 ````
 
 ### E2E Tests (Playwright)
@@ -58,13 +59,18 @@ bun run test:e2e -- --project=chromium
 ## Tech Stack
 
 - **Framework**: React 19.2.0 + TypeScript (strict mode)
-- **Build**: Vite 7.2.4 + SWC
-- **Router**: TanStack Router 1.145.7 (file-based routing)
-- **State**: Zustand 5.0.9 (client state), TanStack Query 5.90.16 (server state)
+- **Build**: Vite+ 0.1.24 using Vite 8.0.16 + OXC
+- **Router**: TanStack Router 1.170.15 (file-based routing)
+- **State**: Zustand 5.0.9 (client state), TanStack Query 5.101.0 (server state)
 - **UI**: Ant Design v6.1.4
 - **Real-time**: SignalR 10.0.0
-- **Testing**: Vitest 4.0.16 (unit), Playwright 1.57.0 (E2E)
-- **Package Manager**: Bun
+- **Testing**: Vitest 4.1.8 (unit), Playwright 1.57.0 (E2E)
+- **Toolchain**: Vite+ (`vp`) with Bun package-manager backend
+
+## Reference Upstream
+
+- The legacy CC98 frontend is kept next to this rewrite at `../cc98-web-upstream`.
+- Use that repository only as an implementation/reference source when matching existing CC98 behavior; do not vendor it back into this repository.
 
 ## Code Style Guidelines
 
@@ -72,13 +78,13 @@ bun run test:e2e -- --project=chromium
 
 ```typescript
 // 1. External dependencies
-import { create } from 'zustand'
-import { useState } from 'react'
+import { create } from "zustand";
+import { useState } from "react";
 
 // 2. Internal dependencies (use path aliases)
-import { authService } from '@/services/auth'
-import { useAuthStore } from '@/stores/auth'
-import type { IUser } from '@/types/api'
+import { authService } from "@/services/auth";
+import { useAuthStore } from "@/stores/auth";
+import type { IUser } from "@/types/api";
 ```
 
 ## TanStack Router (File-Based Routing)
@@ -116,13 +122,13 @@ Use `beforeLoad` hook in layout routes to protect child routes:
 
 ```typescript
 // src/routes/_authenticated.tsx
-export const Route = createFileRoute('/_authenticated')({
+export const Route = createFileRoute("/_authenticated")({
   beforeLoad: () => {
     if (!isAuthenticated()) {
-      throw redirect({ to: '/login' })
+      throw redirect({ to: "/login" });
     }
   },
-})
+});
 ```
 
 ### Navigation
@@ -141,13 +147,13 @@ navigate({ to: '/posts', search: { page: 2 } })
 ### Route Integration with TanStack Query
 
 ```typescript
-export const Route = createFileRoute('/posts')({
+export const Route = createFileRoute("/posts")({
   loader: ({ context }) => {
     // Preload data before component renders
-    return context.queryClient.ensureQueryData(postsQuery)
+    return context.queryClient.ensureQueryData(postsQuery);
   },
   component: PostsPage,
-})
+});
 ```
 
 ### Auto-Generated Files
@@ -155,7 +161,7 @@ export const Route = createFileRoute('/posts')({
 - `src/routeTree.gen.ts` - Auto-generated route tree (DO NOT EDIT, but COMMIT to git)
   - **Should be committed to version control** for CI/CD and type stability
   - Regenerated automatically by Vite plugin on file changes during development
-  - Format/lint this file to prevent it from being checked
+  - Ignored by Vite+ format/lint checks because TanStack regenerates it
 
 ### Path Aliases (Required)
 
@@ -197,11 +203,11 @@ src/
 
 ```typescript
 // 1. Imports
-import { useState } from 'react'
+import { useState } from "react";
 
 // 2. Type definitions
 interface Props {
-  title: string
+  title: string;
 }
 
 // 3. Component/Function
@@ -240,16 +246,16 @@ async getCurrentUser(): Promise<IUser>
 export class ApiError extends Error {
   constructor(
     public status: number,
-    message: string
+    message: string,
   ) {
-    super(message)
-    this.name = 'ApiError'
+    super(message);
+    this.name = "ApiError";
   }
 }
 
 // Try-catch with type guards
 try {
-  await operation()
+  await operation();
 } catch (error) {
   if (error instanceof ApiError) {
     // Handle specific error
@@ -272,7 +278,7 @@ export const authService = {
   async logout(): Promise<void> {
     // Implementation
   },
-}
+};
 ```
 
 ### Zustand Store Pattern
@@ -280,20 +286,20 @@ export const authService = {
 ```typescript
 interface State {
   // State
-  user: IUser | null
+  user: IUser | null;
   // Actions
-  setUser: (user: IUser) => void
+  setUser: (user: IUser) => void;
 }
 
 export const useStore = create<State>()(
   persist(
-    set => ({
+    (set) => ({
       user: null,
-      setUser: user => set({ user }),
+      setUser: (user) => set({ user }),
     }),
-    { name: 'storage-name' }
-  )
-)
+    { name: "storage-name" },
+  ),
+);
 ```
 
 ### Hook Pattern
@@ -302,8 +308,8 @@ Create wrapper hooks around stores/services:
 
 ```typescript
 export function useAuth() {
-  const { user, isAuthenticated } = useAuthStore()
-  return { user, isAuthenticated }
+  const { user, isAuthenticated } = useAuthStore();
+  return { user, isAuthenticated };
 }
 ```
 
@@ -331,9 +337,9 @@ Every directory must have an `index.ts` for clean exports:
 
 ```typescript
 // src/services/index.ts
-export { apiClient } from './client'
-export * from './auth'
-export * from './user'
+export { apiClient } from "./client";
+export * from "./auth";
+export * from "./user";
 ```
 
 ### API Client Pattern
@@ -345,8 +351,8 @@ Use the centralized `apiClient` for all API calls - it handles:
 - Consistent error handling
 
 ```typescript
-import { apiClient } from '@/services/client'
-const data = await apiClient.get<IUser>('/user/me')
+import { apiClient } from "@/services/client";
+const data = await apiClient.get<IUser>("/user/me");
 ```
 
 ### API Reference
@@ -374,25 +380,6 @@ See **[API_REFERENCE.md](API_REFERENCE.md)** for complete backend API documentat
 - Use descriptive test names
 - Mock external dependencies (API, SignalR)
 - Keep tests focused and independent
-
-## Formatting Rules
-
-Prettier configuration (auto-applied on commit):
-
-- No semicolons
-- Single quotes
-- 2 spaces indentation
-- 100 char line width
-- Trailing commas (ES5)
-- LF line endings
-
-## Pre-commit Requirements
-
-Husky runs `lint-staged` on every commit:
-
-- All `.ts`/`.tsx` files must pass ESLint (max 0 warnings)
-- All `.ts`/`.tsx`/`.css` files must be Prettier-formatted
-- Fix issues with: `bun run lint:fix && bun run format`
 
 ## Visual Verification with Playwright
 

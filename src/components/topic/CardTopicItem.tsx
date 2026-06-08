@@ -1,36 +1,36 @@
-import { Link } from '@tanstack/react-router'
-import { Badge } from '@/components/ui/badge'
-import { User, Clock, Pin, Star, Play, FileText, MessageSquare, Eye } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
-import { zhCN } from 'date-fns/locale'
-import type { ITopic } from '@/types/api'
-import { getBoardNameById } from '@/lib/board-utils'
+import { Link } from "@tanstack/react-router";
+import { Badge } from "@/components/ui/badge";
+import { User, Clock, Pin, Star, Play, FileText, MessageSquare, Eye } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { zhCN } from "date-fns/locale";
+import type { ITopic } from "@/types/api";
+import { getBoardNameById } from "@/lib/board-utils";
 
 interface CardTopicItemProps {
-  topic: ITopic
+  topic: ITopic;
 }
 
 export function CardTopicItem({ topic }: CardTopicItemProps) {
-  const isTop = topic.topState > 0
-  const isBest = topic.bestState > 0
-  const hasMedia = topic.contentType && topic.contentType >= 2 && topic.contentType <= 4
-  const isImage = topic.contentType === 4
-  const isVideo = topic.contentType === 2
-  const isAudio = topic.contentType === 3
-  const boardName = topic.boardName || getBoardNameById(topic.boardId)
+  const isTop = topic.topState > 0;
+  const isBest = topic.bestState > 0;
+  const hasMedia = topic.contentType && topic.contentType >= 2 && topic.contentType <= 4;
+  const isImage = topic.contentType === 4;
+  const isVideo = topic.contentType === 2;
+  const isAudio = topic.contentType === 3;
+  const boardName = topic.boardName || getBoardNameById(topic.boardId);
 
   // 获取内容预览（用于媒体帖子）
   const contentPreview = topic.content
     ? topic.content.length > 100
-      ? topic.content.substring(0, 100) + '...'
+      ? topic.content.substring(0, 100) + "..."
       : topic.content
-    : null
+    : null;
 
   // 获取缩略图
   const thumbnail =
     hasMedia && topic.mediaContent?.thumbnail && topic.mediaContent.thumbnail.length > 0
       ? topic.mediaContent.thumbnail[0]
-      : null
+      : null;
 
   return (
     <Link
@@ -113,7 +113,7 @@ export function CardTopicItem({ topic }: CardTopicItemProps) {
         <div className="flex items-center gap-3 flex-wrap">
           <span className="flex items-center gap-1">
             <User className="w-3 h-3" />
-            {topic.isAnonymous ? '匿名用户' : topic.userName}
+            {topic.isAnonymous ? "匿名用户" : topic.userName}
           </span>
           <span className="flex items-center gap-1">
             <Clock className="w-3 h-3" />
@@ -136,5 +136,5 @@ export function CardTopicItem({ topic }: CardTopicItemProps) {
         </div>
       </div>
     </Link>
-  )
+  );
 }

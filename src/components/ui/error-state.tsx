@@ -1,16 +1,16 @@
-import { AlertCircle, Lock } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Link } from '@tanstack/react-router'
-import { ApiError } from '@/services/client'
+import { AlertCircle, Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
+import { ApiError } from "@/services/client";
 
 interface ErrorStateProps {
-  error: Error | null
-  retry?: () => void
+  error: Error | null;
+  retry?: () => void;
 }
 
 export function ErrorState({ error, retry }: ErrorStateProps) {
-  const isAuthError = error instanceof ApiError && error.isAuthError()
-  const message = error?.message || '未知错误'
+  const isAuthError = error instanceof ApiError && error.isAuthError();
+  const message = error?.message || "未知错误";
 
   if (isAuthError) {
     return (
@@ -33,7 +33,7 @@ export function ErrorState({ error, retry }: ErrorStateProps) {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -53,5 +53,5 @@ export function ErrorState({ error, retry }: ErrorStateProps) {
         )}
       </div>
     </div>
-  )
+  );
 }

@@ -1,23 +1,23 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 /**
  * 编辑器模式
  */
-type EditorMode = 'ubb' | 'markdown'
+type EditorMode = "ubb" | "markdown";
 
 /**
  * 编辑器状态
  */
 interface EditorState {
-  mode: EditorMode
-  ubbContent: string
-  markdownContent: string
+  mode: EditorMode;
+  ubbContent: string;
+  markdownContent: string;
 
-  setMode: (mode: EditorMode) => void
-  setUbbContent: (content: string) => void
-  setMarkdownContent: (content: string) => void
-  clearContents: () => void
+  setMode: (mode: EditorMode) => void;
+  setUbbContent: (content: string) => void;
+  setMarkdownContent: (content: string) => void;
+  clearContents: () => void;
 }
 
 /**
@@ -25,21 +25,21 @@ interface EditorState {
  */
 export const useEditorStore = create<EditorState>()(
   persist(
-    set => ({
-      mode: 'ubb',
-      ubbContent: '',
-      markdownContent: '',
+    (set) => ({
+      mode: "ubb",
+      ubbContent: "",
+      markdownContent: "",
 
-      setMode: mode => set({ mode }),
+      setMode: (mode) => set({ mode }),
 
-      setUbbContent: content => set({ ubbContent: content }),
+      setUbbContent: (content) => set({ ubbContent: content }),
 
-      setMarkdownContent: content => set({ markdownContent: content }),
+      setMarkdownContent: (content) => set({ markdownContent: content }),
 
-      clearContents: () => set({ ubbContent: '', markdownContent: '' }),
+      clearContents: () => set({ ubbContent: "", markdownContent: "" }),
     }),
     {
-      name: 'editor-storage',
-    }
-  )
-)
+      name: "editor-storage",
+    },
+  ),
+);

@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
-import { TransferPage } from '@/pages/user-center'
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
+import { TransferPage } from "@/pages/user-center";
 
 function UserCenterTransferRoute() {
   return (
@@ -17,9 +17,9 @@ function UserCenterTransferRoute() {
       </div>
       <TransferPage />
     </div>
-  )
+  );
 }
 
-export const Route = createFileRoute('/_authenticated/usercenter/transfer')({
+export const Route = createFileRoute("/_authenticated/usercenter/transfer")({
   component: UserCenterTransferRoute,
-})
+});

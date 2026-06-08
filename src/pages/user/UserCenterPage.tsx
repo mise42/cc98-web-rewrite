@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Badge } from '@/components/ui/badge'
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import {
   Mail,
   Calendar,
@@ -17,49 +17,49 @@ import {
   BookOpen,
   Users,
   User,
-} from 'lucide-react'
-import { userService } from '@/services/user'
-import { format } from 'date-fns'
-import { zhCN } from 'date-fns/locale'
-import { UbbContainer } from '@/components/UbbContainer'
+} from "lucide-react";
+import { userService } from "@/services/user";
+import { format } from "date-fns";
+import { zhCN } from "date-fns/locale";
+import { UbbContainer } from "@/components/UbbContainer";
 
-const TOPIC_PREVIEW_PAGE_SIZE = 5
+const TOPIC_PREVIEW_PAGE_SIZE = 5;
 
 export function UserCenterPage() {
-  const [topicPage, setTopicPage] = useState(1)
+  const [topicPage, setTopicPage] = useState(1);
   const {
     data: userInfo,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['user', 'me', 'info'],
+    queryKey: ["user", "me", "info"],
     queryFn: () => userService.getCurrentUser(),
     staleTime: 1000 * 60 * 5,
-  })
+  });
 
-  const topicsFrom = (topicPage - 1) * TOPIC_PREVIEW_PAGE_SIZE
+  const topicsFrom = (topicPage - 1) * TOPIC_PREVIEW_PAGE_SIZE;
 
   const { data: myTopics } = useQuery({
-    queryKey: ['user', 'me', 'topics', 'preview', topicPage],
+    queryKey: ["user", "me", "topics", "preview", topicPage],
     queryFn: () => userService.getRecentTopics(topicsFrom, TOPIC_PREVIEW_PAGE_SIZE + 1),
     staleTime: 1000 * 60,
-  })
+  });
 
-  if (isLoading) return <UserCenterSkeleton />
+  if (isLoading) return <UserCenterSkeleton />;
 
   if (error || !userInfo) {
     return (
       <div className="container mx-auto px-4 py-12 flex justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-destructive mb-4">加载失败</h2>
-          <p className="text-muted-foreground">{(error as Error)?.message ?? '未知错误'}</p>
+          <p className="text-muted-foreground">{(error as Error)?.message ?? "未知错误"}</p>
         </div>
       </div>
-    )
+    );
   }
 
-  const hasMoreTopics = !!myTopics && myTopics.length > TOPIC_PREVIEW_PAGE_SIZE
-  const displayTopics = hasMoreTopics ? myTopics.slice(0, TOPIC_PREVIEW_PAGE_SIZE) : myTopics
+  const hasMoreTopics = !!myTopics && myTopics.length > TOPIC_PREVIEW_PAGE_SIZE;
+  const displayTopics = hasMoreTopics ? myTopics.slice(0, TOPIC_PREVIEW_PAGE_SIZE) : myTopics;
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-[1200px]">
@@ -125,16 +125,16 @@ export function UserCenterPage() {
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 shrink-0" />
-                  <span className="truncate">{userInfo.emailAddress || '未设置'}</span>
+                  <span className="truncate">{userInfo.emailAddress || "未设置"}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 shrink-0" />
-                  <span className="truncate">QQ：{userInfo.qq || '未设置'}</span>
+                  <span className="truncate">QQ：{userInfo.qq || "未设置"}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 shrink-0" />
                   <span>
-                    注册于 {format(new Date(userInfo.registerTime), 'yyyy-MM-dd', { locale: zhCN })}
+                    注册于 {format(new Date(userInfo.registerTime), "yyyy-MM-dd", { locale: zhCN })}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -152,12 +152,12 @@ export function UserCenterPage() {
                 </h4>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   {[
-                    { label: '帖子', value: userInfo.postCount },
-                    { label: '点赞', value: userInfo.receivedLikeCount ?? 0 },
-                    { label: '粉丝', value: userInfo.fanCount },
-                    { label: '风评', value: userInfo.popularity },
-                    { label: '威望', value: userInfo.prestige },
-                    { label: '财富', value: userInfo.wealth },
+                    { label: "帖子", value: userInfo.postCount },
+                    { label: "点赞", value: userInfo.receivedLikeCount ?? 0 },
+                    { label: "粉丝", value: userInfo.fanCount },
+                    { label: "风评", value: userInfo.popularity },
+                    { label: "威望", value: userInfo.prestige },
+                    { label: "财富", value: userInfo.wealth },
                   ].map(({ label, value }) => (
                     <div key={label} className="text-center p-2 bg-muted/30 rounded">
                       <div className="text-base font-bold text-foreground">{value}</div>
@@ -174,7 +174,7 @@ export function UserCenterPage() {
                     版主头衔
                   </h4>
                   <div className="space-y-1.5 text-sm">
-                    {userInfo.boardMasterTitles.map(title => (
+                    {userInfo.boardMasterTitles.map((title) => (
                       <div
                         key={`${title.boardId}-${title.title}`}
                         className="p-2 bg-muted/30 rounded"
@@ -195,14 +195,14 @@ export function UserCenterPage() {
           {/* 快捷入口 */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { to: '/usercenter/mytopics/1', icon: MessageSquare, label: '我的主题' },
-              { to: '/usercenter/myposts/1', icon: BookOpen, label: '我的回复' },
-              { to: '/usercenter/favorites/1', icon: Eye, label: '我的收藏' },
-              { to: '/following/boards', icon: Award, label: '关注版面' },
-              { to: '/following-topics', icon: Users, label: '关注用户' },
-              { to: '/usercenter/fans', icon: User, label: '我的粉丝' },
-              { to: '/usercenter/transfer', icon: TrendingUp, label: '转账系统' },
-              { to: '/usercenter/theme', icon: Flame, label: '切换皮肤' },
+              { to: "/usercenter/mytopics/1", icon: MessageSquare, label: "我的主题" },
+              { to: "/usercenter/myposts/1", icon: BookOpen, label: "我的回复" },
+              { to: "/usercenter/favorites/1", icon: Eye, label: "我的收藏" },
+              { to: "/following/boards", icon: Award, label: "关注版面" },
+              { to: "/following-topics", icon: Users, label: "关注用户" },
+              { to: "/usercenter/fans", icon: User, label: "我的粉丝" },
+              { to: "/usercenter/transfer", icon: TrendingUp, label: "转账系统" },
+              { to: "/usercenter/theme", icon: Flame, label: "切换皮肤" },
             ].map(({ to, icon: Icon, label }) => (
               <Link key={to} to={to}>
                 <Card className="shadow-sm bg-card/50 hover:bg-muted/30 transition-colors cursor-pointer">
@@ -230,7 +230,7 @@ export function UserCenterPage() {
                 </div>
               ) : (
                 <div className="space-y-2 lg:flex-1">
-                  {displayTopics.map(topic => (
+                  {displayTopics.map((topic) => (
                     <Link
                       key={topic.id}
                       to="/topic/$topicId"
@@ -250,7 +250,7 @@ export function UserCenterPage() {
                           {topic.hitCount || 0}
                         </span>
                         <span>
-                          {format(new Date(topic.lastPostTime || topic.time), 'MM-dd HH:mm', {
+                          {format(new Date(topic.lastPostTime || topic.time), "MM-dd HH:mm", {
                             locale: zhCN,
                           })}
                         </span>
@@ -262,7 +262,7 @@ export function UserCenterPage() {
 
               <div className="mt-3 border-t border-border pt-3 flex items-center justify-between text-xs text-muted-foreground">
                 <button
-                  onClick={() => setTopicPage(p => Math.max(1, p - 1))}
+                  onClick={() => setTopicPage((p) => Math.max(1, p - 1))}
                   disabled={topicPage === 1}
                   className="hover:text-foreground disabled:opacity-40"
                 >
@@ -270,13 +270,13 @@ export function UserCenterPage() {
                 </button>
                 <Link
                   to="/usercenter/mytopics/$page"
-                  params={{ page: '1' }}
+                  params={{ page: "1" }}
                   className="hover:text-foreground"
                 >
                   查看全部
                 </Link>
                 <button
-                  onClick={() => setTopicPage(p => p + 1)}
+                  onClick={() => setTopicPage((p) => p + 1)}
                   disabled={!hasMoreTopics}
                   className="hover:text-foreground disabled:opacity-40"
                 >
@@ -288,7 +288,7 @@ export function UserCenterPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function UserCenterSkeleton() {
@@ -306,5 +306,5 @@ function UserCenterSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }

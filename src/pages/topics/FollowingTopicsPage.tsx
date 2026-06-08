@@ -1,47 +1,47 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import { MessageSquare, Eye, Clock, Users, ArrowLeft } from 'lucide-react'
-import { apiClient } from '@/services/client'
-import type { ITopic } from '@/types/api'
-import { format } from 'date-fns'
-import { zhCN } from 'date-fns/locale'
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { MessageSquare, Eye, Clock, Users, ArrowLeft } from "lucide-react";
+import { apiClient } from "@/services/client";
+import type { ITopic } from "@/types/api";
+import { format } from "date-fns";
+import { zhCN } from "date-fns/locale";
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 20;
 
 async function getFolloweTopics(from: number, size: number): Promise<ITopic[]> {
-  return apiClient.get<ITopic[]>(`/me/followee/topic?from=${from}&size=${size}`)
+  return apiClient.get<ITopic[]>(`/me/followee/topic?from=${from}&size=${size}`);
 }
 
 export function FollowingTopicsPage() {
-  return <FollowingTopicsPageContent />
+  return <FollowingTopicsPageContent />;
 }
 
 interface FollowingTopicsPageContentProps {
-  compact?: boolean
+  compact?: boolean;
 }
 
 export function FollowingTopicsPageContent({
   compact = false,
 }: FollowingTopicsPageContentProps = {}) {
-  const [page, setPage] = useState(1)
-  const from = (page - 1) * PAGE_SIZE
+  const [page, setPage] = useState(1);
+  const from = (page - 1) * PAGE_SIZE;
 
   const {
     data: topics,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['me', 'followee', 'topics', page],
+    queryKey: ["me", "followee", "topics", page],
     queryFn: () => getFolloweTopics(from, PAGE_SIZE),
     staleTime: 1000 * 60,
-  })
+  });
 
   // 用当前页数量判断是否还有更多（满 PAGE_SIZE 则尝试下一页）
-  const hasMore = topics ? topics.length === PAGE_SIZE : false
+  const hasMore = topics ? topics.length === PAGE_SIZE : false;
 
   const content = (
     <>
@@ -62,7 +62,7 @@ export function FollowingTopicsPageContent({
             </div>
           ) : (
             <div className="space-y-3">
-              {topics.map(topic => (
+              {topics.map((topic) => (
                 <TopicCard key={topic.id} topic={topic} />
               ))}
             </div>
@@ -73,7 +73,7 @@ export function FollowingTopicsPageContent({
               variant="outline"
               size="sm"
               disabled={page === 1}
-              onClick={() => setPage(p => p - 1)}
+              onClick={() => setPage((p) => p - 1)}
             >
               ← 上一页
             </Button>
@@ -82,7 +82,7 @@ export function FollowingTopicsPageContent({
               variant="outline"
               size="sm"
               disabled={!hasMore}
-              onClick={() => setPage(p => p + 1)}
+              onClick={() => setPage((p) => p + 1)}
             >
               下一页 →
             </Button>
@@ -90,10 +90,10 @@ export function FollowingTopicsPageContent({
         </>
       )}
     </>
-  )
+  );
 
   if (compact) {
-    return content
+    return content;
   }
 
   return (
@@ -113,7 +113,7 @@ export function FollowingTopicsPageContent({
       </div>
       {content}
     </div>
-  )
+  );
 }
 
 function TopicCard({ topic }: { topic: ITopic }) {
@@ -128,7 +128,7 @@ function TopicCard({ topic }: { topic: ITopic }) {
           {topic.title}
         </Link>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-          <span>{topic.isAnonymous ? '匿名用户' : topic.userName}</span>
+          <span>{topic.isAnonymous ? "匿名用户" : topic.userName}</span>
           <span className="flex items-center gap-1">
             <MessageSquare className="w-3 h-3" />
             {topic.replyCount}
@@ -139,12 +139,12 @@ function TopicCard({ topic }: { topic: ITopic }) {
           </span>
           <span className="flex items-center gap-1">
             <Clock className="w-3 h-3" />
-            {format(new Date(topic.lastPostTime ?? topic.time), 'MM-dd HH:mm', { locale: zhCN })}
+            {format(new Date(topic.lastPostTime ?? topic.time), "MM-dd HH:mm", { locale: zhCN })}
           </span>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function FollowingTopicsSkeleton() {
@@ -154,5 +154,5 @@ function FollowingTopicsSkeleton() {
         <Skeleton key={i} className="h-20 w-full rounded-lg" />
       ))}
     </div>
-  )
+  );
 }

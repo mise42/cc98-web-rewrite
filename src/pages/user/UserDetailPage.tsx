@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Mail,
   Calendar,
@@ -16,68 +16,69 @@ import {
   UserMinus,
   ArrowLeft,
   Users,
-} from 'lucide-react'
-import { userService } from '@/services/user'
-import { useAuth } from '@/hooks/useAuth'
-import { format } from 'date-fns'
-import { zhCN } from 'date-fns/locale'
-import { UbbContainer } from '@/components/UbbContainer'
+} from "lucide-react";
+import { userService } from "@/services/user";
+import { useAuth } from "@/hooks/useAuth";
+import { format } from "date-fns";
+import { zhCN } from "date-fns/locale";
+import { UbbContainer } from "@/components/UbbContainer";
 
 interface UserDetailPageProps {
-  isOwnProfile?: boolean
-  userId?: number
+  isOwnProfile?: boolean;
+  userId?: number;
 }
 
-const TOPIC_PREVIEW_PAGE_SIZE = 6
+const TOPIC_PREVIEW_PAGE_SIZE = 6;
 
 export function UserDetailPage({ isOwnProfile = true, userId }: UserDetailPageProps) {
-  const [topicPage, setTopicPage] = useState(1)
-  const { user: currentUser, isAuthenticated } = useAuth()
-  const queryClient = useQueryClient()
+  const [topicPage, setTopicPage] = useState(1);
+  const { user: currentUser, isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
 
-  const targetUserId = isOwnProfile ? currentUser?.id : userId
+  const targetUserId = isOwnProfile ? currentUser?.id : userId;
 
   const {
     data: userInfo,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['user', targetUserId],
+    queryKey: ["user", targetUserId],
     queryFn: () => userService.getUser(targetUserId!),
     enabled: !!targetUserId,
     staleTime: 1000 * 60 * 5,
-  })
+  });
 
-  const topicsFrom = (topicPage - 1) * TOPIC_PREVIEW_PAGE_SIZE
+  const topicsFrom = (topicPage - 1) * TOPIC_PREVIEW_PAGE_SIZE;
 
   const { data: recentTopics, isLoading: topicsLoading } = useQuery({
-    queryKey: ['user', targetUserId, 'recent-topics', topicPage],
-    queryFn: () => userService.getUserRecentTopics(targetUserId!, topicsFrom, TOPIC_PREVIEW_PAGE_SIZE + 1),
+    queryKey: ["user", targetUserId, "recent-topics", topicPage],
+    queryFn: () =>
+      userService.getUserRecentTopics(targetUserId!, topicsFrom, TOPIC_PREVIEW_PAGE_SIZE + 1),
     enabled: !!targetUserId,
     staleTime: 1000 * 60,
-  })
+  });
 
   const followMutation = useMutation({
     mutationFn: (follow: boolean) =>
       follow ? userService.followUser(targetUserId!) : userService.unfollowUser(targetUserId!),
-    onMutate: async follow => {
-      await queryClient.cancelQueries({ queryKey: ['user', targetUserId] })
-      const prev = queryClient.getQueryData<typeof userInfo>(['user', targetUserId])
-      queryClient.setQueryData<typeof userInfo>(['user', targetUserId], old =>
-        old ? { ...old, isFollowing: follow, fanCount: old.fanCount + (follow ? 1 : -1) } : old
-      )
-      return { prev }
+    onMutate: async (follow) => {
+      await queryClient.cancelQueries({ queryKey: ["user", targetUserId] });
+      const prev = queryClient.getQueryData<typeof userInfo>(["user", targetUserId]);
+      queryClient.setQueryData<typeof userInfo>(["user", targetUserId], (old) =>
+        old ? { ...old, isFollowing: follow, fanCount: old.fanCount + (follow ? 1 : -1) } : old,
+      );
+      return { prev };
     },
     onError: (_err, _follow, ctx) => {
-      queryClient.setQueryData(['user', targetUserId], ctx?.prev)
+      queryClient.setQueryData(["user", targetUserId], ctx?.prev);
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['user', targetUserId] })
+      queryClient.invalidateQueries({ queryKey: ["user", targetUserId] });
     },
-  })
+  });
 
   if (isLoading) {
-    return <UserDetailPageSkeleton />
+    return <UserDetailPageSkeleton />;
   }
 
   if (error) {
@@ -88,7 +89,7 @@ export function UserDetailPage({ isOwnProfile = true, userId }: UserDetailPagePr
           <p className="text-muted-foreground">{(error as Error).message}</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!userInfo) {
@@ -96,13 +97,13 @@ export function UserDetailPage({ isOwnProfile = true, userId }: UserDetailPagePr
       <div className="container mx-auto px-4 py-12 flex justify-center">
         <div className="text-center text-muted-foreground">用户信息加载失败</div>
       </div>
-    )
+    );
   }
 
-  const hasMoreTopics = !!recentTopics && recentTopics.length > TOPIC_PREVIEW_PAGE_SIZE
+  const hasMoreTopics = !!recentTopics && recentTopics.length > TOPIC_PREVIEW_PAGE_SIZE;
   const displayTopics = hasMoreTopics
     ? recentTopics.slice(0, TOPIC_PREVIEW_PAGE_SIZE)
-    : recentTopics
+    : recentTopics;
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-[1200px]">
@@ -143,7 +144,7 @@ export function UserDetailPage({ isOwnProfile = true, userId }: UserDetailPagePr
               {!isOwnProfile && isAuthenticated && currentUser?.id !== userInfo.id && (
                 <div className="mt-3">
                   <Button
-                    variant={userInfo.isFollowing ? 'outline' : 'default'}
+                    variant={userInfo.isFollowing ? "outline" : "default"}
                     size="sm"
                     className="w-full gap-1"
                     disabled={followMutation.isPending}
@@ -182,7 +183,9 @@ export function UserDetailPage({ isOwnProfile = true, userId }: UserDetailPagePr
                   个人简介
                 </div>
                 <div className="max-h-24 overflow-y-auto pr-1 text-xs leading-5 text-foreground whitespace-pre-wrap break-words">
-                  {userInfo.introduction || <span className="text-muted-foreground">暂无个人简介</span>}
+                  {userInfo.introduction || (
+                    <span className="text-muted-foreground">暂无个人简介</span>
+                  )}
                 </div>
               </div>
             </CardHeader>
@@ -191,16 +194,16 @@ export function UserDetailPage({ isOwnProfile = true, userId }: UserDetailPagePr
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 shrink-0" />
-                  <span className="truncate">{userInfo.emailAddress || '未公开'}</span>
+                  <span className="truncate">{userInfo.emailAddress || "未公开"}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 shrink-0" />
-                  <span className="truncate">QQ：{userInfo.qq || '未公开'}</span>
+                  <span className="truncate">QQ：{userInfo.qq || "未公开"}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 shrink-0" />
                   <span>
-                    注册于 {format(new Date(userInfo.registerTime), 'yyyy-MM-dd', { locale: zhCN })}
+                    注册于 {format(new Date(userInfo.registerTime), "yyyy-MM-dd", { locale: zhCN })}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -218,12 +221,12 @@ export function UserDetailPage({ isOwnProfile = true, userId }: UserDetailPagePr
                 </h4>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   {[
-                    { label: '帖子', value: userInfo.postCount },
-                    { label: '点赞', value: userInfo.receivedLikeCount ?? 0 },
-                    { label: '粉丝', value: userInfo.fanCount },
-                    { label: '风评', value: userInfo.popularity },
-                    { label: '威望', value: userInfo.prestige },
-                    { label: '财富', value: userInfo.wealth },
+                    { label: "帖子", value: userInfo.postCount },
+                    { label: "点赞", value: userInfo.receivedLikeCount ?? 0 },
+                    { label: "粉丝", value: userInfo.fanCount },
+                    { label: "风评", value: userInfo.popularity },
+                    { label: "威望", value: userInfo.prestige },
+                    { label: "财富", value: userInfo.wealth },
                   ].map(({ label, value }) => (
                     <div key={label} className="text-center p-2 bg-muted/30 rounded">
                       <div className="text-base font-bold text-foreground">{value}</div>
@@ -240,7 +243,7 @@ export function UserDetailPage({ isOwnProfile = true, userId }: UserDetailPagePr
                     版主头衔
                   </h4>
                   <div className="space-y-1.5 text-sm">
-                    {userInfo.boardMasterTitles.map(title => (
+                    {userInfo.boardMasterTitles.map((title) => (
                       <div
                         key={`${title.boardId}-${title.title}`}
                         className="p-2 bg-muted/30 rounded"
@@ -277,7 +280,7 @@ export function UserDetailPage({ isOwnProfile = true, userId }: UserDetailPagePr
                 </div>
               ) : (
                 <div className="space-y-2 lg:flex-1">
-                  {displayTopics.map(topic => (
+                  {displayTopics.map((topic) => (
                     <Link
                       key={topic.id}
                       to="/topic/$topicId"
@@ -297,7 +300,7 @@ export function UserDetailPage({ isOwnProfile = true, userId }: UserDetailPagePr
                           {topic.hitCount || 0}
                         </span>
                         <span>
-                          {format(new Date(topic.lastPostTime || topic.time), 'MM-dd HH:mm', {
+                          {format(new Date(topic.lastPostTime || topic.time), "MM-dd HH:mm", {
                             locale: zhCN,
                           })}
                         </span>
@@ -309,7 +312,7 @@ export function UserDetailPage({ isOwnProfile = true, userId }: UserDetailPagePr
 
               <div className="mt-3 border-t border-border pt-3 flex items-center justify-between text-xs text-muted-foreground">
                 <button
-                  onClick={() => setTopicPage(p => Math.max(1, p - 1))}
+                  onClick={() => setTopicPage((p) => Math.max(1, p - 1))}
                   disabled={topicPage === 1}
                   className="hover:text-foreground disabled:opacity-40"
                 >
@@ -317,7 +320,7 @@ export function UserDetailPage({ isOwnProfile = true, userId }: UserDetailPagePr
                 </button>
                 <span>第 {topicPage} 页</span>
                 <button
-                  onClick={() => setTopicPage(p => p + 1)}
+                  onClick={() => setTopicPage((p) => p + 1)}
                   disabled={!hasMoreTopics}
                   className="hover:text-foreground disabled:opacity-40"
                 >
@@ -326,12 +329,10 @@ export function UserDetailPage({ isOwnProfile = true, userId }: UserDetailPagePr
               </div>
             </CardContent>
           </Card>
-
-
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function UserDetailPageSkeleton() {
@@ -346,5 +347,5 @@ function UserDetailPageSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }

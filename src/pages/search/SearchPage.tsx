@@ -1,123 +1,123 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link, useNavigate, useSearch } from '@tanstack/react-router'
-import { Folder, Search, User as UserIcon } from 'lucide-react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { PaginationControls } from '@/components/common/PaginationControls'
-import { ClassicTopicItem } from '@/components/topic/ClassicTopicItem'
-import { ErrorState } from '@/components/ui/error-state'
-import { topicService } from '@/services/topic'
-import { boardService } from '@/services/board'
-import { userService } from '@/services/user'
-import { ApiError } from '@/services/client'
-import type { ITopic, IBoard, IUser } from '@/types/api'
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { Folder, Search, User as UserIcon } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { PaginationControls } from "@/components/common/PaginationControls";
+import { ClassicTopicItem } from "@/components/topic/ClassicTopicItem";
+import { ErrorState } from "@/components/ui/error-state";
+import { topicService } from "@/services/topic";
+import { boardService } from "@/services/board";
+import { userService } from "@/services/user";
+import { ApiError } from "@/services/client";
+import type { ITopic, IBoard, IUser } from "@/types/api";
 
-type SearchTab = 'topics' | 'boards' | 'users'
+type SearchTab = "topics" | "boards" | "users";
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 20;
 
 const shouldRetry = (failureCount: number, error: unknown): boolean => {
   if (error instanceof ApiError && error.isAuthError()) {
-    return false
+    return false;
   }
-  return failureCount < 3
-}
+  return failureCount < 3;
+};
 
 export function SearchPage() {
-  const navigate = useNavigate({ from: '/search' })
-  const queryClient = useQueryClient()
+  const navigate = useNavigate({ from: "/search" });
+  const queryClient = useQueryClient();
 
-  const { keyword, tab, page, boardId } = useSearch({ from: '/search' })
-  const currentPage = Number.isFinite(page) && page > 0 ? page : 1
-  const currentTab: SearchTab = tab
-  const currentBoardId = Number.isFinite(boardId) && boardId > 0 ? boardId : 0
-  const trimmedKeyword = keyword.trim()
-  const hasKeyword = trimmedKeyword.length > 0
+  const { keyword, tab, page, boardId } = useSearch({ from: "/search" });
+  const currentPage = Number.isFinite(page) && page > 0 ? page : 1;
+  const currentTab: SearchTab = tab;
+  const currentBoardId = Number.isFinite(boardId) && boardId > 0 ? boardId : 0;
+  const trimmedKeyword = keyword.trim();
+  const hasKeyword = trimmedKeyword.length > 0;
 
   const updateSearch = (updates: Partial<{ tab: SearchTab; page: number; boardId: number }>) => {
     navigate({
-      to: '/search',
-      search: prev => ({
+      to: "/search",
+      search: (prev) => ({
         keyword: prev.keyword,
         tab: updates.tab ?? prev.tab,
         page: updates.page ?? prev.page,
         boardId: updates.boardId ?? prev.boardId,
       }),
-    })
-  }
+    });
+  };
 
   const handleTabChange = (nextTab: string) => {
     const normalizedTab: SearchTab =
-      nextTab === 'boards' || nextTab === 'users' ? nextTab : 'topics'
+      nextTab === "boards" || nextTab === "users" ? nextTab : "topics";
 
-    if (normalizedTab === 'topics') {
-      updateSearch({ tab: normalizedTab, page: 1, boardId: currentBoardId })
+    if (normalizedTab === "topics") {
+      updateSearch({ tab: normalizedTab, page: 1, boardId: currentBoardId });
     } else {
-      updateSearch({ tab: normalizedTab, page: 1, boardId: 0 })
+      updateSearch({ tab: normalizedTab, page: 1, boardId: 0 });
     }
-  }
+  };
 
   const handlePageChange = (nextPage: number) => {
-    updateSearch({ page: nextPage })
-  }
+    updateSearch({ page: nextPage });
+  };
 
   const {
     data: topics = [],
     isLoading: topicsLoading,
     error: topicsError,
   } = useQuery<ITopic[]>({
-    queryKey: ['search', 'topics', trimmedKeyword, currentBoardId, currentPage],
+    queryKey: ["search", "topics", trimmedKeyword, currentBoardId, currentPage],
     queryFn: () => {
-      const from = (currentPage - 1) * PAGE_SIZE
-      return topicService.searchTopics(trimmedKeyword, from, PAGE_SIZE, currentBoardId)
+      const from = (currentPage - 1) * PAGE_SIZE;
+      return topicService.searchTopics(trimmedKeyword, from, PAGE_SIZE, currentBoardId);
     },
-    enabled: currentTab === 'topics' && hasKeyword,
+    enabled: currentTab === "topics" && hasKeyword,
     staleTime: 1000 * 30,
     retry: shouldRetry,
-  })
+  });
 
   const {
     data: boards = [],
     isLoading: boardsLoading,
     error: boardsError,
   } = useQuery<IBoard[]>({
-    queryKey: ['search', 'boards', trimmedKeyword],
+    queryKey: ["search", "boards", trimmedKeyword],
     queryFn: () => boardService.searchBoards(trimmedKeyword),
-    enabled: currentTab === 'boards' && hasKeyword,
+    enabled: currentTab === "boards" && hasKeyword,
     staleTime: 1000 * 30,
     retry: shouldRetry,
-  })
+  });
 
   const {
     data: userResult,
     isLoading: userLoading,
     error: userError,
   } = useQuery<IUser | null>({
-    queryKey: ['search', 'users', trimmedKeyword],
+    queryKey: ["search", "users", trimmedKeyword],
     queryFn: async () => {
       try {
-        return await userService.getUserByName(trimmedKeyword)
+        return await userService.getUserByName(trimmedKeyword);
       } catch (error) {
         if (error instanceof ApiError && error.status === 404) {
-          return null
+          return null;
         }
-        throw error
+        throw error;
       }
     },
-    enabled: currentTab === 'users' && hasKeyword,
+    enabled: currentTab === "users" && hasKeyword,
     staleTime: 1000 * 30,
     retry: shouldRetry,
-  })
+  });
 
   const activeError =
-    currentTab === 'topics' ? topicsError : currentTab === 'boards' ? boardsError : userError
+    currentTab === "topics" ? topicsError : currentTab === "boards" ? boardsError : userError;
 
   const activeLoading =
-    currentTab === 'topics' ? topicsLoading : currentTab === 'boards' ? boardsLoading : userLoading
+    currentTab === "topics" ? topicsLoading : currentTab === "boards" ? boardsLoading : userLoading;
 
   if (activeLoading) {
-    return <SearchSkeleton />
+    return <SearchSkeleton />;
   }
 
   if (activeError) {
@@ -126,11 +126,11 @@ export function SearchPage() {
         error={activeError as Error}
         retry={() =>
           queryClient.invalidateQueries({
-            queryKey: ['search', currentTab, trimmedKeyword],
+            queryKey: ["search", currentTab, trimmedKeyword],
           })
         }
       />
-    )
+    );
   }
 
   return (
@@ -138,7 +138,9 @@ export function SearchPage() {
       <div className="flex items-center gap-3 mb-6">
         <Search className="w-6 h-6 text-primary" />
         <h1 className="text-2xl font-bold text-foreground">搜索</h1>
-        {hasKeyword && <span className="text-sm text-muted-foreground">关键词：{trimmedKeyword}</span>}
+        {hasKeyword && (
+          <span className="text-sm text-muted-foreground">关键词：{trimmedKeyword}</span>
+        )}
       </div>
 
       <Tabs value={currentTab} onValueChange={handleTabChange}>
@@ -157,7 +159,7 @@ export function SearchPage() {
             <Card className="shadow-md bg-card/50 backdrop-blur-sm">
               <CardContent className="p-0">
                 <div className="divide-y divide-border">
-                  {topics.map(topic => (
+                  {topics.map((topic) => (
                     <ClassicTopicItem key={topic.id} topic={topic} />
                   ))}
                 </div>
@@ -191,7 +193,7 @@ export function SearchPage() {
               </CardHeader>
               <CardContent className="p-0">
                 <div className="divide-y divide-border">
-                  {boards.map(board => (
+                  {boards.map((board) => (
                     <Link
                       key={board.id}
                       to="/board/$boardId"
@@ -249,7 +251,7 @@ export function SearchPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
 
 function EmptyPrompt({ message }: { message: string }) {
@@ -257,7 +259,7 @@ function EmptyPrompt({ message }: { message: string }) {
     <div className="container mx-auto px-4 py-12 flex justify-center">
       <div className="text-center text-muted-foreground">{message}</div>
     </div>
-  )
+  );
 }
 
 function SearchSkeleton() {
@@ -280,5 +282,5 @@ function SearchSkeleton() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

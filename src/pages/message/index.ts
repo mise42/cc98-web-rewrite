@@ -1,1 +1,1 @@
-export { MessageCenterPage } from './MessageCenterPage'
+export { MessageCenterPage } from "./MessageCenterPage";

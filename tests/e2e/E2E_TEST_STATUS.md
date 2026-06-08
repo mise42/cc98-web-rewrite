@@ -25,6 +25,7 @@
 **帖子详情页测试** - `tests/e2e/topic-detail.spec.ts`
 
 测试用例已编写但需要调整。当前问题：
+
 - 认证和路由的时序问题
 - 需要改进测试等待策略
 
@@ -45,6 +46,7 @@
 ### 测试覆盖的功能点
 
 #### 帖子内容显示
+
 - 主题标题、内容
 - 回复列表
 - 用户信息
@@ -52,6 +54,7 @@
 - 楼层号
 
 #### 交互功能
+
 - 点赞按钮
 - 点踩按钮
 - 引用按钮
@@ -59,11 +62,13 @@
 - 退出追踪
 
 #### 视图模式
+
 - 分页模式
 - 无限滚动模式
 - 模式切换
 
 #### 特殊状态
+
 - 追踪模式
 - 空状态
 - 加载状态
@@ -71,11 +76,13 @@
 ## 运行测试
 
 ### 运行所有 E2E 测试
+
 ```bash
 bun run test:e2e
 ```
 
 ### 运行特定测试文件
+
 ```bash
 # 基础测试
 bun run playwright test basic.spec.ts
@@ -88,6 +95,7 @@ bun run playwright test topic-detail.spec.ts
 ```
 
 ### 调试模式
+
 ```bash
 # 带浏览器界面
 bun run playwright test --debug
@@ -97,6 +105,7 @@ bun run playwright test --ui
 ```
 
 ### 查看测试报告
+
 ```bash
 # HTML报告
 bun run playwright show-report
@@ -108,10 +117,12 @@ bun run playwright show-trace test-results/trace.zip
 ## 当前问题
 
 ### 1. 认证状态设置
+
 **问题**: 部分测试因为认证重定向而失败
 **解决方案**: 已创建 `loginAs()` 辅助函数，需要在每个测试开始时调用
 
 **使用方法**:
+
 ```typescript
 import { loginAs } from './test-utils'
 
@@ -131,8 +142,10 @@ test('my test', async ({ page }) => {
 ```
 
 ### 2. 测试等待策略
+
 **问题**: 某些测试超时等待元素
 **建议**:
+
 - 使用 `waitForResponse` 等待API完成
 - 使用 `waitForSelector` 等待DOM元素
 - 避免硬编码延迟 `waitForTimeout`
@@ -140,54 +153,61 @@ test('my test', async ({ page }) => {
 ## 测试最佳实践
 
 ### 1. Mock策略
+
 ```typescript
 // Mock API响应
-await page.route('**/api.cc98.top/topic/6399262', async route => {
+await page.route("**/api.cc98.top/topic/6399262", async (route) => {
   await route.fulfill({
     status: 200,
-    contentType: 'application/json',
+    contentType: "application/json",
     body: JSON.stringify(mockData),
-  })
-})
+  });
+});
 ```
 
 ### 2. 认证处理
+
 ```typescript
 // 设置测试用户
-await loginAs(page, 'testuser')
+await loginAs(page, "testuser");
 ```
 
 ### 3. 元素选择
+
 ```typescript
 // 好的做法 - 语义化选择器
-await page.getByRole('button', { name: '追踪' }).click()
-await page.getByText('测试主题')
+await page.getByRole("button", { name: "追踪" }).click();
+await page.getByText("测试主题");
 
 // 避免 - 脆弱的CSS选择器
-await page.locator('.shadow-md.bg-card\\/50')
+await page.locator(".shadow-md.bg-card\\/50");
 ```
 
 ### 4. 断言
+
 ```typescript
 // 清晰的断言
-await expect(page.getByText('加载中...')).toBeVisible()
-await expect(page).toHaveURL('/topic/6399262')
+await expect(page.getByText("加载中...")).toBeVisible();
+await expect(page).toHaveURL("/topic/6399262");
 ```
 
 ## 下一步
 
 ### 优先级1: 修复现有测试
+
 1. 调整 `topic-detail.spec.ts` 的测试等待逻辑
 2. 确保所有Mock在正确的时机设置
 3. 添加更详细的错误日志
 
 ### 优先级2: 添加新测试
+
 1. 完整的点赞/点踩流程测试
 2. 引用功能完整流程测试（需要编辑器）
 3. 分页功能详细测试
 4. 无限滚动功能测试
 
 ### 优先级3: 测试增强
+
 1. 添加视觉回归测试
 2. 性能测试
 3. 可访问性测试
@@ -205,6 +225,7 @@ await expect(page).toHaveURL('/topic/6399262')
 ### Mock数据结构
 
 **主题数据**:
+
 ```typescript
 {
   id: 6399262,
@@ -220,6 +241,7 @@ await expect(page).toHaveURL('/topic/6399262')
 ```
 
 **回复数据**:
+
 ```typescript
 {
   id: 1,
@@ -235,20 +257,21 @@ await expect(page).toHaveURL('/topic/6399262')
 ```
 
 ### 认证状态
+
 ```typescript
 const authState = {
   state: {
     user: {
       id: 1,
-      name: 'testuser',
+      name: "testuser",
       // ...更多字段
     },
     isAuthenticated: true,
   },
   version: 0,
-}
+};
 
-localStorage.setItem('auth-storage', JSON.stringify(authState))
+localStorage.setItem("auth-storage", JSON.stringify(authState));
 ```
 
 ## 注意事项
@@ -262,6 +285,7 @@ localStorage.setItem('auth-storage', JSON.stringify(authState))
 ## CI/CD集成
 
 测试可以在以下时机运行：
+
 - Pull Request创建时
 - 代码推送到main分支时
 - 每日定时运行

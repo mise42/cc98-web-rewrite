@@ -1,44 +1,45 @@
-import { useQuery } from '@tanstack/react-query'
-import { useParams, Link } from '@tanstack/react-router'
-import { Card, CardContent } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { MessageSquare, Clock, Folder, Quote } from 'lucide-react'
-import { userService } from '@/services/user'
-import { boardService } from '@/services/board'
-import { format } from 'date-fns'
-import { zhCN } from 'date-fns/locale'
+import { useQuery } from "@tanstack/react-query";
+import { useParams, Link } from "@tanstack/react-router";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { MessageSquare, Clock, Folder, Quote } from "lucide-react";
+import { userService } from "@/services/user";
+import { boardService } from "@/services/board";
+import { format } from "date-fns";
+import { zhCN } from "date-fns/locale";
+import type { RecentPost } from "@/services/user";
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 10;
 
 export function MyPostsPage() {
-  const params = useParams({ from: '/_authenticated/usercenter/myposts/$page' })
-  const page = Number(params.page) || 1
-  const from = (page - 1) * PAGE_SIZE
+  const params = useParams({ from: "/_authenticated/usercenter/myposts/$page" });
+  const page = Number(params.page) || 1;
+  const from = (page - 1) * PAGE_SIZE;
 
   const {
     data: response,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['user', 'me', 'posts', page],
+    queryKey: ["user", "me", "posts", page],
     queryFn: () => userService.getRecentPosts(from, PAGE_SIZE),
     staleTime: 1000 * 60,
-  })
+  });
 
-  const posts = response?.data || []
-  const totalPosts = response?.count || 0
-  const totalPages = Math.ceil(totalPosts / PAGE_SIZE)
+  const posts = response?.data || [];
+  const totalPosts = response?.count || 0;
+  const totalPages = Math.ceil(totalPosts / PAGE_SIZE);
 
-  const boardIds = posts.map(p => p.boardId) || []
+  const boardIds = posts.map((p) => p.boardId) || [];
   const { data: boards } = useQuery({
-    queryKey: ['boards', 'batch', boardIds],
-    queryFn: () => Promise.all(boardIds.map(id => boardService.getBoard(String(id)))),
+    queryKey: ["boards", "batch", boardIds],
+    queryFn: () => Promise.all(boardIds.map((id) => boardService.getBoard(String(id)))),
     enabled: boardIds.length > 0,
     staleTime: 1000 * 60 * 5,
-  })
+  });
 
   if (isLoading) {
-    return <MyPostsSkeleton />
+    return <MyPostsSkeleton />;
   }
 
   if (error) {
@@ -46,20 +47,20 @@ export function MyPostsPage() {
       <div className="text-center py-12">
         <p className="text-destructive">加载失败</p>
       </div>
-    )
+    );
   }
 
   if (posts.length === 0) {
-    return <div className="text-center py-12 text-muted-foreground">暂无回复</div>
+    return <div className="text-center py-12 text-muted-foreground">暂无回复</div>;
   }
 
   return (
     <div className="space-y-3">
-      {posts.map(post => {
-        const board = boards?.find(b => b.id === post.boardId)
+      {posts.map((post) => {
+        const board = boards?.find((b) => b.id === post.boardId);
         return (
           <PostItem key={post.id} post={post} boardName={board?.name || `版面 ${post.boardId}`} />
-        )
+        );
       })}
 
       {page > 1 && (
@@ -82,12 +83,12 @@ export function MyPostsPage() {
         </Link>
       )}
     </div>
-  )
+  );
 }
 
 interface PostItemProps {
-  post: any
-  boardName: string
+  post: RecentPost;
+  boardName: string;
 }
 
 function PostItem({ post, boardName }: PostItemProps) {
@@ -119,22 +120,22 @@ function PostItem({ post, boardName }: PostItemProps) {
               </span>
               <span className="flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5" />
-                {format(new Date(post.time), 'yyyy-MM-dd HH:mm', { locale: zhCN })}
+                {format(new Date(post.time), "yyyy-MM-dd HH:mm", { locale: zhCN })}
               </span>
             </div>
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function MyPostsSkeleton() {
   return (
     <div className="space-y-3">
-      {[1, 2, 3, 4, 5].map(i => (
+      {[1, 2, 3, 4, 5].map((i) => (
         <Skeleton key={i} className="h-28 w-full rounded-lg" />
       ))}
     </div>
-  )
+  );
 }

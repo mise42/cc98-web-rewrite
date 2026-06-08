@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { EditProfilePage } from '@/pages/user/EditProfilePage'
+import { createFileRoute } from "@tanstack/react-router";
+import { EditProfilePage } from "@/pages/user/EditProfilePage";
 
-export const Route = createFileRoute('/_authenticated/usercenter/edit')({
+export const Route = createFileRoute("/_authenticated/usercenter/edit")({
   component: EditProfilePage,
-})
+});

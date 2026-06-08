@@ -1,29 +1,29 @@
-import React from 'react'
-import { UbbImage } from './UbbImage'
-import { FileDown } from 'lucide-react'
+import React from "react";
+import { UbbImage } from "./UbbImage";
+import { FileDown } from "lucide-react";
 
 interface UploadProps {
-  children?: React.ReactNode
-  params?: string
+  children?: React.ReactNode;
+  params?: string;
 }
 
-export const Upload: React.FC<UploadProps> = ({ children, params = '' }) => {
+export const Upload: React.FC<UploadProps> = ({ children, params = "" }) => {
   const url = React.Children.toArray(children)
-    .map(child => (typeof child === 'string' || typeof child === 'number' ? String(child) : ''))
-    .join('')
-    .trim()
+    .map((child) => (typeof child === "string" || typeof child === "number" ? String(child) : ""))
+    .join("")
+    .trim();
 
-  if (!url) return null
+  if (!url) return null;
 
-  const parts = params.split(',')
-  const type = parts[0]?.toLowerCase()
-  const display = parts[1]
+  const parts = params.split(",");
+  const type = parts[0]?.toLowerCase();
+  const display = parts[1];
 
-  const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(type)
-  const initialHidden = display === '1'
+  const isImage = ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(type);
+  const initialHidden = display === "1";
 
   if (isImage) {
-    return <UbbImage src={url} alt="upload image" initialHidden={initialHidden} />
+    return <UbbImage src={url} alt="upload image" initialHidden={initialHidden} />;
   }
 
   return (
@@ -36,5 +36,5 @@ export const Upload: React.FC<UploadProps> = ({ children, params = '' }) => {
       <FileDown className="w-4 h-4" />
       点击下载文件
     </a>
-  )
-}
+  );
+};

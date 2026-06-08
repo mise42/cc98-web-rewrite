@@ -1,19 +1,19 @@
-import { Link } from '@tanstack/react-router'
-import { Badge } from '@/components/ui/badge'
-import { MessageSquare, Eye, User, Clock, Pin, Star } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
-import { zhCN } from 'date-fns/locale'
-import type { ITopic } from '@/types/api'
-import { getBoardNameById } from '@/lib/board-utils'
+import { Link } from "@tanstack/react-router";
+import { Badge } from "@/components/ui/badge";
+import { MessageSquare, Eye, User, Clock, Pin, Star } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { zhCN } from "date-fns/locale";
+import type { ITopic } from "@/types/api";
+import { getBoardNameById } from "@/lib/board-utils";
 
 interface ClassicTopicItemProps {
-  topic: ITopic
+  topic: ITopic;
 }
 
 export function ClassicTopicItem({ topic }: ClassicTopicItemProps) {
-  const isTop = topic.topState > 0
-  const isBest = topic.bestState > 0
-  const boardName = topic.boardName || getBoardNameById(topic.boardId)
+  const isTop = topic.topState > 0;
+  const isBest = topic.bestState > 0;
+  const boardName = topic.boardName || getBoardNameById(topic.boardId);
 
   return (
     <Link
@@ -48,7 +48,7 @@ export function ClassicTopicItem({ topic }: ClassicTopicItemProps) {
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <User className="w-3 h-3" />
-            {topic.isAnonymous ? '匿名用户' : topic.userName}
+            {topic.isAnonymous ? "匿名用户" : topic.userName}
           </span>
           <span className="flex items-center gap-1">
             <Clock className="w-3 h-3" />
@@ -72,5 +72,5 @@ export function ClassicTopicItem({ topic }: ClassicTopicItemProps) {
         </div>
       </div>
     </Link>
-  )
+  );
 }

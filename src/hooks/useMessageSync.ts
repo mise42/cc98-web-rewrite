@@ -1,8 +1,8 @@
-import { useEffect } from 'react'
-import { messageService } from '@/services/message'
-import { useAuthStore } from '@/stores/auth'
-import { useMessageStore } from '@/stores/message'
-import { useSignalR } from './useSignalR'
+import { useEffect } from "react";
+import { messageService } from "@/services/message";
+import { useAuthStore } from "@/stores/auth";
+import { useMessageStore } from "@/stores/message";
+import { useSignalR } from "./useSignalR";
 
 /**
  * 消息同步 Hook
@@ -10,32 +10,32 @@ import { useSignalR } from './useSignalR'
  * - 建立 SignalR 实时连接
  */
 export function useMessageSync() {
-  const { isAuthenticated } = useAuthStore()
-  const { setUnreadSummary, clearMessages } = useMessageStore()
+  const { isAuthenticated } = useAuthStore();
+  const { setUnreadSummary, clearMessages } = useMessageStore();
 
-  useSignalR()
+  useSignalR();
 
   useEffect(() => {
     if (!isAuthenticated) {
-      clearMessages()
-      return
+      clearMessages();
+      return;
     }
 
-    let cancelled = false
+    let cancelled = false;
 
     messageService
       .getUnreadCount()
-      .then(summary => {
+      .then((summary) => {
         if (!cancelled) {
-          setUnreadSummary(summary)
+          setUnreadSummary(summary);
         }
       })
-      .catch(error => {
-        console.error('Failed to sync unread message count:', error)
-      })
+      .catch((error) => {
+        console.error("Failed to sync unread message count:", error);
+      });
 
     return () => {
-      cancelled = true
-    }
-  }, [isAuthenticated, setUnreadSummary, clearMessages])
+      cancelled = true;
+    };
+  }, [isAuthenticated, setUnreadSummary, clearMessages]);
 }

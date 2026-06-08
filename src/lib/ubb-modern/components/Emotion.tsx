@@ -1,97 +1,97 @@
 interface EmotionProps {
-  emotionId: string
-  baseUrl: string
+  emotionId: string;
+  baseUrl: string;
 }
 
 export function Emotion({ emotionId, baseUrl }: EmotionProps) {
-  const num = parseInt(emotionId, 10)
+  const num = parseInt(emotionId, 10);
   if (isNaN(num) || num < 0 || num > 91) {
-    console.warn(`Invalid emoticonId: ${emotionId}`)
-    return <span>[em{emotionId}]</span>
+    console.warn(`Invalid emoticonId: ${emotionId}`);
+    return <span>[em{emotionId}]</span>;
   }
 
-  const url = `${baseUrl}/static/images/em/em${emotionId}.gif`
+  const url = `${baseUrl}/static/images/em/em${emotionId}.gif`;
 
   return (
     <img src={url} alt={`em${emotionId}`} className="inline-block align-middle" loading="lazy" />
-  )
+  );
 }
 
 interface AcProps {
-  acId: string
-  baseUrl: string
+  acId: string;
+  baseUrl: string;
 }
 
 export function Ac({ acId, baseUrl }: AcProps) {
-  const num = parseInt(acId, 10)
+  const num = parseInt(acId, 10);
   const isValid =
-    (num >= 1 && num <= 54) || (num >= 1001 && num <= 1040) || (num >= 2001 && num <= 2055)
+    (num >= 1 && num <= 54) || (num >= 1001 && num <= 1040) || (num >= 2001 && num <= 2055);
 
   if (!isValid) {
-    console.warn(`Invalid acId: ${acId}`)
-    return <span>[ac{acId}]</span>
+    console.warn(`Invalid acId: ${acId}`);
+    return <span>[ac{acId}]</span>;
   }
 
-  const url = `${baseUrl}/static/images/ac/${acId}.png`
+  const url = `${baseUrl}/static/images/ac/${acId}.png`;
 
-  return <img src={url} alt={`ac${acId}`} className="inline-block align-middle" loading="lazy" />
+  return <img src={url} alt={`ac${acId}`} className="inline-block align-middle" loading="lazy" />;
 }
 
 interface MahjongProps {
-  type: 'a' | 'c' | 'f'
-  mahjongId: string
-  baseUrl: string
+  type: "a" | "c" | "f";
+  mahjongId: string;
+  baseUrl: string;
 }
 
 export function Mahjong({ type, mahjongId, baseUrl }: MahjongProps) {
-  const num = parseInt(mahjongId, 10)
-  let isValid = false
+  const num = parseInt(mahjongId, 10);
+  let isValid = false;
 
-  if (type === 'a' && num >= 1 && num <= 16) {
-    isValid = true
-  } else if (type === 'c') {
-    const validIds = [3, 18, 19, 46, 49, 59, 96, 134, 189, 217]
+  if (type === "a" && num >= 1 && num <= 16) {
+    isValid = true;
+  } else if (type === "c") {
+    const validIds = [3, 18, 19, 46, 49, 59, 96, 134, 189, 217];
     if (validIds.includes(num)) {
-      isValid = true
+      isValid = true;
     }
-  } else if (type === 'f' && num >= 1 && num <= 208) {
-    isValid = true
+  } else if (type === "f" && num >= 1 && num <= 208) {
+    isValid = true;
   }
 
   if (!isValid) {
-    console.warn(`Invalid mahjongId: ${type}:${mahjongId}`)
+    console.warn(`Invalid mahjongId: ${type}:${mahjongId}`);
     return (
       <span>
         [{type}:{mahjongId}]
       </span>
-    )
+    );
   }
 
-  let url = ''
+  let url = "";
   const animatedIds: Record<string, boolean> = {
-    '004': true,
-    '009': true,
-    '056': true,
-    '061': true,
-    '062': true,
-    '087': true,
-    '115': true,
-    '120': true,
-    '137': true,
-    '168': true,
-    '169': true,
-    '175': true,
-    '206': true,
-  }
+    "004": true,
+    "009": true,
+    "056": true,
+    "061": true,
+    "062": true,
+    "087": true,
+    "115": true,
+    "120": true,
+    "137": true,
+    "168": true,
+    "169": true,
+    "175": true,
+    "206": true,
+  };
 
-  if (type === 'a') {
-    url = `${baseUrl}/static/images/mahjong/animal2017/${mahjongId}.png`
-  } else if (type === 'c') {
-    const ext = ['018', '049', '096'].includes(mahjongId) ? 'gif' : 'png'
-    url = `${baseUrl}/static/images/mahjong/carton2017/${mahjongId}.${ext}`
-  } else if (type === 'f') {
-    const ext = animatedIds[mahjongId] ? 'gif' : 'png'
-    url = `${baseUrl}/static/images/mahjong/face2017/${mahjongId}.${ext}`
+  if (type === "a") {
+    url = `${baseUrl}/static/images/mahjong/animal2017/${mahjongId}.png`;
+  } else if (type === "c") {
+    const ext = ["018", "049", "096"].includes(mahjongId) ? "gif" : "png";
+    url = `${baseUrl}/static/images/mahjong/carton2017/${mahjongId}.${ext}`;
+  } else if (type === "f") {
+    const ext = animatedIds[mahjongId] ? "gif" : "png";
+    url = `${baseUrl}/static/images/mahjong/face2017/${mahjongId}.${ext}`;
   }
 
   return (
@@ -101,61 +101,61 @@ export function Mahjong({ type, mahjongId, baseUrl }: MahjongProps) {
       className="inline-block align-middle"
       loading="lazy"
     />
-  )
+  );
 }
 
 interface MsProps {
-  msId: string
-  baseUrl: string
+  msId: string;
+  baseUrl: string;
 }
 
 export function Ms({ msId, baseUrl }: MsProps) {
-  const num = parseInt(msId, 10)
+  const num = parseInt(msId, 10);
   if (isNaN(num) || num < 1 || num > 54) {
-    console.warn(`Invalid msId: ${msId}`)
-    return <span>[ms{msId}]</span>
+    console.warn(`Invalid msId: ${msId}`);
+    return <span>[ms{msId}]</span>;
   }
 
-  const url = `${baseUrl}/static/images/ms/ms${msId}.png`
+  const url = `${baseUrl}/static/images/ms/ms${msId}.png`;
 
-  return <img src={url} alt={`ms${msId}`} className="inline-block align-middle" loading="lazy" />
+  return <img src={url} alt={`ms${msId}`} className="inline-block align-middle" loading="lazy" />;
 }
 
 interface TbProps {
-  tbId: string
-  baseUrl: string
+  tbId: string;
+  baseUrl: string;
 }
 
 export function Tb({ tbId, baseUrl }: TbProps) {
-  const num = parseInt(tbId, 10)
+  const num = parseInt(tbId, 10);
   if (isNaN(num) || num < 1 || num > 33) {
-    console.warn(`Invalid tbId: ${tbId}`)
-    return <span>[tb{tbId}]</span>
+    console.warn(`Invalid tbId: ${tbId}`);
+    return <span>[tb{tbId}]</span>;
   }
 
-  const url = `${baseUrl}/static/images/tb/tb${tbId}.png`
+  const url = `${baseUrl}/static/images/tb/tb${tbId}.png`;
 
-  return <img src={url} alt={`tb${tbId}`} className="inline-block align-middle" loading="lazy" />
+  return <img src={url} alt={`tb${tbId}`} className="inline-block align-middle" loading="lazy" />;
 }
 
 interface Cc98Props {
-  cc98Id: string
-  baseUrl: string
+  cc98Id: string;
+  baseUrl: string;
 }
 
 export function Cc98({ cc98Id, baseUrl }: Cc98Props) {
-  const num = parseInt(cc98Id, 10)
+  const num = parseInt(cc98Id, 10);
   if (isNaN(num) || num < 1 || num > 37) {
-    console.warn(`Invalid cc98Id: ${cc98Id}`)
-    return <span>[CC98{cc98Id}]</span>
+    console.warn(`Invalid cc98Id: ${cc98Id}`);
+    return <span>[CC98{cc98Id}]</span>;
   }
 
   // CC9801-CC9814 are .gif, CC9815-CC9837 are .png
-  const ext = num <= 14 ? 'gif' : 'png'
-  const paddedId = cc98Id.padStart(2, '0')
-  const url = `${baseUrl}/static/images/CC98/CC98${paddedId}.${ext}`
+  const ext = num <= 14 ? "gif" : "png";
+  const paddedId = cc98Id.padStart(2, "0");
+  const url = `${baseUrl}/static/images/CC98/CC98${paddedId}.${ext}`;
 
   return (
     <img src={url} alt={`CC98${cc98Id}`} className="inline-block align-middle" loading="lazy" />
-  )
+  );
 }

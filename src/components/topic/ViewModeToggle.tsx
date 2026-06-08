@@ -4,20 +4,20 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { List, InfinityIcon } from 'lucide-react'
+} from "@/components/ui/select";
+import { List, InfinityIcon } from "lucide-react";
 
-type ViewMode = 'pagination' | 'infinite'
+type ViewMode = "pagination" | "infinite";
 
 interface ViewModeToggleProps {
-  mode: ViewMode
-  onModeChange: (mode: ViewMode) => void
+  mode: ViewMode;
+  onModeChange: (mode: ViewMode) => void;
 }
 
 const modeOptions: { value: ViewMode; label: string; icon: React.ReactNode }[] = [
-  { value: 'pagination', label: '分页浏览', icon: <List className="w-4 h-4" /> },
-  { value: 'infinite', label: '无限滚动', icon: <InfinityIcon className="w-4 h-4" /> },
-]
+  { value: "pagination", label: "分页浏览", icon: <List className="w-4 h-4" /> },
+  { value: "infinite", label: "无限滚动", icon: <InfinityIcon className="w-4 h-4" /> },
+];
 
 export function ViewModeToggle({ mode, onModeChange }: ViewModeToggleProps) {
   return (
@@ -26,7 +26,7 @@ export function ViewModeToggle({ mode, onModeChange }: ViewModeToggleProps) {
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        {modeOptions.map(option => (
+        {modeOptions.map((option) => (
           <SelectItem key={option.value} value={option.value}>
             <div className="flex items-center gap-2">
               {option.icon}
@@ -36,5 +36,5 @@ export function ViewModeToggle({ mode, onModeChange }: ViewModeToggleProps) {
         ))}
       </SelectContent>
     </Select>
-  )
+  );
 }

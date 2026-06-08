@@ -1,37 +1,37 @@
-import { useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import { CheckCircle, Flame } from 'lucide-react'
-import { userService } from '@/services/user'
-import { format } from 'date-fns'
-import { zhCN } from 'date-fns/locale'
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CheckCircle, Flame } from "lucide-react";
+import { userService } from "@/services/user";
+import { format } from "date-fns";
+import { zhCN } from "date-fns/locale";
 
 export function SignInPage() {
-  const queryClient = useQueryClient()
-  const [latestReward, setLatestReward] = useState<number | null>(null)
+  const queryClient = useQueryClient();
+  const [latestReward, setLatestReward] = useState<number | null>(null);
 
   const { data: signInStatus, isLoading } = useQuery({
-    queryKey: ['me', 'signin'],
+    queryKey: ["me", "signin"],
     queryFn: () => userService.getSignInStatus(),
     staleTime: 1000 * 60,
-  })
+  });
 
   const signInMutation = useMutation({
     mutationFn: () => userService.signIn(),
-    onSuccess: reward => {
-      setLatestReward(reward)
-      queryClient.invalidateQueries({ queryKey: ['me', 'signin'] })
-      queryClient.invalidateQueries({ queryKey: ['user', 'me', 'info'] })
+    onSuccess: (reward) => {
+      setLatestReward(reward);
+      queryClient.invalidateQueries({ queryKey: ["me", "signin"] });
+      queryClient.invalidateQueries({ queryKey: ["user", "me", "info"] });
     },
-  })
+  });
 
   if (isLoading || !signInStatus) {
-    return <Skeleton className="h-56 w-full rounded-lg" />
+    return <Skeleton className="h-56 w-full rounded-lg" />;
   }
 
-  const alreadySignedIn = signInStatus.hasSignedInToday || latestReward !== null
+  const alreadySignedIn = signInStatus.hasSignedInToday || latestReward !== null;
 
   return (
     <Card className="shadow-md bg-card/50 backdrop-blur-sm">
@@ -56,7 +56,7 @@ export function SignInPage() {
                   今日已签到
                 </>
               ) : (
-                '今日未签到'
+                "今日未签到"
               )}
             </span>
           </div>
@@ -64,10 +64,10 @@ export function SignInPage() {
             <span className="text-sm text-muted-foreground">上次签到</span>
             <span className="text-sm">
               {signInStatus.lastSignInTime
-                ? format(new Date(signInStatus.lastSignInTime), 'yyyy-MM-dd HH:mm', {
+                ? format(new Date(signInStatus.lastSignInTime), "yyyy-MM-dd HH:mm", {
                     locale: zhCN,
                   })
-                : '—'}
+                : "—"}
             </span>
           </div>
         </div>
@@ -85,12 +85,12 @@ export function SignInPage() {
         <Button
           className="w-full"
           disabled={alreadySignedIn || signInMutation.isPending}
-          variant={alreadySignedIn ? 'outline' : 'default'}
+          variant={alreadySignedIn ? "outline" : "default"}
           onClick={() => signInMutation.mutate()}
         >
-          {signInMutation.isPending ? '签到中...' : alreadySignedIn ? '今日已签到' : '立即签到'}
+          {signInMutation.isPending ? "签到中..." : alreadySignedIn ? "今日已签到" : "立即签到"}
         </Button>
       </CardContent>
     </Card>
-  )
+  );
 }

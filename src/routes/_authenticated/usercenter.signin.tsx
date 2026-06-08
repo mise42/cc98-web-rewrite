@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
-import { SignInPage } from '@/pages/user-center'
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
+import { SignInPage } from "@/pages/user-center";
 
 function UserCenterSignInRoute() {
   return (
@@ -17,9 +17,9 @@ function UserCenterSignInRoute() {
       </div>
       <SignInPage />
     </div>
-  )
+  );
 }
 
-export const Route = createFileRoute('/_authenticated/usercenter/signin')({
+export const Route = createFileRoute("/_authenticated/usercenter/signin")({
   component: UserCenterSignInRoute,
-})
+});

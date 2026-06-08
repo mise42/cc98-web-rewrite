@@ -1,46 +1,46 @@
-import { createRootRouteWithContext, Outlet, HeadContent, Link } from '@tanstack/react-router'
-import type { QueryClient } from '@tanstack/react-query'
-import { baseDarkTokens, baseLightTokens } from '@/config/design-tokens'
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
-import { Button } from '@/components/ui/button'
-import { buttonVariants } from '@/components/ui/button-variants'
-import { Toaster } from 'sonner'
-import { useEffect } from 'react'
-import { useMessageSync } from '@/hooks/useMessageSync'
-import { useAuthSync } from '@/hooks/useAuthSync'
-import { useThemeSync } from '@/hooks/useThemeSync'
-import { useAuthStore } from '@/stores/auth'
-import { useThemeStore } from '@/stores/theme'
-import { cn } from '@/lib/utils'
+import { createRootRouteWithContext, Outlet, HeadContent, Link } from "@tanstack/react-router";
+import type { QueryClient } from "@tanstack/react-query";
+import { baseDarkTokens, baseLightTokens } from "@/config/design-tokens";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
+import { Toaster } from "sonner";
+import { useEffect } from "react";
+import { useMessageSync } from "@/hooks/useMessageSync";
+import { useAuthSync } from "@/hooks/useAuthSync";
+import { useThemeSync } from "@/hooks/useThemeSync";
+import { useAuthStore } from "@/stores/auth";
+import { useThemeStore } from "@/stores/theme";
+import { cn } from "@/lib/utils";
 
 interface RouterContext {
-  queryClient: QueryClient
+  queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
     meta: [
       {
-        title: 'CC98 论坛',
+        title: "CC98 论坛",
       },
       {
-        name: 'description',
-        content: 'CC98 论坛 - 浙江大学学生社区',
+        name: "description",
+        content: "CC98 论坛 - 浙江大学学生社区",
       },
       {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1.0',
+        name: "viewport",
+        content: "width=device-width, initial-scale=1.0",
       },
       {
-        name: 'theme-color',
+        name: "theme-color",
         content: baseLightTokens.background,
-        media: '(prefers-color-scheme: light)',
+        media: "(prefers-color-scheme: light)",
       },
       {
-        name: 'theme-color',
+        name: "theme-color",
         content: baseDarkTokens.background,
-        media: '(prefers-color-scheme: dark)',
+        media: "(prefers-color-scheme: dark)",
       },
     ],
   }),
@@ -63,20 +63,20 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       </Link>
     </div>
   ),
-})
+});
 
 function RootComponent() {
-  useAuthSync()
-  useMessageSync()
-  useThemeSync()
+  useAuthSync();
+  useMessageSync();
+  useThemeSync();
 
-  const userTheme = useAuthStore(state => state.user?.theme)
-  const setLegacyThemeId = useThemeStore(state => state.setLegacyThemeId)
+  const userTheme = useAuthStore((state) => state.user?.theme);
+  const setLegacyThemeId = useThemeStore((state) => state.setLegacyThemeId);
 
   useEffect(() => {
-    if (typeof userTheme !== 'number') return
-    setLegacyThemeId(userTheme)
-  }, [setLegacyThemeId, userTheme])
+    if (typeof userTheme !== "number") return;
+    setLegacyThemeId(userTheme);
+  }, [setLegacyThemeId, userTheme]);
 
   return (
     <>
@@ -85,8 +85,8 @@ function RootComponent() {
         <a
           href="#main-content"
           className={cn(
-            buttonVariants({ variant: 'secondary', size: 'sm' }),
-            'sr-only fixed left-4 top-4 z-[60] focus:not-sr-only'
+            buttonVariants({ variant: "secondary", size: "sm" }),
+            "sr-only fixed left-4 top-4 z-[60] focus:not-sr-only",
           )}
         >
           跳转到主要内容
@@ -99,5 +99,5 @@ function RootComponent() {
         <Toaster position="top-center" richColors />
       </div>
     </>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
-import { MyPostsPage } from '@/pages/user-center'
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
+import { MyPostsPage } from "@/pages/user-center";
 
 function MyPostsRoute() {
   return (
@@ -17,9 +17,9 @@ function MyPostsRoute() {
       </div>
       <MyPostsPage />
     </div>
-  )
+  );
 }
 
-export const Route = createFileRoute('/_authenticated/usercenter/myposts/$page')({
+export const Route = createFileRoute("/_authenticated/usercenter/myposts/$page")({
   component: MyPostsRoute,
-})
+});

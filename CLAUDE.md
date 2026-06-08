@@ -6,34 +6,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Development server (http://localhost:5173)
-bun run dev
+vp dev --host --port 5173
 
 # Build production version
-bun run build
+vp build
 
 # Preview production build
-bun run preview
+vp preview
 
 # Testing
-bun run test              # Run all unit tests (Vitest)
-bun run test:ui           # Run Vitest with UI
+vp test run               # Run all unit tests (Vitest)
+vp test --ui              # Run Vitest with UI
 bun run test:e2e          # Run E2E tests (Playwright)
 
 # Code quality
-bun run lint              # ESLint check (max 0 warnings)
-bun run lint:fix          # ESLint auto-fix
-bun run format            # Prettier format
-bun run format:check      # Prettier check
+vp check                  # Run Vite+ default format/lint checks
+vp check --fix            # Auto-fix Vite+ default format/lint issues
+vp lint                   # Run Oxlint through Vite+
+vp fmt                    # Run Oxfmt through Vite+
+vp staged                 # Run staged-file checks used by git hooks
 ```
 
 ### Running Single Tests
 
 ```bash
 # Unit tests - specific file
-bun run test path/to/test.test.ts
+vp test run path/to/test.test.ts
 
 # Unit tests - watch mode with filter
-bun run test -- --grep "test name pattern"
+vp test watch -t "test name pattern"
 
 # E2E tests - specific file
 bun run test:e2e path/to/test.spec.ts
@@ -48,17 +49,19 @@ This is a modern rewrite of the CC98 forum using React 19, TypeScript, and TanSt
 
 ### Tech Stack
 
-- **Build**: Vite 7.2.4 + SWC (fast compilation)
+- **Build**: Vite+ 0.1.24 using Vite 8.0.16 + OXC
 - **Framework**: React 19.2.0 + TypeScript (strict mode)
-- **Router**: TanStack Router 1.145.7 (file-based routing)
-- **State Management**: Zustand 5.0.9 (client), TanStack Query 5.90.16 (server)
+- **Router**: TanStack Router 1.170.15 (file-based routing)
+- **State Management**: Zustand 5.0.9 (client), TanStack Query 5.101.0 (server)
 - **Real-time**: SignalR 10.0.0
-- **Testing**: Vitest 4.0.16 (unit), Playwright 1.57.0 (E2E)
-- **Package Manager**: Bun
+- **Testing**: Vitest 4.1.8 (unit), Playwright 1.57.0 (E2E)
+- **Toolchain**: Vite+ (`vp`) with Bun package-manager backend
 
 ### Key Architectural Patterns
 
 **File-Based Routing**: Routes are auto-generated from `src/routes/` directory structure. The route tree (`routeTree.gen.ts`) is auto-generated but **must be committed** to git.
+
+**Git Hooks**: Vite+ manages hooks in `.vite-hooks`; local Git config points `core.hooksPath` at `.vite-hooks/_`. The pre-commit hook runs `vp staged`, which reads the `staged` block from `vite.config.ts`.
 
 **Authentication Flow**: OAuth2 with token refresh. Tokens stored in localStorage, managed by `TokenManager` singleton. Protected routes use `beforeLoad` hook in `_authenticated.tsx` layout.
 
@@ -101,14 +104,14 @@ This project uses TanStack Router's file-based routing system.
 Routes requiring authentication must be placed under `_authenticated/` directory or implement `beforeLoad`:
 
 ```typescript
-export const Route = createFileRoute('/_authenticated')({
+export const Route = createFileRoute("/_authenticated")({
   beforeLoad: () => {
-    const { isAuthenticated, isLoading } = useAuthStore.getState()
+    const { isAuthenticated, isLoading } = useAuthStore.getState();
     if (!isLoading && !isAuthenticated) {
-      throw redirect({ to: '/login', search: { redirect: location.href } })
+      throw redirect({ to: "/login", search: { redirect: location.href } });
     }
   },
-})
+});
 ```
 
 ### Route Loading with TanStack Query
@@ -116,15 +119,15 @@ export const Route = createFileRoute('/_authenticated')({
 Use the `loader` function to preload data before component renders:
 
 ```typescript
-export const Route = createFileRoute('/board/$boardId')({
+export const Route = createFileRoute("/board/$boardId")({
   loader: ({ context, params }) => {
     return context.queryClient.ensureQueryData({
-      queryKey: ['board', params.boardId],
+      queryKey: ["board", params.boardId],
       queryFn: () => boardService.getBoard(params.boardId),
-    })
+    });
   },
   component: BoardDetailPage,
-})
+});
 ```
 
 ## Authentication & Authorization
@@ -145,13 +148,13 @@ All services export singleton objects with async methods:
 // src/services/board.ts
 export const boardService = {
   async getBoard(boardId: string): Promise<IBoard> {
-    return apiClient.get<IBoard>(`/board/${boardId}`)
+    return apiClient.get<IBoard>(`/board/${boardId}`);
   },
 
-  async getBoardTopics(boardId: string, page: number): Promise<{list: ITopic[]; total: number}> {
-    return apiClient.get(`/board/${boardId}/topic?page=${page}`)
-  }
-}
+  async getBoardTopics(boardId: string, page: number): Promise<{ list: ITopic[]; total: number }> {
+    return apiClient.get(`/board/${boardId}/topic?page=${page}`);
+  },
+};
 ```
 
 Always use the centralized `apiClient` from `src/services/client.ts` for API calls.
@@ -161,6 +164,7 @@ Always use the centralized `apiClient` from `src/services/client.ts` for API cal
 **Import Order**: External dependencies → Internal dependencies (use path aliases) → Types
 
 **Naming Conventions**:
+
 - Components: PascalCase (`UserProfile.tsx`)
 - Utilities: kebab-case (`token-manager.ts`)
 - API Types: PascalCase with I prefix (`IUser`, `ITopic`)
@@ -169,6 +173,7 @@ Always use the centralized `apiClient` from `src/services/client.ts` for API cal
 **TypeScript**: Use `type` for aliases, `interface` for object shapes. Explicit return types on exported functions.
 
 **Formatting** (auto-applied by Prettier):
+
 - No semicolons
 - Single quotes
 - 2 space indentation
@@ -190,11 +195,5 @@ Development server proxies API requests to backend:
 - `/api/*` → `https://qsh.api.cc98.top`
 - `/openid/*` → `https://qsh.openid.cc98.top`
 - `/hub/*` → SignalR WebSocket endpoint
-
-## Git Hooks
-
-Husky + lint-staged runs on every commit:
-- ESLint with auto-fix on `.ts`/`.tsx` files
-- Prettier format on `.ts`/`.tsx`/`.css` files
 
 See `AGENTS.md` for more detailed architectural patterns and conventions.

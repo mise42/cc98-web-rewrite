@@ -2,67 +2,67 @@ export interface IConfig {
   /**
    * 学术贴
    */
-  academics: IBasicTopic[]
+  academics: IBasicTopic[];
   /**
    * 公告
    */
-  announcement: string
+  announcement: string;
   /**
    * 感性
    */
-  emotion: IBasicTopic[]
+  emotion: IBasicTopic[];
   /**
    * 交易
    */
-  fleaMarket: IBasicTopic[]
+  fleaMarket: IBasicTopic[];
   /**
    * 十大
    */
-  hotTopic: IBasicTopic[]
-  lastUpdateTime: string
-  lastUpdateUser: string
+  hotTopic: IBasicTopic[];
+  lastUpdateTime: string;
+  lastUpdateUser: string;
   /**
    * 在线用户数
    */
-  onlineUserCount: number
+  onlineUserCount: number;
   /**
    * 兼职
    */
-  partTimeJob: IBasicTopic[]
+  partTimeJob: IBasicTopic[];
   /**
    * 总帖数
    */
-  postCount: number
+  postCount: number;
   /**
    * 推荐功能
    */
-  recommendationFunction: any[]
+  recommendationFunction: any[];
   /**
    * 推荐阅读
    */
-  recommendationReading: IRecommendationReading[]
+  recommendationReading: IRecommendationReading[];
   /**
    * 校园活动
    */
-  schoolEvent: IBasicTopic[]
+  schoolEvent: IBasicTopic[];
   /**
    * 校园新闻
    */
-  schoolNews: IBasicTopic[]
+  schoolNews: IBasicTopic[];
   /**
    * 学习天地
    */
-  study: IBasicTopic[]
+  study: IBasicTopic[];
   /**
    * 今日贴数
    */
-  todayCount: number
+  todayCount: number;
   /**
    * 总主题
    */
-  topicCount: number
+  topicCount: number;
   /**
    * 总用户
    */
-  userCount: number
+  userCount: number;
 }

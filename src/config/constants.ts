@@ -14,25 +14,25 @@ export const Constants = {
   // OAuth 配置
   oauth: {
     clientId: import.meta.env.VITE_OAUTH_CLIENT_ID,
-    clientSecret: import.meta.env.VITE_OAUTH_CLIENT_SECRET || '',
+    clientSecret: import.meta.env.VITE_OAUTH_CLIENT_SECRET || "",
     redirectUri: import.meta.env.VITE_OAUTH_REDIRECT_URI,
     tokenEndpoint: `${import.meta.env.VITE_OPENID_URL}/connect/token`,
     authorizeEndpoint: `${import.meta.env.VITE_OPENID_URL}/connect/authorize`,
-    scope: 'cc98-api openid offline_access',
+    scope: "cc98-api openid offline_access",
   },
 
   // SignalR 配置
   signalrUrl: import.meta.env.VITE_SIGNALR_URL,
-  signalrHubName: 'notification',
+  signalrHubName: "notification",
 
   // 本地存储键
   storageKeys: {
-    accessToken: 'access_token',
-    refreshToken: 'refresh_token',
-    tokenExpiresAt: 'token_expires_at',
-    userInfo: 'user_info',
-    theme: 'theme',
-    editorMode: 'editor_mode',
+    accessToken: "access_token",
+    refreshToken: "refresh_token",
+    tokenExpiresAt: "token_expires_at",
+    userInfo: "user_info",
+    theme: "theme",
+    editorMode: "editor_mode",
   },
 
   // 分页配置
@@ -45,10 +45,10 @@ export const Constants = {
   upload: {
     maxImageSize: 10 * 1024 * 1024, // 10MB
     maxVideoSize: 100 * 1024 * 1024, // 100MB
-    allowedImageTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
-    allowedVideoTypes: ['video/mp4', 'video/webm'],
+    allowedImageTypes: ["image/jpeg", "image/png", "image/gif", "image/webp"],
+    allowedVideoTypes: ["video/mp4", "video/webm"],
   },
-} as const
+} as const;
 
 // 类型导出
-export type AppConfig = typeof Constants
+export type AppConfig = typeof Constants;

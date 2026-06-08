@@ -1,80 +1,80 @@
-import { useState, useRef } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import { ArrowLeft, Save, Upload } from 'lucide-react'
-import { userService } from '@/services/user'
+import { useState, useRef } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowLeft, Save, Upload } from "lucide-react";
+import { userService } from "@/services/user";
 
-import type { IUser } from '@/types/api'
+import type { IUser } from "@/types/api";
 
-type Gender = 0 | 1
+type Gender = 0 | 1;
 
 export function EditProfilePage() {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const avatarInputRef = useRef<HTMLInputElement>(null)
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const { data: userInfo, isLoading } = useQuery({
-    queryKey: ['user', 'me', 'info'],
+    queryKey: ["user", "me", "info"],
     queryFn: () => userService.getCurrentUser(),
     staleTime: 1000 * 60 * 5,
-  })
+  });
 
   // 表单字段本地状态（以 userInfo 初始化）
-  const [introduction, setIntroduction] = useState<string | null>(null)
-  const [signatureCode, setSignatureCode] = useState<string | null>(null)
-  const [gender, setGender] = useState<Gender | null>(null)
-  const [birthday, setBirthday] = useState<string | null>(null)
-  const [qq, setQq] = useState<string | null>(null)
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
-  const [avatarFile, setAvatarFile] = useState<File | null>(null)
-  const [saveSuccess, setSaveSuccess] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
+  const [introduction, setIntroduction] = useState<string | null>(null);
+  const [signatureCode, setSignatureCode] = useState<string | null>(null);
+  const [gender, setGender] = useState<Gender | null>(null);
+  const [birthday, setBirthday] = useState<string | null>(null);
+  const [qq, setQq] = useState<string | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const updateMutation = useMutation({
     mutationFn: async () => {
-      const updates: Partial<IUser> = {}
+      const updates: Partial<IUser> = {};
 
-      if (introduction !== null) updates.introduction = introduction
-      if (signatureCode !== null) updates.signatureCode = signatureCode
-      if (gender !== null) updates.gender = gender
-      if (birthday !== null) updates.birthday = birthday || null
-      if (qq !== null) updates.qq = qq
+      if (introduction !== null) updates.introduction = introduction;
+      if (signatureCode !== null) updates.signatureCode = signatureCode;
+      if (gender !== null) updates.gender = gender;
+      if (birthday !== null) updates.birthday = birthday || null;
+      if (qq !== null) updates.qq = qq;
 
-      const promises: Promise<unknown>[] = []
+      const promises: Promise<unknown>[] = [];
 
       if (Object.keys(updates).length > 0) {
-        promises.push(userService.updateUserInfo(updates))
+        promises.push(userService.updateUserInfo(updates));
       }
 
       if (avatarFile) {
-        promises.push(userService.uploadAvatar(avatarFile))
+        promises.push(userService.uploadAvatar(avatarFile));
       }
 
-      await Promise.all(promises)
+      await Promise.all(promises);
     },
     onSuccess: () => {
-      setSaveSuccess(true)
-      setSaveError(null)
-      queryClient.invalidateQueries({ queryKey: ['user', 'me', 'info'] })
-      setTimeout(() => navigate({ to: '/usercenter' }), 1200)
+      setSaveSuccess(true);
+      setSaveError(null);
+      queryClient.invalidateQueries({ queryKey: ["user", "me", "info"] });
+      setTimeout(() => navigate({ to: "/usercenter" }), 1200);
     },
-    onError: err => {
-      setSaveError(err instanceof Error ? err.message : '保存失败，请重试')
-      setSaveSuccess(false)
+    onError: (err) => {
+      setSaveError(err instanceof Error ? err.message : "保存失败，请重试");
+      setSaveSuccess(false);
     },
-  })
+  });
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setAvatarFile(file)
-    const reader = new FileReader()
-    reader.onload = ev => setAvatarPreview(ev.target?.result as string)
-    reader.readAsDataURL(file)
-  }
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarFile(file);
+    const reader = new FileReader();
+    reader.onload = (ev) => setAvatarPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+  };
 
   if (isLoading || !userInfo) {
     return (
@@ -82,16 +82,16 @@ export function EditProfilePage() {
         <Skeleton className="h-10 w-48 mb-6" />
         <Skeleton className="h-96 w-full rounded-lg" />
       </div>
-    )
+    );
   }
 
   // 显示值：本地修改过的优先，否则用 userInfo 原始值
-  const displayIntro = introduction ?? userInfo.introduction ?? ''
-  const displaySig = signatureCode ?? userInfo.signatureCode ?? ''
-  const displayGender = gender ?? (userInfo.gender as Gender)
-  const displayBirthday = birthday ?? (userInfo.birthday ? userInfo.birthday.split('T')[0] : '')
-  const displayQq = qq ?? userInfo.qq ?? ''
-  const displayAvatar = avatarPreview ?? userInfo.portraitUrl
+  const displayIntro = introduction ?? userInfo.introduction ?? "";
+  const displaySig = signatureCode ?? userInfo.signatureCode ?? "";
+  const displayGender = gender ?? (userInfo.gender as Gender);
+  const displayBirthday = birthday ?? (userInfo.birthday ? userInfo.birthday.split("T")[0] : "");
+  const displayQq = qq ?? userInfo.qq ?? "";
+  const displayAvatar = avatarPreview ?? userInfo.portraitUrl;
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-[700px]">
@@ -117,9 +117,7 @@ export function EditProfilePage() {
               {displayAvatar ? (
                 <img src={displayAvatar} alt="头像" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-3xl font-bold">
-                  {userInfo.name.charAt(0).toUpperCase()}
-                </span>
+                <span className="text-3xl font-bold">{userInfo.name.charAt(0).toUpperCase()}</span>
               )}
             </div>
             <div>
@@ -148,18 +146,18 @@ export function EditProfilePage() {
           <div className="space-y-1.5">
             <label className="text-sm font-medium">性别</label>
             <div className="flex gap-3">
-              {([1, 0] as Gender[]).map(g => (
+              {([1, 0] as Gender[]).map((g) => (
                 <button
                   key={g}
                   type="button"
                   onClick={() => setGender(g)}
                   className={`px-4 py-1.5 rounded-full border text-sm transition-colors ${
                     displayGender === g
-                      ? 'border-primary bg-primary/10 text-primary font-medium'
-                      : 'border-border text-muted-foreground hover:border-primary/50'
+                      ? "border-primary bg-primary/10 text-primary font-medium"
+                      : "border-border text-muted-foreground hover:border-primary/50"
                   }`}
                 >
-                  {g === 1 ? '男' : '女'}
+                  {g === 1 ? "男" : "女"}
                 </button>
               ))}
             </div>
@@ -171,7 +169,7 @@ export function EditProfilePage() {
             <input
               type="date"
               value={displayBirthday}
-              onChange={e => setBirthday(e.target.value)}
+              onChange={(e) => setBirthday(e.target.value)}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition-colors focus-visible:ring-1 focus-visible:ring-primary"
             />
           </div>
@@ -182,7 +180,7 @@ export function EditProfilePage() {
             <input
               type="text"
               value={displayQq}
-              onChange={e => setQq(e.target.value)}
+              onChange={(e) => setQq(e.target.value)}
               placeholder="请输入 QQ 号"
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition-colors focus-visible:ring-1 focus-visible:ring-primary"
             />
@@ -193,7 +191,7 @@ export function EditProfilePage() {
             <label className="text-sm font-medium">个人简介</label>
             <textarea
               value={displayIntro}
-              onChange={e => setIntroduction(e.target.value)}
+              onChange={(e) => setIntroduction(e.target.value)}
               placeholder="介绍一下自己..."
               rows={4}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none transition-colors focus-visible:ring-1 focus-visible:ring-primary resize-y"
@@ -205,7 +203,7 @@ export function EditProfilePage() {
             <label className="text-sm font-medium">签名档</label>
             <textarea
               value={displaySig}
-              onChange={e => setSignatureCode(e.target.value)}
+              onChange={(e) => setSignatureCode(e.target.value)}
               placeholder="支持 UBB 格式的签名档..."
               rows={3}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono outline-none transition-colors focus-visible:ring-1 focus-visible:ring-primary resize-y"
@@ -237,11 +235,11 @@ export function EditProfilePage() {
               className="gap-1.5"
             >
               <Save className="w-4 h-4" />
-              {updateMutation.isPending ? '保存中...' : '保存更改'}
+              {updateMutation.isPending ? "保存中..." : "保存更改"}
             </Button>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

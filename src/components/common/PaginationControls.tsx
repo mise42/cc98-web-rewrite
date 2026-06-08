@@ -1,12 +1,12 @@
-import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationControlsProps {
-  currentPage: number
-  totalCount: number
-  pageSize: number
-  onPageChange: (page: number) => void
-  scrollToTop?: boolean
+  currentPage: number;
+  totalCount: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  scrollToTop?: boolean;
 }
 
 /**
@@ -27,53 +27,53 @@ export function PaginationControls({
   onPageChange,
   scrollToTop = true,
 }: PaginationControlsProps) {
-  const totalPages = Math.ceil(totalCount / pageSize)
+  const totalPages = Math.ceil(totalCount / pageSize);
 
-  if (totalPages <= 1) return null
+  if (totalPages <= 1) return null;
 
   const getPageNumbers = () => {
-    const pages: (number | string)[] = []
-    const maxVisible = 7
+    const pages: (number | string)[] = [];
+    const maxVisible = 7;
 
     if (totalPages <= maxVisible) {
       // 显示所有页码
       for (let i = 1; i <= totalPages; i++) {
-        pages.push(i)
+        pages.push(i);
       }
     } else {
       // 智能显示页码
       if (currentPage <= 3) {
         // 当前页在前面
-        for (let i = 1; i <= 5; i++) pages.push(i)
-        pages.push('...')
-        pages.push(totalPages)
+        for (let i = 1; i <= 5; i++) pages.push(i);
+        pages.push("...");
+        pages.push(totalPages);
       } else if (currentPage >= totalPages - 2) {
         // 当前页在后面
-        pages.push(1)
-        pages.push('...')
-        for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i)
+        pages.push(1);
+        pages.push("...");
+        for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
       } else {
         // 当前页在中间
-        pages.push(1)
-        pages.push('...')
-        pages.push(currentPage - 1)
-        pages.push(currentPage)
-        pages.push(currentPage + 1)
-        pages.push('...')
-        pages.push(totalPages)
+        pages.push(1);
+        pages.push("...");
+        pages.push(currentPage - 1);
+        pages.push(currentPage);
+        pages.push(currentPage + 1);
+        pages.push("...");
+        pages.push(totalPages);
       }
     }
 
-    return pages
-  }
+    return pages;
+  };
 
   const handlePageChange = (page: number) => {
-    if (page < 1 || page > totalPages || page === currentPage) return
-    onPageChange(page)
+    if (page < 1 || page > totalPages || page === currentPage) return;
+    onPageChange(page);
     if (scrollToTop) {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }
+  };
 
   return (
     <div className="flex items-center justify-center gap-2 py-6">
@@ -89,10 +89,10 @@ export function PaginationControls({
 
       <div className="flex items-center gap-1">
         {getPageNumbers().map((page, index) =>
-          typeof page === 'number' ? (
+          typeof page === "number" ? (
             <Button
               key={index}
-              variant={currentPage === page ? 'default' : 'outline'}
+              variant={currentPage === page ? "default" : "outline"}
               size="sm"
               onClick={() => handlePageChange(page)}
               className="min-w-[40px]"
@@ -103,7 +103,7 @@ export function PaginationControls({
             <span key={index} className="px-2 text-muted-foreground">
               {page}
             </span>
-          )
+          ),
         )}
       </div>
 
@@ -121,5 +121,5 @@ export function PaginationControls({
         第 {currentPage} / {totalPages} 页
       </div>
     </div>
-  )
+  );
 }

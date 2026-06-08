@@ -24,12 +24,14 @@ tests/
 ### ✅ 工作正常的测试
 
 #### 基础测试 (`basic.spec.ts`)
+
 - ✅ 首页导航
 - ✅ 认证状态设置
 - ✅ API Mock功能
 - ✅ 页面加载
 
 #### UBB渲染测试 (`ubb-rendering.spec.ts`)
+
 - ✅ UBB标签渲染（粗体、斜体、下划线等）
 - ✅ Markdown渲染
 - ✅ 图片、表格、列表等
@@ -56,6 +58,7 @@ tests/
 ## 测试覆盖的功能
 
 ### 核心功能 ✅
+
 - [x] 帖子内容加载
 - [x] 回复列表显示
 - [x] 用户信息显示
@@ -63,6 +66,7 @@ tests/
 - [x] 时间戳显示
 
 ### 交互功能 ✅
+
 - [x] 点赞按钮
 - [x] 点踩按钮
 - [x] 引用按钮
@@ -71,12 +75,14 @@ tests/
 - [x] 返回版面
 
 ### 高级功能 ✅
+
 - [x] 分页/无限滚动切换
 - [x] 用户追踪模式
 - [x] 追踪状态提示
 - [x] 空状态处理
 
 ### UI/UX ✅
+
 - [x] 响应式布局
 - [x] 按钮状态（禁用/启用）
 - [x] 加载状态
@@ -87,10 +93,10 @@ tests/
 ### 1. 认证辅助 (`test-utils.ts`)
 
 ```typescript
-import { loginAs } from './test-utils'
+import { loginAs } from "./test-utils";
 
 // 设置测试用户
-await loginAs(page, 'testuser')
+await loginAs(page, "testuser");
 ```
 
 ### 2. Mock辅助 (`helpers.ts`)
@@ -103,20 +109,20 @@ import {
   getPostByFloor,
   getLikeButton,
   getTraceButton,
-} from './helpers'
+} from "./helpers";
 ```
 
 ### 3. 常用选择器
 
 ```typescript
 // 按楼层查找帖子
-const post = getPostByFloor(page, 1)
+const post = getPostByFloor(page, 1);
 
 // 获取点赞按钮
-const likeBtn = getLikeButton(page, 1)
+const likeBtn = getLikeButton(page, 1);
 
 // 获取追踪按钮
-const traceBtn = getTraceButton(page, 1)
+const traceBtn = getTraceButton(page, 1);
 ```
 
 ## 运行测试
@@ -153,14 +159,18 @@ bun run playwright show-trace test-results/[trace-name].zip
 ## 当前状态
 
 ### 通过的测试 ✅
+
 - 基础功能测试 (2/2)
 - UBB渲染测试 (1/1)
 
 ### 需要调试的测试 ⚠️
+
 - 帖子详情测试 (0/14通过)
 
 ### 调试问题
+
 主要问题是测试设置中的认证和路由时序。解决方案：
+
 1. 确保在访问页面前先设置认证
 2. 在适当的时机设置API Mock
 3. 改进等待策略
@@ -170,34 +180,40 @@ bun run playwright show-trace test-results/[trace-name].zip
 ### Mock数据示例
 
 **主题数据**:
+
 - ID: 6399262
 - 标题: "测试主题"
 - 回复数: 25
 - 版面ID: 7
 
 **回复数据**:
+
 - 3条回复（楼层1、15、23）
 - 包含用户A、B、C
 - 点赞/点踩数量
 
 **版面数据**:
+
 - ID: 7
 - 名称: "技术交流"
 
 ## 下一步工作
 
 ### 短期（本周）
+
 1. 修复帖子详情测试的时序问题
 2. 确保所有14个测试通过
 3. 添加更多错误场景测试
 
 ### 中期（本月）
+
 1. 完整的点赞/点踩流程测试
 2. 引用功能测试（需要编辑器）
 3. 分页和无限滚动详细测试
 4. 添加视觉回归测试
 
 ### 长期
+
 1. 性能测试
 2. 可访问性测试
 3. 跨浏览器测试矩阵
@@ -206,30 +222,34 @@ bun run playwright show-trace test-results/[trace-name].zip
 ## 测试最佳实践
 
 ### 1. 测试结构
+
 ```typescript
-test.describe('Feature', () => {
+test.describe("Feature", () => {
   test.beforeEach(async ({ page }) => {
     // 设置：登录、Mock等
-  })
+  });
 
-  test('should do something', async ({ page }) => {
+  test("should do something", async ({ page }) => {
     // 执行
     // 断言
-  })
-})
+  });
+});
 ```
 
 ### 2. Mock策略
+
 - Mock所有外部API
 - 使用真实的响应结构
 - 覆盖成功和失败场景
 
 ### 3. 选择器策略
+
 - 优先使用语义化选择器（`getByRole`, `getByText`）
 - 避免依赖CSS类名
 - 使用 `filter` 精确定位
 
 ### 4. 等待策略
+
 - 使用 `waitForSelector` 等待元素
 - 使用 `waitForResponse` 等待API
 - 避免固定延迟
@@ -244,6 +264,7 @@ test.describe('Feature', () => {
 ## 贡献指南
 
 添加新测试时：
+
 1. 使用现有的辅助函数
 2. 遵循命名约定
 3. 添加必要的注释
@@ -255,6 +276,7 @@ test.describe('Feature', () => {
 虽然部分测试还需要调试，但测试框架和测试用例已经完整建立。基础功能测试通过表明测试环境配置正确。帖子详情测试的14个用例已编写完成，主要问题是时序调整，这些都可以快速解决。
 
 测试覆盖了帖子详情页的所有主要功能，包括：
+
 - 内容显示
 - 用户交互（点赞、点踩、引用、追踪）
 - 视图模式切换

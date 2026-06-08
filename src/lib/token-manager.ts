@@ -3,10 +3,10 @@
  * 负责管理 OAuth2 access token 和 refresh token
  */
 class TokenManager {
-  private static readonly ACCESS_TOKEN_KEY = 'access_token'
-  private static readonly REFRESH_TOKEN_KEY = 'refresh_token'
-  private static readonly TOKEN_EXPIRES_AT_KEY = 'token_expires_at'
-  private static readonly REFRESH_TOKEN_EXPIRES_AT = 'refresh_token_expires_at'
+  private static readonly ACCESS_TOKEN_KEY = "access_token";
+  private static readonly REFRESH_TOKEN_KEY = "refresh_token";
+  private static readonly TOKEN_EXPIRES_AT_KEY = "token_expires_at";
+  private static readonly REFRESH_TOKEN_EXPIRES_AT = "refresh_token_expires_at";
 
   /**
    * 获取有效的 access token
@@ -14,91 +14,91 @@ class TokenManager {
    */
   async getAccessToken(): Promise<string | null> {
     // 检查现有的有效 token
-    const token = localStorage.getItem(TokenManager.ACCESS_TOKEN_KEY)
-    const expiresAt = localStorage.getItem(TokenManager.TOKEN_EXPIRES_AT_KEY)
+    const token = localStorage.getItem(TokenManager.ACCESS_TOKEN_KEY);
+    const expiresAt = localStorage.getItem(TokenManager.TOKEN_EXPIRES_AT_KEY);
 
     if (token && expiresAt) {
-      const expiresAtNum = Number(expiresAt)
+      const expiresAtNum = Number(expiresAt);
       // 提前 5 分钟刷新 token
       if (Date.now() < expiresAtNum - 5 * 60 * 1000) {
-        return token
+        return token;
       }
     }
 
     // Token 过期或不存在，尝试刷新
-    return this.refreshAccessToken()
+    return this.refreshAccessToken();
   }
 
   /**
    * 刷新 access token
    */
   async refreshAccessToken(): Promise<string | null> {
-    const refreshToken = localStorage.getItem(TokenManager.REFRESH_TOKEN_KEY)
+    const refreshToken = localStorage.getItem(TokenManager.REFRESH_TOKEN_KEY);
 
     // 检查 refresh token 是否过期
-    const refreshExpiresAt = localStorage.getItem(TokenManager.REFRESH_TOKEN_EXPIRES_AT)
+    const refreshExpiresAt = localStorage.getItem(TokenManager.REFRESH_TOKEN_EXPIRES_AT);
     if (refreshExpiresAt && Date.now() > Number(refreshExpiresAt)) {
       // refresh token 也过期了，清除所有 token
-      this.clear()
-      return null
+      this.clear();
+      return null;
     }
 
     if (!refreshToken) {
-      return null
+      return null;
     }
 
     try {
       const params = new URLSearchParams({
         client_id: import.meta.env.VITE_OAUTH_CLIENT_ID,
-        client_secret: import.meta.env.VITE_OAUTH_CLIENT_SECRET || '',
-        grant_type: 'refresh_token',
+        client_secret: import.meta.env.VITE_OAUTH_CLIENT_SECRET || "",
+        grant_type: "refresh_token",
         refresh_token: refreshToken,
-      })
+      });
 
-      const response = await fetch(import.meta.env.VITE_OPENID_URL + '/connect/token', {
-        method: 'POST',
+      const response = await fetch(import.meta.env.VITE_OPENID_URL + "/connect/token", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          "Content-Type": "application/x-www-form-urlencoded",
         },
         body: params.toString(),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Token refresh failed')
+        throw new Error("Token refresh failed");
       }
 
       const data = (await response.json()) as {
-        access_token: string
-        token_type: string
-        expires_in: number
-        refresh_token?: string
-      }
+        access_token: string;
+        token_type: string;
+        expires_in: number;
+        refresh_token?: string;
+      };
 
       if (data.access_token) {
-        const token = `${data.token_type} ${data.access_token}`
-        this.setAccessToken(token, data.expires_in)
+        const token = `${data.token_type} ${data.access_token}`;
+        this.setAccessToken(token, data.expires_in);
 
         if (data.refresh_token) {
-          this.setRefreshToken(data.refresh_token)
+          this.setRefreshToken(data.refresh_token);
         }
 
-        return token
+        return token;
       }
     } catch (error) {
-      console.error('Token refresh failed:', error)
-      this.clear()
+      console.error("Token refresh failed:", error);
+      this.clear();
     }
 
-    return null
+    return null;
   }
 
   /**
    * 设置 access token
    */
   setAccessToken(token: string, expiresIn: number): void {
-    const expiresAt = Date.now() + expiresIn * 1000
-    localStorage.setItem(TokenManager.ACCESS_TOKEN_KEY, token)
-    localStorage.setItem(TokenManager.TOKEN_EXPIRES_AT_KEY, String(expiresAt))
+    const expiresAt = Date.now() + expiresIn * 1000;
+    localStorage.setItem(TokenManager.ACCESS_TOKEN_KEY, token);
+    localStorage.setItem(TokenManager.TOKEN_EXPIRES_AT_KEY, String(expiresAt));
   }
 
   /**
@@ -106,60 +106,60 @@ class TokenManager {
    */
   setRefreshToken(token: string, expiresIn: number = 2592000): void {
     // 默认 30 天
-    const expiresAt = Date.now() + expiresIn * 1000
-    localStorage.setItem(TokenManager.REFRESH_TOKEN_KEY, token)
-    localStorage.setItem(TokenManager.REFRESH_TOKEN_EXPIRES_AT, String(expiresAt))
+    const expiresAt = Date.now() + expiresIn * 1000;
+    localStorage.setItem(TokenManager.REFRESH_TOKEN_KEY, token);
+    localStorage.setItem(TokenManager.REFRESH_TOKEN_EXPIRES_AT, String(expiresAt));
   }
 
   /**
    * 清除所有 token
    */
   clear(): void {
-    localStorage.removeItem(TokenManager.ACCESS_TOKEN_KEY)
-    localStorage.removeItem(TokenManager.REFRESH_TOKEN_KEY)
-    localStorage.removeItem(TokenManager.TOKEN_EXPIRES_AT_KEY)
-    localStorage.removeItem(TokenManager.REFRESH_TOKEN_EXPIRES_AT)
+    localStorage.removeItem(TokenManager.ACCESS_TOKEN_KEY);
+    localStorage.removeItem(TokenManager.REFRESH_TOKEN_KEY);
+    localStorage.removeItem(TokenManager.TOKEN_EXPIRES_AT_KEY);
+    localStorage.removeItem(TokenManager.REFRESH_TOKEN_EXPIRES_AT);
   }
 
   /**
    * 检查是否有有效的 access token
    */
   hasValidToken(): boolean {
-    const token = localStorage.getItem(TokenManager.ACCESS_TOKEN_KEY)
-    const expiresAt = localStorage.getItem(TokenManager.TOKEN_EXPIRES_AT_KEY)
+    const token = localStorage.getItem(TokenManager.ACCESS_TOKEN_KEY);
+    const expiresAt = localStorage.getItem(TokenManager.TOKEN_EXPIRES_AT_KEY);
 
     if (!token || !expiresAt) {
-      return false
+      return false;
     }
 
-    return Date.now() < Number(expiresAt)
+    return Date.now() < Number(expiresAt);
   }
 
   /**
    * 检查 refresh token 是否可用
    */
   hasValidRefreshToken(): boolean {
-    const refreshToken = localStorage.getItem(TokenManager.REFRESH_TOKEN_KEY)
-    const refreshExpiresAt = localStorage.getItem(TokenManager.REFRESH_TOKEN_EXPIRES_AT)
+    const refreshToken = localStorage.getItem(TokenManager.REFRESH_TOKEN_KEY);
+    const refreshExpiresAt = localStorage.getItem(TokenManager.REFRESH_TOKEN_EXPIRES_AT);
 
     if (!refreshToken) {
-      return false
+      return false;
     }
 
     if (!refreshExpiresAt) {
-      return true
+      return true;
     }
 
-    return Date.now() < Number(refreshExpiresAt)
+    return Date.now() < Number(refreshExpiresAt);
   }
 
   /**
    * 是否存在可恢复会话（access 或 refresh 任一可用）
    */
   hasSession(): boolean {
-    return this.hasValidToken() || this.hasValidRefreshToken()
+    return this.hasValidToken() || this.hasValidRefreshToken();
   }
 }
 
 // 导出单例实例
-export default new TokenManager()
+export default new TokenManager();

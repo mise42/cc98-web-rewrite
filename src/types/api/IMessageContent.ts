@@ -1,29 +1,29 @@
 export interface IMessageContent {
-  id: number
+  id: number;
   /**
    * 发送方 ID
    */
-  senderId: number
+  senderId: number;
   /**
    * 接收方 ID
    */
-  receiverId: number
+  receiverId: number;
   /**
    * 发信时间
    */
-  time: string
+  time: string;
   /**
    * 是否已读
    */
-  isRead: boolean
+  isRead: boolean;
   /**
    * 发信内容
    */
-  content: string
+  content: string;
   /**
    * 是否为留言
    */
-  isBookMessage?: boolean
-  senderDeleted?: boolean
-  receiverDeleted?: boolean
+  isBookMessage?: boolean;
+  senderDeleted?: boolean;
+  receiverDeleted?: boolean;
 }

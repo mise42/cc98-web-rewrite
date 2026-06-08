@@ -1,32 +1,32 @@
-import { Link } from '@tanstack/react-router'
-import { Separator } from '@/components/ui/separator'
+import { Link } from "@tanstack/react-router";
+import { Separator } from "@/components/ui/separator";
 
 export function Footer() {
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear();
 
   const cc98Links = [
-    { name: 'CC98论坛', url: 'https://www.cc98.org' },
-    { name: 'bilibili官号', url: 'https://space.bilibili.com/222288454' },
-    { name: 'NexusHD高清社区', url: 'https://www.nexushd.org' },
-    { name: '雕塑流年', url: '/user/id/517471' },
-    { name: 'CC98舞团', url: 'https://space.bilibili.com/695376760' },
-    { name: 'CC98竞猜中心', url: 'https://gaming.cc98.org' },
-    { name: 'CC98抽卡游戏', url: 'https://card.cc98.org' },
-    { name: 'CC98账户管理', url: 'https://account.cc98.org' },
-    { name: 'CC98登录中心', url: 'https://openid.cc98.org' },
-  ]
+    { name: "CC98论坛", url: "https://www.cc98.org" },
+    { name: "bilibili官号", url: "https://space.bilibili.com/222288454" },
+    { name: "NexusHD高清社区", url: "https://www.nexushd.org" },
+    { name: "雕塑流年", url: "/user/id/517471" },
+    { name: "CC98舞团", url: "https://space.bilibili.com/695376760" },
+    { name: "CC98竞猜中心", url: "https://gaming.cc98.org" },
+    { name: "CC98抽卡游戏", url: "https://card.cc98.org" },
+    { name: "CC98账户管理", url: "https://account.cc98.org" },
+    { name: "CC98登录中心", url: "https://openid.cc98.org" },
+  ];
 
   const friendLinks = [
-    { name: '浙江大学', url: 'http://www.zju.edu.cn' },
-    { name: '浙江大学党委宣传部', url: 'http://xcb.zju.edu.cn' },
-    { name: '浙江大学计算机学院', url: 'http://www.cs.zju.edu.cn' },
-    { name: 'ZJUers轻首页', url: 'https://zjuers.com' },
-    { name: '求是潮', url: 'https://www.qsc.zju.edu.cn' },
-    { name: '浙大图助', url: 'http://www.zjulib.com' },
-    { name: '浙江大学广播电视网', url: 'https://www.zdgd.zju.edu.cn' },
-    { name: '飘渺水云间', url: 'http://www.zju88.org/agent/index.do' },
-    { name: '缘网', url: 'http://luckweb.057101.com/bt2/index.asp' },
-  ]
+    { name: "浙江大学", url: "http://www.zju.edu.cn" },
+    { name: "浙江大学党委宣传部", url: "http://xcb.zju.edu.cn" },
+    { name: "浙江大学计算机学院", url: "http://www.cs.zju.edu.cn" },
+    { name: "ZJUers轻首页", url: "https://zjuers.com" },
+    { name: "求是潮", url: "https://www.qsc.zju.edu.cn" },
+    { name: "浙大图助", url: "http://www.zjulib.com" },
+    { name: "浙江大学广播电视网", url: "https://www.zdgd.zju.edu.cn" },
+    { name: "飘渺水云间", url: "http://www.zju88.org/agent/index.do" },
+    { name: "缘网", url: "http://luckweb.057101.com/bt2/index.asp" },
+  ];
 
   return (
     <footer className="w-full border-t border-border bg-background py-8 text-sm text-muted-foreground mt-auto">
@@ -36,7 +36,7 @@ export function Footer() {
             <span className="font-semibold text-foreground">CC98运营管理团队：</span>
             {cc98Links.map((link, index) => (
               <div key={index} className="flex items-center">
-                {link.url.startsWith('/user') ? (
+                {link.url.startsWith("/user") ? (
                   <Link to={link.url} className="hover:text-primary transition-colors">
                     {link.name}
                   </Link>
@@ -103,5 +103,5 @@ export function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }

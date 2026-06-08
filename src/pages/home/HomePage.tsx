@@ -1,25 +1,33 @@
-import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
-import { Carousel } from '@/components/ui/carousel'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { MessageSquare, Flame, BarChart3, Users, FileText, Award, ChevronRight } from 'lucide-react'
-import type { IIndex } from '@/types/config'
-import { UbbContainer } from '@/components/UbbContainer'
-import { getIconForFunction } from '@/lib/utils/icons'
-import { cn } from '@/lib/utils'
-import { configService } from '@/services/config'
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { Carousel } from "@/components/ui/carousel";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  MessageSquare,
+  Flame,
+  BarChart3,
+  Users,
+  FileText,
+  Award,
+  ChevronRight,
+} from "lucide-react";
+import type { IIndex } from "@/types/config";
+import { UbbContainer } from "@/components/UbbContainer";
+import { getIconForFunction } from "@/lib/utils/icons";
+import { cn } from "@/lib/utils";
+import { configService } from "@/services/config";
 
 export function HomePage() {
   const { data, isLoading, error, refetch } = useQuery<IIndex>({
-    queryKey: ['config', 'index'],
+    queryKey: ["config", "index"],
     queryFn: () => configService.getIndex(),
     staleTime: 1000 * 60,
-  })
+  });
 
   if (isLoading) {
-    return <HomePageSkeleton />
+    return <HomePageSkeleton />;
   }
 
   if (error) {
@@ -36,7 +44,7 @@ export function HomePage() {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   if (!data) {
@@ -44,7 +52,7 @@ export function HomePage() {
       <div className="container mx-auto px-4 py-12 flex justify-center">
         <div className="text-center text-muted-foreground">暂无数据</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -73,9 +81,9 @@ export function HomePage() {
                 <Carousel
                   items={data.recommendationReading}
                   renderItem={(item, index) => {
-                    const href = item.url || item.link || '#'
-                    const imageSrc = item.imageUrl || item.imageLink
-                    const isBoardIcon = imageSrc?.includes('/static/images/_')
+                    const href = item.url || item.link || "#";
+                    const imageSrc = item.imageUrl || item.imageLink;
+                    const isBoardIcon = imageSrc?.includes("/static/images/_");
 
                     return (
                       <a
@@ -88,18 +96,18 @@ export function HomePage() {
                         {imageSrc && (
                           <div
                             className={cn(
-                              'relative overflow-hidden w-[80px] h-[80px] shrink-0',
+                              "relative overflow-hidden w-[80px] h-[80px] shrink-0",
                               isBoardIcon
-                                ? 'w-[56px] h-[56px] self-center rounded-full bg-primary p-2 ring-1 ring-primary/25'
-                                : 'rounded-md'
+                                ? "w-[56px] h-[56px] self-center rounded-full bg-primary p-2 ring-1 ring-primary/25"
+                                : "rounded-md",
                             )}
                           >
                             <img
                               src={imageSrc}
                               alt={item.title}
                               className={cn(
-                                'w-full h-full transition-transform duration-300 group-hover:scale-110',
-                                isBoardIcon ? 'object-contain' : 'object-cover'
+                                "w-full h-full transition-transform duration-300 group-hover:scale-110",
+                                isBoardIcon ? "object-contain" : "object-cover",
                               )}
                             />
                           </div>
@@ -115,7 +123,7 @@ export function HomePage() {
                           )}
                         </div>
                       </a>
-                    )
+                    );
                   }}
                   autoPlay
                   interval={5000}
@@ -147,7 +155,7 @@ export function HomePage() {
                       <span
                         className={`
                         flex items-center justify-center w-6 h-6 rounded text-xs font-bold shrink-0
-                        ${index < 3 ? 'bg-destructive/10 text-destructive' : 'bg-muted text-muted-foreground'}
+                        ${index < 3 ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground"}
                       `}
                       >
                         {index + 1}
@@ -184,11 +192,11 @@ export function HomePage() {
               <CardContent className="p-4">
                 <div className="grid grid-cols-4 gap-4">
                   {data.recommendationFunction.map((item, index) => {
-                    const Icon = getIconForFunction(item.title)
+                    const Icon = getIconForFunction(item.title);
                     return (
                       <a
                         key={index}
-                        href={item.url || item.link || '#'}
+                        href={item.url || item.link || "#"}
                         className="flex flex-col items-center gap-2 group"
                       >
                         <div className="w-12 h-12 rounded-xl bg-background shadow-sm flex items-center justify-center border border-border group-hover:border-primary/50 group-hover:shadow-md transition-all">
@@ -198,7 +206,7 @@ export function HomePage() {
                           {item.title}
                         </span>
                       </a>
-                    )
+                    );
                   })}
                 </div>
 
@@ -279,7 +287,7 @@ export function HomePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function HomePageSkeleton() {
@@ -297,5 +305,5 @@ function HomePageSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }

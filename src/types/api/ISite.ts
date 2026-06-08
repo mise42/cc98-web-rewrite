@@ -2,73 +2,73 @@ export interface ISite {
   /**
    * 全站公告
    */
-  announcement: string
+  announcement: string;
   /**
    * 全站管理员
    */
-  anonymityAdmin: string[]
+  anonymityAdmin: string[];
   /**
    * 是否开启生日提醒
    */
-  birthdayActivityIsEnabled: boolean
+  birthdayActivityIsEnabled: boolean;
   /**
    * 生日提醒奖励配置
    */
-  birthdayActivitySetting: string
+  birthdayActivitySetting: string;
   /**
    * 是否维护中
    */
-  isMaintaining: boolean
+  isMaintaining: boolean;
   /**
    *
    */
-  lastBirthdayActivityDay: string
+  lastBirthdayActivityDay: string;
   /**
    * 最新注册用户
    */
-  lastUserName: string
+  lastUserName: string;
   /**
    * 最高在线人数
    */
-  maxOnlineCount: number
+  maxOnlineCount: number;
   /**
    * 最高在线时间
    */
-  maxOnlineDate: string
+  maxOnlineDate: string;
   /**
    * 最高单日发帖数
    */
-  maxPostCount: number
+  maxPostCount: number;
   /**
    * 最高单日发帖时间
    */
-  maxPostDate: string
+  maxPostDate: string;
   /**
    * 全站贴总数
    */
-  postCount: number
+  postCount: number;
   /**
    * 是否开启签到
    */
-  signInEnabled: boolean
+  signInEnabled: boolean;
   /**
    * 签到奖励区间
    */
-  signInRewards: string[]
+  signInRewards: string[];
   /**
    * 签到楼id
    */
-  signInTopicId: number
+  signInTopicId: number;
   /**
    * 今日主题数
    */
-  todayCount: number
+  todayCount: number;
   /**
    * 今日发帖数
    */
-  topicCount: number
+  topicCount: number;
   /**
    * 用户总数
    */
-  userCount: number
+  userCount: number;
 }

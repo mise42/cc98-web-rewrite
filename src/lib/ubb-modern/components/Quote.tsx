@@ -1,5 +1,5 @@
-import React from 'react'
-import { CollapsibleContent } from '@/components/ui/CollapsibleContent'
+import React from "react";
+import { CollapsibleContent } from "@/components/ui/CollapsibleContent";
 
 export const Quote: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   return (
@@ -8,5 +8,5 @@ export const Quote: React.FC<{ children?: React.ReactNode }> = ({ children }) =>
         {children}
       </blockquote>
     </CollapsibleContent>
-  )
-}
+  );
+};

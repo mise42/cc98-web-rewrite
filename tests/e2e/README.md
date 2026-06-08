@@ -101,29 +101,29 @@ import {
   getQuoteButton,
   mockTopicResponse,
   mockPostResponse,
-} from './helpers'
+} from "./helpers";
 
 // 使用示例
-test('my test', async ({ page }) => {
+test("my test", async ({ page }) => {
   // 设置 Mock
   await setupTopicPageMocks(page, {
-    topic: mockTopicResponse({ title: '自定义标题' }),
-    posts: [mockPostResponse({ floor: 5 })]
-  })
+    topic: mockTopicResponse({ title: "自定义标题" }),
+    posts: [mockPostResponse({ floor: 5 })],
+  });
 
   // 访问页面
-  await page.goto('/topic/6399262')
+  await page.goto("/topic/6399262");
 
   // 等待加载
-  await waitForPosts(page)
+  await waitForPosts(page);
 
   // 获取元素
-  const post = getPostByFloor(page, 5)
-  const likeBtn = getLikeButton(page, 5)
+  const post = getPostByFloor(page, 5);
+  const likeBtn = getLikeButton(page, 5);
 
   // 断言
-  await expect(post).toBeVisible()
-})
+  await expect(post).toBeVisible();
+});
 ```
 
 ## 编写新测试
@@ -131,27 +131,27 @@ test('my test', async ({ page }) => {
 ### 基本测试模板
 
 ```typescript
-import { test, expect } from '@playwright/test'
-import { setupTopicPageMocks, mockTopicResponse, mockPostResponse, waitForPosts } from '../helpers'
+import { test, expect } from "@playwright/test";
+import { setupTopicPageMocks, mockTopicResponse, mockPostResponse, waitForPosts } from "../helpers";
 
-test.describe('Feature Name', () => {
-  test('should do something', async ({ page }) => {
+test.describe("Feature Name", () => {
+  test("should do something", async ({ page }) => {
     // 1. Setup mocks
-    await setupTopicPageMocks(page)
+    await setupTopicPageMocks(page);
 
     // 2. Navigate to page
-    await page.goto('/topic/6399262')
+    await page.goto("/topic/6399262");
 
     // 3. Wait for content
-    await waitForPosts(page)
+    await waitForPosts(page);
 
     // 4. Interact with page
-    await page.getByRole('button', { name: 'Click Me' }).click()
+    await page.getByRole("button", { name: "Click Me" }).click();
 
     // 5. Assertions
-    await expect(page.getByText('Success')).toBeVisible()
-  })
-})
+    await expect(page.getByText("Success")).toBeVisible();
+  });
+});
 ```
 
 ### 测试最佳实践
@@ -185,67 +185,67 @@ test.describe('Feature Name', () => {
 ### 测试异步操作
 
 ```typescript
-test('should handle async action', async ({ page }) => {
-  await setupTopicPageMocks(page)
-  await page.goto('/topic/6399262')
+test("should handle async action", async ({ page }) => {
+  await setupTopicPageMocks(page);
+  await page.goto("/topic/6399262");
 
   // 点击按钮
-  await page.getByRole('button', { name: 'Like' }).click()
+  await page.getByRole("button", { name: "Like" }).click();
 
   // 等待 API 完成
-  await page.waitForResponse('**/post/*/like')
+  await page.waitForResponse("**/post/*/like");
 
   // 验证结果
-  await expect(page.getByText('Updated')).toBeVisible()
-})
+  await expect(page.getByText("Updated")).toBeVisible();
+});
 ```
 
 ### 测试表单输入
 
 ```typescript
-test('should handle form input', async ({ page }) => {
-  await page.goto('/login')
+test("should handle form input", async ({ page }) => {
+  await page.goto("/login");
 
-  const usernameInput = page.getByLabel('Username')
-  const passwordInput = page.getByLabel('Password')
-  const submitButton = page.getByRole('button', { name: 'Login' })
+  const usernameInput = page.getByLabel("Username");
+  const passwordInput = page.getByLabel("Password");
+  const submitButton = page.getByRole("button", { name: "Login" });
 
-  await usernameInput.fill('testuser')
-  await passwordInput.fill('password123')
-  await submitButton.click()
+  await usernameInput.fill("testuser");
+  await passwordInput.fill("password123");
+  await submitButton.click();
 
-  await expect(page).toHaveURL('/dashboard')
-})
+  await expect(page).toHaveURL("/dashboard");
+});
 ```
 
 ### 测试路由导航
 
 ```typescript
-test('should navigate to board page', async ({ page }) => {
-  await setupTopicPageMocks(page)
-  await page.goto('/topic/6399262')
+test("should navigate to board page", async ({ page }) => {
+  await setupTopicPageMocks(page);
+  await page.goto("/topic/6399262");
 
-  const backLink = page.getByRole('link', { name: /返回.*/ })
-  await backLink.click()
+  const backLink = page.getByRole("link", { name: /返回.*/ });
+  await backLink.click();
 
-  await expect(page).toHaveURL(/\/board\/\d+/)
-})
+  await expect(page).toHaveURL(/\/board\/\d+/);
+});
 ```
 
 ### 测试条件渲染
 
 ```typescript
-test('should show/hide based on state', async ({ page }) => {
+test("should show/hide based on state", async ({ page }) => {
   await setupTopicPageMocks(page, {
-    posts: [mockPostResponse({ isAnonymous: true })]
-  })
+    posts: [mockPostResponse({ isAnonymous: true })],
+  });
 
-  await page.goto('/topic/6399262')
+  await page.goto("/topic/6399262");
 
   // 匿名用户不应该看到追踪按钮
-  const traceButton = page.getByRole('button', { name: '追踪' })
-  await expect(traceButton).not.toBeVisible()
-})
+  const traceButton = page.getByRole("button", { name: "追踪" });
+  await expect(traceButton).not.toBeVisible();
+});
 ```
 
 ## 调试测试
@@ -270,6 +270,7 @@ bun run playwright test --reporter=html
 ### 截图和录屏
 
 Playwright 在测试失败时自动：
+
 - 截图
 - 录制视频
 - 保存 trace
@@ -297,7 +298,7 @@ bun run playwright show-trace trace.zip
 增加超时时间：
 
 ```typescript
-test.setTimeout(60000) // 60 秒
+test.setTimeout(60000); // 60 秒
 ```
 
 ### 测试不稳定
@@ -311,9 +312,9 @@ test.setTimeout(60000) // 60 秒
 确保 URL 匹配：
 
 ```typescript
-await page.route('**/api.cc98.top/**', async route => {
+await page.route("**/api.cc98.top/**", async (route) => {
   // 你的 mock 逻辑
-})
+});
 ```
 
 ## 相关资源

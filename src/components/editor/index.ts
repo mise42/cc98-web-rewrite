@@ -1,1 +1,1 @@
-export { FormatToolbar } from './FormatToolbar'
+export { FormatToolbar } from "./FormatToolbar";

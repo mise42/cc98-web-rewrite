@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
-import { ThemePage } from '@/pages/user-center'
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
+import { ThemePage } from "@/pages/user-center";
 
 function UserCenterThemeRoute() {
   return (
@@ -17,9 +17,9 @@ function UserCenterThemeRoute() {
       </div>
       <ThemePage />
     </div>
-  )
+  );
 }
 
-export const Route = createFileRoute('/_authenticated/usercenter/theme')({
+export const Route = createFileRoute("/_authenticated/usercenter/theme")({
   component: UserCenterThemeRoute,
-})
+});

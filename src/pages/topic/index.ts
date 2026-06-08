@@ -1,1 +1,1 @@
-export { TopicDetailPage } from './TopicDetailPage'
+export { TopicDetailPage } from "./TopicDetailPage";

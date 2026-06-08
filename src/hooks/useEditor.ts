@@ -1,4 +1,4 @@
-import { useEditorStore } from '@/stores/editor'
+import { useEditorStore } from "@/stores/editor";
 
 /**
  * 编辑器 Hook
@@ -12,7 +12,7 @@ export function useEditor() {
     setUbbContent,
     setMarkdownContent,
     clearContents,
-  } = useEditorStore()
+  } = useEditorStore();
 
   return {
     mode,
@@ -22,7 +22,7 @@ export function useEditor() {
     setUbbContent,
     setMarkdownContent,
     clearContents,
-    isUbbMode: mode === 'ubb',
-    isMarkdownMode: mode === 'markdown',
-  }
+    isUbbMode: mode === "ubb",
+    isMarkdownMode: mode === "markdown",
+  };
 }

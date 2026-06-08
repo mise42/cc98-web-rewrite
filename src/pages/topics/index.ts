@@ -1,3 +1,3 @@
-export { NewTopicsPage } from './NewTopicsPage'
-export { RecommendedTopicsPage } from './RecommendedTopicsPage'
-export { FollowingTopicsPage } from './FollowingTopicsPage'
+export { NewTopicsPage } from "./NewTopicsPage";
+export { RecommendedTopicsPage } from "./RecommendedTopicsPage";
+export { FollowingTopicsPage } from "./FollowingTopicsPage";

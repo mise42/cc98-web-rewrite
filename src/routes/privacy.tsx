@@ -1,9 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { Card, CardContent } from '@/components/ui/card'
+import { createFileRoute } from "@tanstack/react-router";
+import { Card, CardContent } from "@/components/ui/card";
 
-export const Route = createFileRoute('/privacy')({
+export const Route = createFileRoute("/privacy")({
   component: PrivacyPage,
-})
+});
 
 function PrivacyPage() {
   return (
@@ -13,15 +13,15 @@ function PrivacyPage() {
         <CardContent className="p-5 prose prose-sm dark:prose-invert max-w-none space-y-4">
           <h2 className="text-base font-semibold">信息收集</h2>
           <p>
-            CC98 论坛仅收集您注册和使用论坛所必要的信息，包括用户名、邮箱地址等，用于账号管理和身份验证。
+            CC98
+            论坛仅收集您注册和使用论坛所必要的信息，包括用户名、邮箱地址等，用于账号管理和身份验证。
           </p>
           <h2 className="text-base font-semibold">信息使用</h2>
-          <p>
-            您的个人信息仅用于论坛功能的正常运作，不会出售或未经授权地共享给第三方。
-          </p>
+          <p>您的个人信息仅用于论坛功能的正常运作，不会出售或未经授权地共享给第三方。</p>
           <h2 className="text-base font-semibold">Cookie</h2>
           <p>
-            本站使用 Cookie 和 localStorage 存储登录凭证，以维持您的登录状态。关闭浏览器或主动退出后，相关数据将被清除。
+            本站使用 Cookie 和 localStorage
+            存储登录凭证，以维持您的登录状态。关闭浏览器或主动退出后，相关数据将被清除。
           </p>
           <h2 className="text-base font-semibold">内容责任</h2>
           <p>
@@ -33,5 +33,5 @@ function PrivacyPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -1,52 +1,52 @@
-import { useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
-import { User, Lock, LogIn } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { toast } from 'sonner'
-import { useAuth } from '@/hooks/useAuth'
+import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { User, Lock, LogIn } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 interface LoginPageProps {
-  redirect?: string
+  redirect?: string;
 }
 
 export function LoginPage({ redirect }: LoginPageProps) {
-  const navigate = useNavigate()
-  const { login } = useAuth()
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handlePasswordLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!username.trim() || username.length < 2) {
-      toast.error('用户名至少2个字符')
-      return
+      toast.error("用户名至少2个字符");
+      return;
     }
 
     if (!password.trim() || password.length < 6) {
-      toast.error('密码至少6个字符')
-      return
+      toast.error("密码至少6个字符");
+      return;
     }
 
     try {
-      setIsSubmitting(true)
-      await login(username, password)
-      toast.success('登录成功！')
-      navigate({ to: redirect || '/', replace: true })
+      setIsSubmitting(true);
+      await login(username, password);
+      toast.success("登录成功！");
+      navigate({ to: redirect || "/", replace: true });
     } catch (error) {
       if (error instanceof Error) {
-        toast.error(error.message || '登录失败，请检查用户名和密码')
+        toast.error(error.message || "登录失败，请检查用户名和密码");
       } else {
-        toast.error('登录失败，请稍后重试')
+        toast.error("登录失败，请稍后重试");
       }
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -76,7 +76,7 @@ export function LoginPage({ redirect }: LoginPageProps) {
                   type="text"
                   placeholder="请输入用户名"
                   value={username}
-                  onChange={e => setUsername(e.target.value)}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="pl-10 bg-background/50 border-input focus-visible:ring-primary"
                   disabled={isSubmitting}
                   autoComplete="username"
@@ -98,7 +98,7 @@ export function LoginPage({ redirect }: LoginPageProps) {
                   type="password"
                   placeholder="请输入密码"
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 bg-background/50 border-input focus-visible:ring-primary"
                   disabled={isSubmitting}
                   autoComplete="current-password"
@@ -107,7 +107,7 @@ export function LoginPage({ redirect }: LoginPageProps) {
             </div>
 
             <Button type="submit" className="w-full font-semibold" disabled={isSubmitting}>
-              {isSubmitting ? '登录中...' : '立即登录'}
+              {isSubmitting ? "登录中..." : "立即登录"}
             </Button>
           </form>
         </CardContent>
@@ -143,5 +143,5 @@ export function LoginPage({ redirect }: LoginPageProps) {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }

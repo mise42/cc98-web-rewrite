@@ -1,38 +1,38 @@
-import BBCode from '@bbob/react'
-import { cc98Preset } from '@/lib/ubb-modern/presets/cc98'
+import BBCode from "@bbob/react";
+import { cc98Preset } from "@/lib/ubb-modern/presets/cc98";
 
-const plugins = [cc98Preset()]
+const plugins = [cc98Preset()];
 
 interface UbbContainerProps {
-  content: string
-  className?: string
+  content: string;
+  className?: string;
 }
 
 export function UbbContainer({ content, className }: UbbContainerProps) {
-  if (!content) return null
+  if (!content) return null;
 
-  let processedContent = content
+  let processedContent = content;
 
-  processedContent = processedContent.replace(/\[(\d{4}\.\d{2}\.\d{2})\]/g, '[date=$1][/date]')
+  processedContent = processedContent.replace(/\[(\d{4}\.\d{2}\.\d{2})\]/g, "[date=$1][/date]");
 
-  processedContent = processedContent.replace(/\[em(\d+)\]/g, '[em id=$1][/em]')
+  processedContent = processedContent.replace(/\[em(\d+)\]/g, "[em id=$1][/em]");
 
-  processedContent = processedContent.replace(/\[ac(\d{2}|\d{4})\]/g, '[ac id=$1][/ac]')
+  processedContent = processedContent.replace(/\[ac(\d{2}|\d{4})\]/g, "[ac id=$1][/ac]");
 
-  processedContent = processedContent.replace(/\[ms(\d+)\]/g, '[ms id=$1][/ms]')
+  processedContent = processedContent.replace(/\[ms(\d+)\]/g, "[ms id=$1][/ms]");
 
-  processedContent = processedContent.replace(/\[tb(\d+)\]/g, '[tb id=$1][/tb]')
+  processedContent = processedContent.replace(/\[tb(\d+)\]/g, "[tb id=$1][/tb]");
 
-  processedContent = processedContent.replace(/\[CC98(\d+)\]/g, '[cc98 id=$1][/cc98]')
+  processedContent = processedContent.replace(/\[CC98(\d+)\]/g, "[cc98 id=$1][/cc98]");
 
   processedContent = processedContent.replace(
     /\[([acf]):(\d{3})\]/g,
-    '[mahjong type=$1 id=$2][/mahjong]'
-  )
+    "[mahjong type=$1 id=$2][/mahjong]",
+  );
 
   return (
-    <div className={className} style={{ whiteSpace: 'pre-line' }}>
+    <div className={className} style={{ whiteSpace: "pre-line" }}>
       <BBCode plugins={plugins}>{processedContent}</BBCode>
     </div>
-  )
+  );
 }

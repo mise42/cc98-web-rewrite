@@ -186,20 +186,20 @@
 
 ```typescript
 {
-  id: number
-  name: string
-  portraitUrl: string
-  birthday: string
-  fanCount: number
-  followCount: number
-  gender: number
-  lastLogOnTime: string
-  popularity: number
-  prestige: number
-  signatureCode: string
-  levelTitle: string
-  displayTitle: string
-  isFollowing: boolean
+  id: number;
+  name: string;
+  portraitUrl: string;
+  birthday: string;
+  fanCount: number;
+  followCount: number;
+  gender: number;
+  lastLogOnTime: string;
+  popularity: number;
+  prestige: number;
+  signatureCode: string;
+  levelTitle: string;
+  displayTitle: string;
+  isFollowing: boolean;
 }
 ```
 
@@ -207,24 +207,24 @@
 
 ```typescript
 {
-  id: number
-  title: string
-  content: string
-  userId: number
-  userName: string
-  portraitUrl: string
-  boardId: number
-  boardName: string
-  time: string
-  lastPostTime: string
-  hitCount: number
-  replyCount: number
-  floorCount: number
-  isAnonymous: boolean
-  isLocked: boolean
-  topState: number
-  tag1: string
-  tag2: string
+  id: number;
+  title: string;
+  content: string;
+  userId: number;
+  userName: string;
+  portraitUrl: string;
+  boardId: number;
+  boardName: string;
+  time: string;
+  lastPostTime: string;
+  hitCount: number;
+  replyCount: number;
+  floorCount: number;
+  isAnonymous: boolean;
+  isLocked: boolean;
+  topState: number;
+  tag1: string;
+  tag2: string;
 }
 ```
 
@@ -232,17 +232,17 @@
 
 ```typescript
 {
-  id: number
-  content: string
-  userId: number
-  userName: string
-  userInfo: UserInfo
-  topicId: number
-  floor: number
-  time: string
-  lastUpdateTime: string
-  isAnonymous: boolean
-  isDeleted: boolean
+  id: number;
+  content: string;
+  userId: number;
+  userName: string;
+  userInfo: UserInfo;
+  topicId: number;
+  floor: number;
+  time: string;
+  lastUpdateTime: string;
+  isAnonymous: boolean;
+  isDeleted: boolean;
 }
 ```
 
@@ -250,10 +250,10 @@
 
 ```typescript
 {
-  atCount: number
-  replyCount: number
-  systemCount: number
-  total: number
+  atCount: number;
+  replyCount: number;
+  systemCount: number;
+  total: number;
 }
 ```
 
@@ -261,10 +261,10 @@
 
 ```typescript
 {
-  id: number
-  name: string
-  description: string
-  parentId: number
+  id: number;
+  name: string;
+  description: string;
+  parentId: number;
 }
 ```
 

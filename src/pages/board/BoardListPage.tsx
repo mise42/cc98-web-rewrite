@@ -1,17 +1,17 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Badge } from '@/components/ui/badge'
-import { LayoutGrid, ChevronDown, ChevronRight, MessageSquare, FileText } from 'lucide-react'
-import { boardService } from '@/services/board'
-import type { IChildBoard, IRootBoard } from '@/types/api'
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { LayoutGrid, ChevronDown, ChevronRight, MessageSquare, FileText } from "lucide-react";
+import { boardService } from "@/services/board";
+import type { IChildBoard, IRootBoard } from "@/types/api";
 
-const NO_IMAGE_AREA_IDS = new Set([2, 29, 35, 37, 33, 604])
+const NO_IMAGE_AREA_IDS = new Set([2, 29, 35, 37, 33, 604]);
 
 export function BoardListPage() {
-  const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set())
+  const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set());
 
   const {
     data: rootBoards,
@@ -19,34 +19,34 @@ export function BoardListPage() {
     error,
     refetch,
   } = useQuery<IRootBoard[]>({
-    queryKey: ['boards', 'all'],
+    queryKey: ["boards", "all"],
     queryFn: () => boardService.getAllBoards(),
     staleTime: 1000 * 60 * 5,
-  })
+  });
 
   const toggleGroup = (groupId: number) => {
-    setExpandedGroups(prev => {
-      const next = new Set(prev)
+    setExpandedGroups((prev) => {
+      const next = new Set(prev);
       if (next.has(groupId)) {
-        next.delete(groupId)
+        next.delete(groupId);
       } else {
-        next.add(groupId)
+        next.add(groupId);
       }
-      return next
-    })
-  }
+      return next;
+    });
+  };
 
   const expandAll = () => {
-    if (!rootBoards) return
-    setExpandedGroups(new Set(rootBoards.map(g => g.id)))
-  }
+    if (!rootBoards) return;
+    setExpandedGroups(new Set(rootBoards.map((g) => g.id)));
+  };
 
   const collapseAll = () => {
-    setExpandedGroups(new Set())
-  }
+    setExpandedGroups(new Set());
+  };
 
   if (isLoading) {
-    return <BoardListSkeleton />
+    return <BoardListSkeleton />;
   }
 
   if (error) {
@@ -63,7 +63,7 @@ export function BoardListPage() {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   if (!rootBoards || rootBoards.length === 0) {
@@ -71,10 +71,10 @@ export function BoardListPage() {
       <div className="container mx-auto px-4 py-12 flex justify-center">
         <div className="text-center text-muted-foreground">暂无版块数据</div>
       </div>
-    )
+    );
   }
 
-  const totalBoards = rootBoards.reduce((sum, root) => sum + root.boards.length, 0)
+  const totalBoards = rootBoards.reduce((sum, root) => sum + root.boards.length, 0);
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-[1200px]">
@@ -103,7 +103,7 @@ export function BoardListPage() {
       </div>
 
       <div className="space-y-4">
-        {rootBoards.map(rootBoard => (
+        {rootBoards.map((rootBoard) => (
           <RootBoardCard
             key={rootBoard.id}
             rootBoard={rootBoard}
@@ -114,23 +114,23 @@ export function BoardListPage() {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 interface RootBoardCardProps {
-  rootBoard: IRootBoard
-  isExpanded: boolean
-  onToggle: () => void
-  useNoImageStyle: boolean
+  rootBoard: IRootBoard;
+  isExpanded: boolean;
+  onToggle: () => void;
+  useNoImageStyle: boolean;
 }
 
 function RootBoardCard({ rootBoard, isExpanded, onToggle, useNoImageStyle }: RootBoardCardProps) {
-  const hasChildren = rootBoard.boards.length > 0
+  const hasChildren = rootBoard.boards.length > 0;
 
   return (
     <Card className="shadow-md bg-card/50 backdrop-blur-sm overflow-hidden">
       <CardHeader
-        className={`pb-3 cursor-pointer hover:bg-muted/30 transition-colors ${hasChildren ? '' : 'cursor-default'}`}
+        className={`pb-3 cursor-pointer hover:bg-muted/30 transition-colors ${hasChildren ? "" : "cursor-default"}`}
         onClick={hasChildren ? onToggle : undefined}
       >
         <div className="flex items-center justify-between">
@@ -150,7 +150,7 @@ function RootBoardCard({ rootBoard, isExpanded, onToggle, useNoImageStyle }: Roo
           </div>
           {rootBoard.masters && rootBoard.masters.length > 0 && (
             <div className="text-sm text-muted-foreground">
-              主管：{rootBoard.masters.join('、')}
+              主管：{rootBoard.masters.join("、")}
             </div>
           )}
         </div>
@@ -160,13 +160,13 @@ function RootBoardCard({ rootBoard, isExpanded, onToggle, useNoImageStyle }: Roo
         <CardContent className="p-0 border-t border-border">
           {useNoImageStyle ? (
             <div className="flex flex-wrap gap-2 p-4">
-              {rootBoard.boards.map(board => (
+              {rootBoard.boards.map((board) => (
                 <NoImageBoardItem key={board.id} board={board} />
               ))}
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4">
-              {rootBoard.boards.map(board => (
+              {rootBoard.boards.map((board) => (
                 <BoardItem key={board.id} board={board} />
               ))}
             </div>
@@ -174,16 +174,16 @@ function RootBoardCard({ rootBoard, isExpanded, onToggle, useNoImageStyle }: Roo
         </CardContent>
       )}
     </Card>
-  )
+  );
 }
 
 interface BoardItemProps {
-  board: IChildBoard
+  board: IChildBoard;
 }
 
 function BoardItem({ board }: BoardItemProps) {
-  const imageUrl = `/static/images/_${board.name}.png`
-  const fallbackUrl = `/static/images/_CC98.png`
+  const imageUrl = `/static/images/_${board.name}.png`;
+  const fallbackUrl = `/static/images/_CC98.png`;
 
   return (
     <Link
@@ -196,11 +196,11 @@ function BoardItem({ board }: BoardItemProps) {
           src={imageUrl}
           alt={board.name}
           className="w-full h-full object-contain"
-          onError={e => {
-            const target = e.target as HTMLImageElement
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
             if (!target.dataset.fallback) {
-              target.dataset.fallback = 'true'
-              target.src = fallbackUrl
+              target.dataset.fallback = "true";
+              target.src = fallbackUrl;
             }
           }}
         />
@@ -219,7 +219,7 @@ function BoardItem({ board }: BoardItemProps) {
         </span>
       </div>
     </Link>
-  )
+  );
 }
 
 function NoImageBoardItem({ board }: BoardItemProps) {
@@ -231,7 +231,7 @@ function NoImageBoardItem({ board }: BoardItemProps) {
     >
       {board.name}
     </Link>
-  )
+  );
 }
 
 function BoardListSkeleton() {
@@ -242,10 +242,10 @@ function BoardListSkeleton() {
         <Skeleton className="w-32 h-8 rounded" />
       </div>
       <div className="space-y-4">
-        {[1, 2, 3, 4, 5].map(i => (
+        {[1, 2, 3, 4, 5].map((i) => (
           <Skeleton key={i} className="h-24 w-full rounded-lg" />
         ))}
       </div>
     </div>
-  )
+  );
 }

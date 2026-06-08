@@ -2,25 +2,25 @@ export interface IBoardMasterTitle {
   /**
    * 用户id
    */
-  userId: number
+  userId: number;
   /**
    * 用户名
    */
-  userName: string
+  userName: string;
   /**
    * 版面id
    */
-  boardId: number
+  boardId: number;
   /**
    * 版面名
    */
-  boardName: string
+  boardName: string;
   /**
    * 头衔名
    */
-  title: string
+  title: string;
   /**
    * FIXME: 不知道有什么用
    */
-  boardMasterLevel: number
+  boardMasterLevel: number;
 }

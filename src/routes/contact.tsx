@@ -1,10 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { Card, CardContent } from '@/components/ui/card'
-import { Mail, MessageSquare, ExternalLink } from 'lucide-react'
+import { createFileRoute } from "@tanstack/react-router";
+import { Card, CardContent } from "@/components/ui/card";
+import { Mail, MessageSquare, ExternalLink } from "lucide-react";
 
-export const Route = createFileRoute('/contact')({
+export const Route = createFileRoute("/contact")({
   component: ContactPage,
-})
+});
 
 function ContactPage() {
   return (
@@ -44,5 +44,5 @@ function ContactPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
