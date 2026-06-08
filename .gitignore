@@ -15,10 +15,6 @@
 /test-debug.png
 /playwright/.cache
 
-# next.js
-/.next/
-/out/
-
 # production
 /dist
 /build
@@ -41,11 +37,7 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 
 # IDE
 .vscode/
 .idea/
-
-# Vendor submodule
-vendor/

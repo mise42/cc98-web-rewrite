@@ -328,7 +328,7 @@ src/
 ├── types/          # TypeScript type definitions
 ├── config/         # Runtime constants
 ├── styles/         # Global styles, CSS variables
-└── routes/         # React Router v7 config
+└── routes/         # TanStack Router file-based routes
 ```
 
 ### Barrel Exports

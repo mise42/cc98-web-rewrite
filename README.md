@@ -52,7 +52,6 @@ cc98-web-rewrite/
 ├── tests/               # 测试文件
 │   ├── unit/            # Vitest 单元测试
 │   └── e2e/             # Playwright E2E 测试
-├── vendor/              # Git submodule（原始项目参考）
 └── public/              # 静态资源
 ```
 
@@ -158,14 +157,6 @@ bun run test:e2e
 
 - `.env.development` - 开发环境
 - `.env.production` - 生产环境
-
-## Git Submodule
-
-本项目包含一个 git submodule，用于参考原始项目：
-
-```bash
-git submodule update --init --recursive
-```
 
 ## 与原项目的主要变化
 
